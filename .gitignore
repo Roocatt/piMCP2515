@@ -1,0 +1,16 @@
+.idea/
+.cmake/
+cmake-build-debug/
+CMakeFiles/
+generated/
+pico-sdk/
+pioasm/
+pioasm-install/
+Testing/
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+pico_flash_region.ld
+
+*.a
+*.o
