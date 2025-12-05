@@ -23,17 +23,38 @@
 #define SET_CS(x) gpio_put(x->cs_pin, 1)
 #define UNSET_CS(x) gpio_put(x->cs_pin, 0)
 
+/* Register Definitions */
+#define PI_MCP2515_RGSTR_CANCTRL 0x0F
+
 /* Instruction definitions */
-#define MCP2515_INSTR_WRITE 0x02
-#define MCP2515_INSTR_READ 0x03
+#define PI_MCP2515_INSTR_WRITE 0x02
+#define PI_MCP2515_INSTR_READ 0x03
+#define PI_MCP2515_INSTR_BITMOD 0x05
+
+/* REQOP definitions */
+#define PI_MCP2515_REQOP_MASK 0xE0
+#define PI_MCP2515_REQOP_NORMAL 0x00
+#define PI_MCP2515_REQOP_SLEEP 0x20
+#define PI_MCP2515_REQOP_LOOPBACK 0x40
+#define PI_MCP2515_REQOP_LISTENONLY 0x60
+#define PI_MCP2515_REQOP_CONFIG 0x80
+#define PI_MCP2515_REQOP_POWERUP 0xE0
 
 typedef struct {
-	spi_inst_t *channel;
+	spi_inst_t *spi_channel;
 	uint8_t cs_pin;
 	uint8_t tx_pin;
 	uint8_t rx_pin;
 	uint8_t sck_pin;
 	uint32_t spi_clock;
 } pi_mcp2515_t;
+
+void	mcp2515_can_message_send(pi_mcp2515_t *);
+void	mcp2515_can_message_read(pi_mcp2515_t *);
+void	mcp2515_register_read(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
+void	mcp2515_register_write(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
+void	mcp2515_register_bitmod(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t);
+void	mcp2515_reqop(pi_mcp2515_t *, uint8_t);
+void	mcp2515_init(pi_mcp2515_t *, spi_inst_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t);
 
 #endif /* PI_MCP2515_H */
