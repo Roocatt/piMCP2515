@@ -25,11 +25,13 @@
 
 /* Register Definitions */
 #define PI_MCP2515_RGSTR_CANCTRL 0x0F
+#define PI_MCP2515_RGSTR_CANINTF 0x2C
 
 /* Instruction definitions */
 #define PI_MCP2515_INSTR_WRITE 0x02
 #define PI_MCP2515_INSTR_READ 0x03
 #define PI_MCP2515_INSTR_BITMOD 0x05
+#define PI_MCP2515_INSTR_READ_STATUS 0xA0
 
 /* REQOP definitions */
 #define PI_MCP2515_REQOP_MASK 0xE0
@@ -40,6 +42,16 @@
 #define PI_MCP2515_REQOP_CONFIG 0x80
 #define PI_MCP2515_REQOP_POWERUP 0xE0
 
+/* RX/TX Status */
+#define PI_MCP2515_STATUS_RX0BF 0x01
+#define PI_MCP2515_STATUS_RX1BF 0x02
+
+typedef struct {
+	uint32_t id;
+	uint8_t dlc;
+	uint8_t payload[8];
+} pi_mcp2515_can_frame_t;
+
 typedef struct {
 	spi_inst_t *spi_channel;
 	uint8_t cs_pin;
@@ -49,8 +61,9 @@ typedef struct {
 	uint32_t spi_clock;
 } pi_mcp2515_t;
 
-void	mcp2515_can_message_send(pi_mcp2515_t *);
-void	mcp2515_can_message_read(pi_mcp2515_t *);
+void	mcp2515_can_message_send(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
+void	mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
+uint8_t	mcp2515_status(pi_mcp2515_t *);
 void	mcp2515_register_read(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
 void	mcp2515_register_write(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
 void	mcp2515_register_bitmod(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t);

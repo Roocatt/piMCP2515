@@ -18,15 +18,62 @@
 #include "pi_MCP2515.h"
 
 void
-mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515)
+mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_frame)
 {
 
 }
 
 void
-mcp2515_can_message_read(pi_mcp2515_t *pi_mcp2515)
+mcp2515_can_message_read(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_frame)
 {
+	uint32_t id;
+	uint8_t buffer[5], status, dlc, ctrl, ctrl_reg, sidh_reg, data_reg, canintf;
 
+	SET_CS(pi_mcp2515);
+	status = mcp2515_status(pi_mcp2515);
+	if (status & PI_MCP2515_STATUS_RX0BF) {
+		ctrl_reg = 0x60;
+		sidh_reg = 0x61;
+		data_reg = 0x66;
+		canintf = 0x01;
+	} else if (status & PI_MCP2515_STATUS_RX1BF) {
+		ctrl_reg = 0x70;
+		sidh_reg = 0x71;
+		data_reg = 0x76;
+		canintf = 0x02;
+	} else {
+		/* TODO Error handle */
+		return;
+	}
+	mcp2515_register_read(pi_mcp2515, buffer, 5, sidh_reg);
+
+	id = (buffer[0] << 3) | (buffer[1] >> 5); /* TODO Missing expanded id */
+	dlc = buffer[4] & 0x0F;
+
+	mcp2515_register_read(pi_mcp2515, &ctrl, 1, ctrl_reg);
+
+	/* TODO incomplete */
+	can_frame->id = id;
+	can_frame->dlc = dlc;
+
+	mcp2515_register_read(pi_mcp2515, buffer, dlc, data_reg);
+	mcp2515_register_bitmod(pi_mcp2515, 0, canintf, PI_MCP2515_RGSTR_CANINTF);
+
+	UNSET_CS(pi_mcp2515);
+}
+
+uint8_t
+mcp2515_status(pi_mcp2515_t *pi_mcp2515)
+{
+	uint8_t instruction, res;
+
+	SET_CS(pi_mcp2515);
+	instruction = PI_MCP2515_INSTR_READ_STATUS;
+	spi_write_blocking(pi_mcp2515->spi_channel, &instruction, 1);
+	spi_read_blocking(pi_mcp2515->spi_channel, 0x00, &res, 1);
+	UNSET_CS(pi_mcp2515);
+
+	return (res);
 }
 
 void
