@@ -1,5 +1,5 @@
 /* Copyright 2025 Roos Catling-Tate
-*
+ *
  * Permission to use, copy, modify, and/or distribute this software for any purpose with or
  * without fee is hereby granted, provided that the above copyright notice and this permission
  * notice appear in all copies.
@@ -42,6 +42,12 @@
 #define PI_MCP2515_REQOP_CONFIG 0x80
 #define PI_MCP2515_REQOP_POWERUP 0xE0
 
+/* CTRL Definitions */
+#define PI_MCP2515_CTRL_RTR 0x08
+
+/* Flag definitions */
+#define PI_MCP2515_FLAG_RTR 0x40000000UL
+
 /* RX/TX Status */
 #define PI_MCP2515_STATUS_RX0BF 0x01
 #define PI_MCP2515_STATUS_RX1BF 0x02
@@ -62,7 +68,7 @@ typedef struct {
 } pi_mcp2515_t;
 
 void	mcp2515_can_message_send(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
-void	mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
+int	mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
 uint8_t	mcp2515_status(pi_mcp2515_t *);
 void	mcp2515_register_read(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
 void	mcp2515_register_write(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);

@@ -23,12 +23,16 @@ mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_f
 
 }
 
-void
+int
 mcp2515_can_message_read(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_frame)
 {
 	uint32_t id;
+	int res;
 	uint8_t buffer[5], status, dlc, ctrl, ctrl_reg, sidh_reg, data_reg, canintf;
 
+	res = 0;
+
+	/* TODO There is a lot of clutter and hardcoded values. This should be more tidy. */
 	SET_CS(pi_mcp2515);
 	status = mcp2515_status(pi_mcp2515);
 	if (status & PI_MCP2515_STATUS_RX0BF) {
@@ -42,24 +46,30 @@ mcp2515_can_message_read(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_f
 		data_reg = 0x76;
 		canintf = 0x02;
 	} else {
-		/* TODO Error handle */
-		return;
+		res = -1;
+		goto end;
 	}
 	mcp2515_register_read(pi_mcp2515, buffer, 5, sidh_reg);
 
-	id = (buffer[0] << 3) | (buffer[1] >> 5); /* TODO Missing expanded id */
+	id = (buffer[0] << 3) | (buffer[1] >> 5);
+	if (buffer[1] & 0x08) { /* Uses expanded ID */
+		id = (((((id<<2) + (buffer[1] & 0x03))<<8) + buffer[2])<<8) + buffer[3];
+	}
 	dlc = buffer[4] & 0x0F;
 
 	mcp2515_register_read(pi_mcp2515, &ctrl, 1, ctrl_reg);
+	if (ctrl & PI_MCP2515_CTRL_RTR) {
+		id |= PI_MCP2515_FLAG_RTR;
+	}
 
-	/* TODO incomplete */
 	can_frame->id = id;
 	can_frame->dlc = dlc;
 
-	mcp2515_register_read(pi_mcp2515, buffer, dlc, data_reg);
+	mcp2515_register_read(pi_mcp2515, can_frame->payload, dlc, data_reg);
 	mcp2515_register_bitmod(pi_mcp2515, 0, canintf, PI_MCP2515_RGSTR_CANINTF);
-
+end:
 	UNSET_CS(pi_mcp2515);
+	return (res);
 }
 
 uint8_t
