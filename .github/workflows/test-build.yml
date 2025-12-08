@@ -15,7 +15,7 @@ jobs:
 
     steps:
     - name: Install dependencies
-      run: sudo apt install -y python3 git tar build-essential
+      run: sudo apt install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi python3 git tar build-essential
     - name: Checkout Pico SDK
       run: git clone --depth 1 https://github.com/raspberrypi/pico-sdk.git ~/pico-sdk
     - uses: actions/checkout@v4
