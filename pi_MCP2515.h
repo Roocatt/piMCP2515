@@ -44,13 +44,22 @@
 
 /* CTRL Definitions */
 #define PI_MCP2515_CTRL_RTR 0x08
+#define PI_MCP2515_CTRL_TXREQ 0x08
+#define PI_MCP2515_CTRL_TXERR 0x10
+#define PI_MCP2515_CTRL_MLOA 0x20
+#define PI_MCP2515_CTRL_ABTF 0x40
 
 /* Flag definitions */
 #define PI_MCP2515_FLAG_RTR 0x40000000UL
+#define PI_MCP2515_FLAG_EFF 0x80000000UL
 
 /* RX/TX Status */
 #define PI_MCP2515_STATUS_RX0BF 0x01
 #define PI_MCP2515_STATUS_RX1BF 0x02
+
+/* ID Mask Definitions */
+#define PI_MCP2515_ID_MASK_SFF 0x000007FFUL
+#define PI_MCP2515_ID_MASK_EFF 0x1FFFFFFFUL
 
 typedef struct {
 	uint32_t id;
@@ -67,7 +76,7 @@ typedef struct {
 	uint32_t spi_clock;
 } pi_mcp2515_t;
 
-void	mcp2515_can_message_send(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
+int	mcp2515_can_message_send(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
 int	mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
 uint8_t	mcp2515_status(pi_mcp2515_t *);
 void	mcp2515_register_read(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);

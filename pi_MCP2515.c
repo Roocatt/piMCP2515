@@ -17,10 +17,60 @@
 
 #include "pi_MCP2515.h"
 
-void
+#include <string.h>
+
+static const uint8_t tx_reg_list[][2] = {
+	/* CTRL, SIDH */
+	{ 0x30, 0x31 },
+	{ 0x40, 0x41 },
+	{ 0x50, 0x51 }
+};
+
+int
 mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_frame)
 {
+	int res;
+	uint16_t id_tmp;
+	uint8_t payload[13], ctrl;
+	bool extended_id;
 
+	res = -1;
+
+	for (int i = 0; i < (sizeof(tx_reg_list) / sizeof(tx_reg_list[0])); i++) {
+		mcp2515_register_read(pi_mcp2515, &ctrl, 1, tx_reg_list[i][0]);
+		if (ctrl & PI_MCP2515_CTRL_TXREQ) {
+			extended_id = can_frame->id & PI_MCP2515_FLAG_EFF;
+
+			id_tmp = (uint16_t)((can_frame->id & (extended_id ? PI_MCP2515_ID_MASK_EFF
+				: PI_MCP2515_ID_MASK_SFF)) & 0x0FFFF);
+			if (extended_id) {
+				payload[3] = (uint8_t)(id_tmp & 0xFF);
+				payload[2] = (uint8_t)(id_tmp >> 8);
+				id_tmp = (uint16_t)(id_tmp >> 16);
+				payload[1] = ((uint8_t)(id_tmp & 0x03) + (uint8_t)((id_tmp & 0x1C) << 3)) | 0x08;
+				payload[0] = (uint8_t)(id_tmp >> 5);
+			} else {
+				payload[0] = (uint8_t)(id_tmp >> 3);
+				payload[1] = (uint8_t)((id_tmp & 0x07) << 5);
+				payload[2] = 0;
+				payload[3] = 0;
+			}
+
+			memcpy(&payload[4], can_frame->payload, can_frame->payload);
+			mcp2515_register_write(pi_mcp2515, payload, can_frame->dlc + 5, tx_reg_list[i][1]);
+			mcp2515_register_bitmod(pi_mcp2515, PI_MCP2515_CTRL_TXREQ, PI_MCP2515_CTRL_TXREQ,
+				tx_reg_list[i][1]);
+
+			/* Check status again for errors */
+			mcp2515_register_read(pi_mcp2515, &ctrl, 1, tx_reg_list[i][0]);
+			if (ctrl & (PI_MCP2515_CTRL_TXERR| PI_MCP2515_CTRL_MLOA | PI_MCP2515_CTRL_ABTF)) {
+				res = 1;
+				break;
+			}
+		}
+	}
+
+	return (res);
 }
 
 int
@@ -53,7 +103,7 @@ mcp2515_can_message_read(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_f
 
 	id = (buffer[0] << 3) | (buffer[1] >> 5);
 	if (buffer[1] & 0x08) { /* Uses expanded ID */
-		id = (((((id<<2) + (buffer[1] & 0x03))<<8) + buffer[2])<<8) + buffer[3];
+		id = (((((id << 2) + (buffer[1] & 0x03)) << 8) + buffer[2]) << 8) + buffer[3];
 	}
 	dlc = buffer[4] & 0x0F;
 
