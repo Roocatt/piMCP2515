@@ -7,6 +7,7 @@ on:
     branches: [ "main" ]
 env:
   BUILD_TYPE: Release
+  PICO_SDK_PATH: "~/pico-sdk"
 
 jobs:
   build:
@@ -16,9 +17,7 @@ jobs:
     - name: Install dependencies
       run: sudo apt install -y python3 git tar build-essential
     - name: Checkout Pico SDK
-      run: git clone https://github.com/raspberrypi/pico-sdk.git
-    - name: Set Pico SDK Environment Variable
-      run: echo "PICO_SDK_PATH=$(pwd)/pico-sdk" >> $GITHUB_ENV
+      run: git clone --depth 1 https://github.com/raspberrypi/pico-sdk.git ~/pico-sdk
     - uses: actions/checkout@v4
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
