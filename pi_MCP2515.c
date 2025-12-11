@@ -182,6 +182,25 @@ mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, uint8_t reqop)
 	mcp2515_register_bitmod(pi_mcp2515, reqop, PI_MCP2515_REQOP_MASK, PI_MCP2515_RGSTR_CANCTRL);
 }
 
+/* TODO These defaults are untested. Make sure this all makes sense. */
+int
+mcp2515_bitrate_default_16mhz_1000kbps(pi_mcp2515_t *pi_mcp2515)
+{
+	return (mcp2515_bitrate_simplified(pi_mcp2515, 1000, 16));
+}
+
+int
+mcp2515_bitrate_default_8mhz_500kbps(pi_mcp2515_t *pi_mcp2515)
+{
+	return (mcp2515_bitrate_simplified(pi_mcp2515, 500, 8));
+}
+
+int
+mcp2515_bitrate_simplified(pi_mcp2515_t *pi_mcp2515, uint16_t baudrate_kbps, uint8_t osc_mhz)
+{
+	return (mcp2515_bitrate_full_optional(pi_mcp2515, baudrate_kbps, osc_mhz, 2, 0, 2,
+		2, 3, false, false, false, true));
+}
 
 /* TODO first draft. Test/validate/fix. Make sure this is right. */
 int
