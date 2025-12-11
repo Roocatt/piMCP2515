@@ -182,6 +182,46 @@ mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, uint8_t reqop)
 	mcp2515_register_bitmod(pi_mcp2515, reqop, PI_MCP2515_REQOP_MASK, PI_MCP2515_RGSTR_CANCTRL);
 }
 
+
+/* TODO first draft. Test/validate/fix. Make sure this is right. */
+int
+mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baudrate_kbps, uint8_t osc_mhz, uint8_t sjw,
+	uint8_t prescaler, uint8_t prseg_tqps, uint8_t phseg_tqps1, uint8_t phseg_tqps2, bool sof, bool wakfil,
+	bool sam, bool btlmode)
+{
+	uint8_t cnf1, cnf2, cnf3;
+
+	if (baudrate_kbps > 1000 || baudrate_kbps == 0 || osc_mhz > 40|| osc_mhz == 0 || sjw > 4 || sjw == 0
+			|| prescaler > 63 || prseg_tqps == 0 || prseg_tqps > 8 || phseg_tqps1 == 0 || phseg_tqps1 > 8
+			|| phseg_tqps2 == 0 || phseg_tqps2 > 8 || phseg_tqps2 <= sjw
+			|| prseg_tqps + phseg_tqps1 < phseg_tqps2) {
+		return (1);
+	}
+
+	cnf1 = ((sjw - 1) << 6) | (prescaler & 0x3f);
+	cnf2 = (((phseg_tqps1 - 1) & 0x07) << 3) | (prseg_tqps & 0x7);
+	cnf3 = (phseg_tqps2 - 1) & 0x07;
+
+	if (btlmode) {
+		cnf2 |= 0x80;
+	}
+	if (sam) {
+		cnf2 |= 0x40;
+	}
+	if (sof) {
+		cnf3 |= 0x80;
+	}
+	if (wakfil) {
+		cnf3 |= 0x40;
+	}
+
+	mcp2515_register_write(pi_mcp2515, &cnf1, 1, PI_MCP2515_RGSTR_CNF1);
+	mcp2515_register_write(pi_mcp2515, &cnf2, 1, PI_MCP2515_RGSTR_CNF2);
+	mcp2515_register_write(pi_mcp2515, &cnf3, 1, PI_MCP2515_RGSTR_CNF3);
+
+	return (0);
+}
+
 void
 mcp2515_init(pi_mcp2515_t *pi_mcp2515, spi_inst_t *spi_channel, uint8_t cs_pin, uint8_t tx_pin, uint8_t rx_pin,
 		uint8_t sck_pin, uint32_t spi_clock)

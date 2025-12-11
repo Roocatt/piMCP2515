@@ -26,6 +26,9 @@
 /* Register Definitions */
 #define PI_MCP2515_RGSTR_CANCTRL 0x0F
 #define PI_MCP2515_RGSTR_CANINTF 0x2C
+#define PI_MCP2515_RGSTR_CNF1 0x2A
+#define PI_MCP2515_RGSTR_CNF2 0x29
+#define PI_MCP2515_RGSTR_CNF3 0x28
 
 /* Instruction definitions */
 #define PI_MCP2515_INSTR_WRITE 0x02
@@ -83,6 +86,7 @@ void	mcp2515_register_read(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
 void	mcp2515_register_write(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
 void	mcp2515_register_bitmod(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t);
 void	mcp2515_reqop(pi_mcp2515_t *, uint8_t);
+void	mcp2515_reset(pi_mcp2515_t *);
 void	mcp2515_init(pi_mcp2515_t *, spi_inst_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t);
 
 #endif /* PI_MCP2515_H */
