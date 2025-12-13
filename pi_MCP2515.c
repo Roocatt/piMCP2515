@@ -130,7 +130,7 @@ mcp2515_status(pi_mcp2515_t *pi_mcp2515)
 	SET_CS(pi_mcp2515);
 	instruction = PI_MCP2515_INSTR_READ_STATUS;
 	mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instruction, 1);
-	spi_read_blocking(pi_mcp2515, 0x00, &res, 1);
+	mcp2515_gpio_spi_read_blocking(pi_mcp2515, &res, 1);
 	UNSET_CS(pi_mcp2515);
 
 	return (res);
