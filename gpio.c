@@ -4,12 +4,18 @@
  * Copyright 2025
  */
 
-#include "gpio.h"
-
 #include <stdint.h>
-#include <hardware/spi.h>
+
+#ifdef USE_PICO_LIB
+#include "pico/stdlib.h"
+#include "hardware/gpio.h"
+#elifdef USE_PRINT_DEBUG
+#include <stdio.h>
+#endif
 
 #include "pi_MCP2515.h"
+
+#include "gpio.h"
 
 #ifdef USE_PICO_LIB
 
@@ -46,7 +52,7 @@ mcp2515_gpio_init(uint8_t pin)
 #ifdef USE_PICO_LIB
 	gpio_init(pin);
 #elifdef USE_PRINT_DEBUG
-	/* TODO */
+	printf("gpio_init(0x%02x)\n", pin);
 #endif
 }
 
@@ -58,7 +64,7 @@ mcp2515_gpio_spi_init(uint8_t spi_channel, uint32_t baudrate)
 
 	spi_init(spi_inst, baudrate);
 #elifdef USE_PRINT_DEBUG
-	/* TODO */
+	printf("spi_init(0x%02x, 0x%08x)\n", spi_channel, baudrate);
 #endif
 }
 
@@ -68,7 +74,7 @@ mcp2515_gpio_set_dir(uint8_t gpio, bool out)
 #ifdef USE_PICO_LIB
 	gpio_set_dir(gpio, out);
 #elifdef USE_PRINT_DEBUG
-	/* TODO */
+	printf("gpio_set_dir(0x%02x, %s)\n", gpio, out ? "true" : "false");
 #endif
 }
 
@@ -78,7 +84,8 @@ mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t
 #ifdef USE_PICO_LIB
 	spi_write_blocking(spi_inst_from_index(pi_mcp2515->spi_channel), data, len);
 #elifdef USE_PRINT_DEBUG
-	/* TODO */
+	printf("spi_write_blocking(0x%02x, 0x%02x%s, 0x%02x)\n", pi_mcp2515->spi_channel, data[0],
+		len == 1 ? "" : "...", len);
 #endif
 }
 
@@ -89,7 +96,8 @@ mcp2515_gpio_spi_read_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t 
 	/* Note: For now, repeated_tx_data is not used anywhere in the library so we just skip it. */
 	spi_read_blocking(spi_inst_from_index(pi_mcp2515->spi_channel), 0x00, data, len);
 #elifdef USE_PRINT_DEBUG
-	/* TODO */
+	printf("spi_read_blocking(0x%02x, 0x00, 0x%02x%s, 0x%02x)\n", pi_mcp2515->spi_channel, data[0],
+		len == 1 ? "" : "...", len);
 #endif
 }
 
@@ -99,6 +107,6 @@ mcp2515_gpio_put(uint8_t pin, uint8_t value)
 #ifdef USE_PICO_LIB
 	gpio_put(pin, value);
 #elifdef USE_PRINT_DEBUG
-	/* TODO */
+	printf("gpio_put(0x%02x, 0x%02x)\n", pin, value);
 #endif
 }

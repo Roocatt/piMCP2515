@@ -11,10 +11,7 @@
  * or using print debugging so that logic can be tested locally.
  */
 
-#ifdef USE_PICO_LIB
-#include "pico/stdlib.h"
-#include "hardware/gpio.h"
-#endif
+#include "pi_MCP2515.h"
 
 #define SET_CS(x) mcp2515_gpio_put(x->cs_pin, 1)
 #define UNSET_CS(x) mcp2515_gpio_put(x->cs_pin, 0)
@@ -30,7 +27,6 @@
 #define PI_MCP2515_GPIO_FUNC_GPCK 8
 #define PI_MCP2515_GPIO_FUNC_USB 9
 #define PI_MCP2515_GPIO_FUNC_NULL 0x1f
-#include "pi_MCP2515.h"
 
 void	mcp2515_gpio_function_set(uint8_t, uint8_t);
 void	mcp2515_gpio_init(uint8_t);

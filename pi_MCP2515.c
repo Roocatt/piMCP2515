@@ -13,6 +13,10 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+/* Warning, this is still an early work in progress.
+ * There is a lot of bad/untested code here. Please be patient, I'm working on it...
+ */
+
 #include <string.h>
 
 #include "gpio.h"
@@ -278,7 +282,12 @@ mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint
 	mcp2515_gpio_function_set(sck_pin, PI_MCP2515_GPIO_FUNC_SPI);
 
 	mcp2515_gpio_init(cs_pin);
-	mcp2515_gpio_set_dir(cs_pin, GPIO_OUT);
+
+	/* TODO The '1u' is GPIO_OUT, but I am just starting to make this all more versatile. Making the code less nasty
+	 * is a problem for future Roos. It will depend on what the other GPIO/SPI libraries look like and how best to
+	 * bridge the differences in gpio.c.
+	 */
+	mcp2515_gpio_set_dir(cs_pin, 1u);
 
 	UNSET_CS(pi_mcp2515);
 }
