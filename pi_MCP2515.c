@@ -13,11 +13,11 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "pico/stdlib.h"
+#include <string.h>
+
+#include "gpio.h"
 
 #include "pi_MCP2515.h"
-
-#include <string.h>
 
 static const uint8_t tx_reg_list[][2] = {
 	/* CTRL, SIDH */
@@ -56,7 +56,7 @@ mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_f
 				payload[3] = 0;
 			}
 
-			memcpy(&payload[4], can_frame->payload, can_frame->payload);
+			memcpy(&payload[4], can_frame->payload, can_frame->dlc);
 			mcp2515_register_write(pi_mcp2515, payload, can_frame->dlc + 5, tx_reg_list[i][1]);
 			mcp2515_register_bitmod(pi_mcp2515, PI_MCP2515_CTRL_TXREQ, PI_MCP2515_CTRL_TXREQ,
 				tx_reg_list[i][1]);
@@ -129,8 +129,8 @@ mcp2515_status(pi_mcp2515_t *pi_mcp2515)
 
 	SET_CS(pi_mcp2515);
 	instruction = PI_MCP2515_INSTR_READ_STATUS;
-	spi_write_blocking(pi_mcp2515->spi_channel, &instruction, 1);
-	spi_read_blocking(pi_mcp2515->spi_channel, 0x00, &res, 1);
+	mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instruction, 1);
+	spi_read_blocking(pi_mcp2515, 0x00, &res, 1);
 	UNSET_CS(pi_mcp2515);
 
 	return (res);
@@ -144,8 +144,8 @@ mcp2515_register_read(pi_mcp2515_t *pi_mcp2515, uint8_t data[], uint8_t len, uin
 	SET_CS(pi_mcp2515);
 	message[0] = PI_MCP2515_INSTR_READ;
 	message[1] = rgstr;
-	spi_write_blocking(pi_mcp2515->spi_channel, message, 2);
-	spi_read_blocking(pi_mcp2515->spi_channel, 0x00, data, len);
+	mcp2515_gpio_spi_write_blocking(pi_mcp2515, message, 2);
+	mcp2515_gpio_spi_read_blocking(pi_mcp2515, data, len);
 	UNSET_CS(pi_mcp2515);
 }
 
@@ -157,8 +157,8 @@ mcp2515_register_write(pi_mcp2515_t *pi_mcp2515, uint8_t values[], uint8_t len, 
 	SET_CS(pi_mcp2515);
 	message[0] = PI_MCP2515_INSTR_WRITE;
 	message[1] = rgstr;
-	spi_write_blocking(pi_mcp2515->spi_channel, message, 2);
-	spi_write_blocking(pi_mcp2515->spi_channel, values, len);
+	mcp2515_gpio_spi_write_blocking(pi_mcp2515, message, 2);
+	mcp2515_gpio_spi_write_blocking(pi_mcp2515, values, len);
 	UNSET_CS(pi_mcp2515);
 }
 
@@ -172,7 +172,7 @@ mcp2515_register_bitmod(pi_mcp2515_t *pi_mcp2515, uint8_t data, uint8_t mask, ui
 	message[1] = rgstr;
 	message[2] = mask;
 	message[3] = data;
-	spi_write_blocking(pi_mcp2515->spi_channel, message, 4);
+	mcp2515_gpio_spi_write_blocking(pi_mcp2515, message, 4);
 	UNSET_CS(pi_mcp2515);
 }
 
@@ -241,8 +241,28 @@ mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baudrate_kbps, 
 	return (0);
 }
 
+uint8_t
+mcp2515_error_tx_count(pi_mcp2515_t *pi_mcp2515)
+{
+	uint8_t res;
+
+	mcp2515_register_read(pi_mcp2515, &res, 1, PI_MCP2515_RGSTR_ECTX);
+
+	return (res);
+}
+
+uint8_t
+mcp2515_error_rx_count(pi_mcp2515_t *pi_mcp2515)
+{
+	uint8_t res;
+
+	mcp2515_register_read(pi_mcp2515, &res, 1, PI_MCP2515_RGSTR_ECRX);
+
+	return (res);
+}
+
 void
-mcp2515_init(pi_mcp2515_t *pi_mcp2515, spi_inst_t *spi_channel, uint8_t cs_pin, uint8_t tx_pin, uint8_t rx_pin,
+mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint8_t tx_pin, uint8_t rx_pin,
 		uint8_t sck_pin, uint32_t spi_clock)
 {
 	pi_mcp2515->spi_channel = spi_channel;
@@ -252,13 +272,13 @@ mcp2515_init(pi_mcp2515_t *pi_mcp2515, spi_inst_t *spi_channel, uint8_t cs_pin, 
 	pi_mcp2515->rx_pin = rx_pin;
 	pi_mcp2515->spi_clock = spi_clock;
 
-	spi_init(spi_channel, spi_clock);
-	gpio_set_function(tx_pin, GPIO_FUNC_SPI);
-	gpio_set_function(rx_pin, GPIO_FUNC_SPI);
-	gpio_set_function(sck_pin, GPIO_FUNC_SPI);
+	mcp2515_gpio_spi_init(spi_channel, spi_clock);
+	mcp2515_gpio_function_set(tx_pin, PI_MCP2515_GPIO_FUNC_SPI);
+	mcp2515_gpio_function_set(rx_pin, PI_MCP2515_GPIO_FUNC_SPI);
+	mcp2515_gpio_function_set(sck_pin, PI_MCP2515_GPIO_FUNC_SPI);
 
-	gpio_init(cs_pin);
-	gpio_set_dir(cs_pin, GPIO_OUT);
+	mcp2515_gpio_init(cs_pin);
+	mcp2515_gpio_set_dir(cs_pin, GPIO_OUT);
 
 	UNSET_CS(pi_mcp2515);
 }

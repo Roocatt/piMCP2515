@@ -27,8 +27,10 @@ pico_sdk_init()
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-add_library(piMCP2515 STATIC pi_MCP2515.c
-        pi_MCP2515.h)
+# TODO improve the build condition for this.
+add_compile_options(-DUSE_PICO_LIB)
+
+add_library(piMCP2515 STATIC pi_MCP2515.c gpio.c)
 
 target_link_libraries(${PROJECT_NAME}
         pico_stdlib

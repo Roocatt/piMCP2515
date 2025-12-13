@@ -20,12 +20,11 @@
 
 #include "hardware/spi.h"
 
-#define SET_CS(x) gpio_put(x->cs_pin, 1)
-#define UNSET_CS(x) gpio_put(x->cs_pin, 0)
-
 /* Register Definitions */
 #define PI_MCP2515_RGSTR_CANCTRL 0x0F
 #define PI_MCP2515_RGSTR_CANINTF 0x2C
+#define PI_MCP2515_RGSTR_ECRX 0x1D
+#define PI_MCP2515_RGSTR_ECTX 0x1C
 #define PI_MCP2515_RGSTR_CNF1 0x2A
 #define PI_MCP2515_RGSTR_CNF2 0x29
 #define PI_MCP2515_RGSTR_CNF3 0x28
@@ -71,7 +70,7 @@ typedef struct {
 } pi_mcp2515_can_frame_t;
 
 typedef struct {
-	spi_inst_t *spi_channel;
+	uint8_t spi_channel;
 	uint8_t cs_pin;
 	uint8_t tx_pin;
 	uint8_t rx_pin;
@@ -92,6 +91,8 @@ int	mcp2515_bitrate_simplified(pi_mcp2515_t *, uint16_t, uint8_t);
 int	mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,
 	bool, bool, bool, bool);
 void	mcp2515_reset(pi_mcp2515_t *);
+uint8_t	mcp2515_error_tx_count(pi_mcp2515_t *);
+uint8_t	mcp2515_error_rx_count(pi_mcp2515_t *);
 void	mcp2515_init(pi_mcp2515_t *, spi_inst_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t);
 
 #endif /* PI_MCP2515_H */
