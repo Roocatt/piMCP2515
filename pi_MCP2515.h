@@ -93,6 +93,6 @@ int	mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, ui
 void	mcp2515_reset(pi_mcp2515_t *);
 uint8_t	mcp2515_error_tx_count(pi_mcp2515_t *);
 uint8_t	mcp2515_error_rx_count(pi_mcp2515_t *);
-void	mcp2515_init(pi_mcp2515_t *, spi_inst_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t);
+void	mcp2515_init(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t);
 
 #endif /* PI_MCP2515_H */
