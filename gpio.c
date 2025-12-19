@@ -10,7 +10,7 @@
  */
 
 #ifdef USE_PICO_LIB
-#error test1aergerg
+
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 

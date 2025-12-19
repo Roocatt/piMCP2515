@@ -17,6 +17,7 @@ cmake_minimum_required(VERSION 3.24)
 set(CMAKE_CXX_COMPILER_FORCED True)
 set(CMAKE_C_COMPILER_FORCED True)
 
+# TODO Better build option logic/defaults.
 if (USE_PICO_LIB)
     include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 else ()
