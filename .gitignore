@@ -9,6 +9,7 @@ pioasm-install/
 Testing/
 cmake_install.cmake
 CMakeCache.txt
+CopyOfCMakeCache.txt
 Makefile
 pico_flash_region.ld
 

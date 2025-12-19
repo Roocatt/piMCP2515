@@ -17,22 +17,37 @@ cmake_minimum_required(VERSION 3.24)
 set(CMAKE_CXX_COMPILER_FORCED True)
 set(CMAKE_C_COMPILER_FORCED True)
 
-include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+if (USE_PICO_LIB)
+    include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+else ()
+    # TODO Not sure if I want to set up crosscompiling this way, and it should automatically select.
+    include("./linux-aarch64-cross-compile.cmake")
+endif ()
 
 project(piMCP2515 C CXX ASM)
 
-set(PICO_BOARD pico)
-pico_sdk_init()
+if (USE_PICO_LIB)
+    set(PICO_BOARD pico)
+    pico_sdk_init()
+endif ()
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-# TODO improve the build condition for this.
-add_compile_options(-DUSE_PICO_LIB)
+add_library(piMCP2515 STATIC pi_MCP2515.c gpio.c pi_MCP2515.h gpio.h)
 
-add_library(piMCP2515 STATIC pi_MCP2515.c gpio.c)
+if (USE_PICO_LIB)
+    target_compile_definitions(piMCP2515 PRIVATE USE_PICO_LIB=1)
 
-target_link_libraries(${PROJECT_NAME}
+    target_link_libraries(${PROJECT_NAME}
         pico_stdlib
         hardware_spi
-)
+    )
+endif ()
+
+if (USE_SPIDEV)
+    target_compile_definitions(piMCP2515 PRIVATE USE_SPIDEV=1)
+endif ()
+
+unset(USE_PICO_LIB CACHE)
+unset(USE_SPIDEV CACHE)

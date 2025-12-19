@@ -23,6 +23,8 @@
 
 #include "pi_MCP2515.h"
 
+#include <stdbool.h>
+
 static const uint8_t tx_reg_list[][2] = {
 	/* CTRL, SIDH */
 	{ 0x30, 0x31 },
@@ -90,12 +92,12 @@ mcp2515_can_message_read(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_f
 	SET_CS(pi_mcp2515);
 	status = mcp2515_status(pi_mcp2515);
 	if (status & PI_MCP2515_STATUS_RX0BF) {
-		ctrl_reg = 0x60;
+		ctrl_reg = PI_MCP2515_RGSTR_RX0CTRL;
 		sidh_reg = 0x61;
 		data_reg = 0x66;
 		canintf = 0x01;
 	} else if (status & PI_MCP2515_STATUS_RX1BF) {
-		ctrl_reg = 0x70;
+		ctrl_reg = PI_MCP2515_RGSTR_RX1CTRL;
 		sidh_reg = 0x71;
 		data_reg = 0x76;
 		canintf = 0x02;
@@ -245,6 +247,26 @@ mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baudrate_kbps, 
 	return (0);
 }
 
+void
+mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
+{
+	uint8_t instr = PI_MCP2515_INSTR_RESET, blank[14] = { 0 };
+
+	SET_CS(pi_mcp2515);
+	mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instr, 1);
+	UNSET_CS(pi_mcp2515);
+
+	/* wait? */
+
+	for (int i = 0; i < sizeof (tx_reg_list) / sizeof (tx_reg_list[0]); i++) {
+		mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), tx_reg_list[i][0]);
+	}
+	mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RX0CTRL);
+	mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RX1CTRL);
+
+
+}
+
 uint8_t
 mcp2515_error_tx_count(pi_mcp2515_t *pi_mcp2515)
 {
@@ -275,19 +297,9 @@ mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint
 	pi_mcp2515->tx_pin = tx_pin;
 	pi_mcp2515->rx_pin = rx_pin;
 	pi_mcp2515->spi_clock = spi_clock;
+	pi_mcp2515->gpio_params = NULL;
 
-	mcp2515_gpio_spi_init(spi_channel, spi_clock);
-	mcp2515_gpio_function_set(tx_pin, PI_MCP2515_GPIO_FUNC_SPI);
-	mcp2515_gpio_function_set(rx_pin, PI_MCP2515_GPIO_FUNC_SPI);
-	mcp2515_gpio_function_set(sck_pin, PI_MCP2515_GPIO_FUNC_SPI);
-
-	mcp2515_gpio_init(cs_pin);
-
-	/* TODO The '1u' is GPIO_OUT, but I am just starting to make this all more versatile. Making the code less nasty
-	 * is a problem for future Roos. It will depend on what the other GPIO/SPI libraries look like and how best to
-	 * bridge the differences in gpio.c.
-	 */
-	mcp2515_gpio_set_dir(cs_pin, 1u);
+	mcp2515_gpio_spi_init(pi_mcp2515, spi_channel, spi_clock);
 
 	UNSET_CS(pi_mcp2515);
 }

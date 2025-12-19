@@ -1,10 +1,10 @@
 # piMCP2515
 
-A library for interacting with CAN bus via SPI and an MCP2515.
+A library for interacting with the MCP2515 CAN bus controller via SPI.
 
-This is a very early work in progress. It is incomplete and not
-tested. I am working on it though, and I hope to have this complete
-soon.
+This is a very early work in progress which is not in any way
+complete or tested. It is not usable in any way. I am working
+on it though, and I hope to have this complete soon.
 
 ## Goals
 

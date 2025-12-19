@@ -16,9 +16,8 @@
 #ifndef PI_MCP2515_H
 #define PI_MCP2515_H
 
+#include <stdbool.h>
 #include <stdint.h>
-
-#include "hardware/spi.h"
 
 /* Register Definitions */
 #define PI_MCP2515_RGSTR_CANCTRL 0x0F
@@ -28,12 +27,15 @@
 #define PI_MCP2515_RGSTR_CNF1 0x2A
 #define PI_MCP2515_RGSTR_CNF2 0x29
 #define PI_MCP2515_RGSTR_CNF3 0x28
+#define PI_MCP2515_RGSTR_RX0CTRL 0x60
+#define PI_MCP2515_RGSTR_RX1CTRL 0x70
 
 /* Instruction definitions */
 #define PI_MCP2515_INSTR_WRITE 0x02
 #define PI_MCP2515_INSTR_READ 0x03
 #define PI_MCP2515_INSTR_BITMOD 0x05
 #define PI_MCP2515_INSTR_READ_STATUS 0xA0
+#define PI_MCP2515_INSTR_RESET 0xC0
 
 /* REQOP definitions */
 #define PI_MCP2515_REQOP_MASK 0xE0
@@ -76,6 +78,7 @@ typedef struct {
 	uint8_t rx_pin;
 	uint8_t sck_pin;
 	uint32_t spi_clock;
+	void *gpio_params;
 } pi_mcp2515_t;
 
 int	mcp2515_can_message_send(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
