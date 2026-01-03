@@ -1,4 +1,4 @@
-# Copyright 2025 Roos Catling-Tate
+# Copyright 2025-2026 Roos Catling-Tate
 #
 # Permission to use, copy, modify, and/or distribute this software for any purpose with or
 # without fee is hereby granted, provided that the above copyright notice and this permission
@@ -22,7 +22,7 @@ if (USE_PICO_LIB)
     include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 else ()
     # TODO Not sure if I want to set up crosscompiling this way, and it should automatically select.
-    include("./linux-aarch64-cross-compile.cmake")
+    include("cmake/linux-aarch64-cross-compile.cmake")
 endif ()
 
 project(piMCP2515 C CXX ASM)
@@ -35,7 +35,7 @@ endif ()
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-add_library(piMCP2515 STATIC pi_MCP2515.c gpio.c pi_MCP2515.h gpio.h)
+add_library(piMCP2515 STATIC src/pi_MCP2515.c src/gpio.c src/pi_MCP2515.h src/gpio.h)
 
 if (USE_PICO_LIB)
     target_compile_definitions(piMCP2515 PRIVATE USE_PICO_LIB=1)
