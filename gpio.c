@@ -1,7 +1,16 @@
-/*
- * Created by Roos Catling-Tate.
- * 
- * Copyright 2025
+/* Copyright 2025-2026 Roos Catling-Tate
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any purpose with or
+ * without fee is hereby granted, provided that the above copyright notice and this permission
+ * notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED “AS IS” AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+ * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* This is a nightmare C file from hell with about as much C preprocessor as actual C code. I may work on making this
@@ -16,9 +25,9 @@
 
 #elifdef USE_SPIDEV
 
-#include <unistd.h>
-#include <fcntl.h>
 #include <sys/ioctl.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #if defined(__linux__)
 #define USE_SPIDEV_LINUX
@@ -46,25 +55,6 @@
 
 #include "gpio.h"
 
-#ifdef USE_PICO_LIB
-
-spi_inst_t	*spi_inst_from_index(uint8_t);
-
-spi_inst_t *
-spi_inst_from_index(uint8_t index)
-{
-	switch (index) {
-	case 0:
-		return (spi0);
-	case 1:
-		return (spi1);
-	default:
-		return (NULL);
-	}
-}
-
-#endif /* USE_PICO_LIB */
-
 #ifdef USE_SPIDEV
 
 static int	spidev_duplex_com(const pi_mcp2515_t *, char[sizeof(uint64_t)], char[sizeof(uint64_t)]);
@@ -76,7 +66,7 @@ spidev_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t
 	struct spi_ioc_transfer tr = {
 		.tx_buf = (uint64_t)tx_buffer,
 		.rx_buf = (uint64_t)rx_buffer,
-		.len = sizeof(tx_buffer),
+		.len = sizeof(uint64_t),
 		.delay_usecs = pi_mcp2515->gpio_spi_delay_usec,
 		.speed_hz = pi_mcp2515->spi_clock,
 		.bits_per_word = pi_mcp2515->gpio_spi_bits_per_word,

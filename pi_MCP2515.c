@@ -1,4 +1,4 @@
-/* Copyright 2025 Roos Catling-Tate
+/* Copyright 2025-2026 Roos Catling-Tate
  *
  * Permission to use, copy, modify, and/or distribute this software for any purpose with or
  * without fee is hereby granted, provided that the above copyright notice and this permission
@@ -17,13 +17,12 @@
  * There is a lot of bad/untested code here. Please be patient, I'm working on it...
  */
 
+#include <stdbool.h>
 #include <string.h>
 
 #include "gpio.h"
 
 #include "pi_MCP2515.h"
-
-#include <stdbool.h>
 
 static const uint8_t tx_reg_list[][2] = {
 	/* CTRL, SIDH */
