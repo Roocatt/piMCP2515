@@ -1,5 +1,5 @@
-name: Test build
-# TODO support different build conditions
+name: Pico SDK Build
+
 on:
   push:
     branches: [ "main" ]
@@ -10,7 +10,7 @@ env:
   PICO_SDK_PATH: "~/pico-sdk"
 
 jobs:
-  build:
+  build-with-pico-sdk:
     runs-on: ubuntu-latest
 
     steps:
