@@ -13,16 +13,8 @@
 
 #include "pi_MCP2515.h"
 
-typedef struct {
-#ifdef USE_PICO_LIB
- spi_inst_t *spi_inst;
-#elifdef USE_SPIDEV
- int spidev_fd;
-#endif
-} gpio_params_t;
-
-#define SET_CS(x) mcp2515_gpio_put(x->cs_pin, 1)
-#define UNSET_CS(x) mcp2515_gpio_put(x->cs_pin, 0)
+#define SET_CS(x) mcp2515_gpio_put(x, x->cs_pin, 1)
+#define UNSET_CS(x) mcp2515_gpio_put(x, x->cs_pin, 0)
 
 #define PI_MCP2515_GPIO_FUNC_XIP 0
 #define PI_MCP2515_GPIO_FUNC_SPI 1
@@ -36,11 +28,12 @@ typedef struct {
 #define PI_MCP2515_GPIO_FUNC_USB 9
 #define PI_MCP2515_GPIO_FUNC_NULL 0x1f
 
-void	mcp2515_gpio_init(uint8_t);
+int	mcp2515_gpio_init(pi_mcp2515_t *, uint8_t);
 void	mcp2515_gpio_set_dir(uint8_t gpio, bool out);
-void	mcp2515_gpio_spi_init(pi_mcp2515_t *, uint8_t, uint32_t);
-void	mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *, uint8_t[], uint8_t);
-void	mcp2515_gpio_spi_read_blocking(pi_mcp2515_t *, uint8_t[], uint8_t);
-void	mcp2515_gpio_put(uint8_t, uint8_t);
+void mcp2515_gpio_spi_free(pi_mcp2515_t *);
+int	mcp2515_gpio_spi_init(pi_mcp2515_t *, uint8_t, uint32_t);
+int	mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *, uint8_t[], uint8_t);
+int	mcp2515_gpio_spi_read_blocking(pi_mcp2515_t *, uint8_t[], uint8_t);
+int	mcp2515_gpio_put(pi_mcp2515_t *, uint8_t, uint8_t);
 
 #endif /* GPIO_H */

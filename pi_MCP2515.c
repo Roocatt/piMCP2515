@@ -33,7 +33,7 @@ static const uint8_t tx_reg_list[][2] = {
 };
 
 int
-mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_frame)
+mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t *can_frame)
 {
 	int res;
 	uint16_t id_tmp;
@@ -142,35 +142,50 @@ mcp2515_status(pi_mcp2515_t *pi_mcp2515)
 	return (res);
 }
 
-void
+int
 mcp2515_register_read(pi_mcp2515_t *pi_mcp2515, uint8_t data[], uint8_t len, uint8_t rgstr)
 {
+	int res;
 	uint8_t message[2];
 
 	SET_CS(pi_mcp2515);
 	message[0] = PI_MCP2515_INSTR_READ;
 	message[1] = rgstr;
-	mcp2515_gpio_spi_write_blocking(pi_mcp2515, message, 2);
-	mcp2515_gpio_spi_read_blocking(pi_mcp2515, data, len);
+	res = mcp2515_gpio_spi_write_blocking(pi_mcp2515, message, 2);
+	if (res)
+		goto err;
+	res = mcp2515_gpio_spi_read_blocking(pi_mcp2515, data, len);
+
+err:
 	UNSET_CS(pi_mcp2515);
+	return (res);
 }
 
-void
+int
 mcp2515_register_write(pi_mcp2515_t *pi_mcp2515, uint8_t values[], uint8_t len, uint8_t rgstr)
 {
+	int res;
 	uint8_t message[2];
 
 	SET_CS(pi_mcp2515);
 	message[0] = PI_MCP2515_INSTR_WRITE;
 	message[1] = rgstr;
-	mcp2515_gpio_spi_write_blocking(pi_mcp2515, message, 2);
-	mcp2515_gpio_spi_write_blocking(pi_mcp2515, values, len);
+
+	res = mcp2515_gpio_spi_write_blocking(pi_mcp2515, message, 2);
+	if (res)
+		goto err;
+	res = mcp2515_gpio_spi_write_blocking(pi_mcp2515, values, len);
+
+err:
 	UNSET_CS(pi_mcp2515);
+
+	return (res);
 }
 
-void
+int
 mcp2515_register_bitmod(pi_mcp2515_t *pi_mcp2515, uint8_t data, uint8_t mask, uint8_t rgstr)
 {
+	int res;
 	uint8_t message[4];
 
 	SET_CS(pi_mcp2515);
@@ -178,14 +193,16 @@ mcp2515_register_bitmod(pi_mcp2515_t *pi_mcp2515, uint8_t data, uint8_t mask, ui
 	message[1] = rgstr;
 	message[2] = mask;
 	message[3] = data;
-	mcp2515_gpio_spi_write_blocking(pi_mcp2515, message, 4);
+	res = mcp2515_gpio_spi_write_blocking(pi_mcp2515, message, 4);
 	UNSET_CS(pi_mcp2515);
+	return (res);
 }
 
-void
+int
 mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, uint8_t reqop)
 {
-	mcp2515_register_bitmod(pi_mcp2515, reqop, PI_MCP2515_REQOP_MASK, PI_MCP2515_RGSTR_CANCTRL);
+	return (mcp2515_register_bitmod(pi_mcp2515, reqop, PI_MCP2515_REQOP_MASK,
+		PI_MCP2515_RGSTR_CANCTRL));
 }
 
 /* TODO These defaults are untested. Make sure this all makes sense. */
@@ -247,30 +264,34 @@ mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baudrate_kbps, 
 	return (0);
 }
 
-void
+int
 mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
 {
+	int res;
 	uint8_t instr = PI_MCP2515_INSTR_RESET, blank[14] = { 0 };
 
 	SET_CS(pi_mcp2515);
-	mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instr, 1);
+	res = mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instr, 1);
 	UNSET_CS(pi_mcp2515);
 
-	/* wait? */
+	if (res)
+		return (res);
 
-	for (int i = 0; i < sizeof (tx_reg_list) / sizeof (tx_reg_list[0]); i++) {
-		mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), tx_reg_list[i][0]);
-	}
-	mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RX0CTRL);
-	mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RX1CTRL);
+	/* TODO wait? */
 
+	/* Return a sum of all return values. This is a reset function, so try and reset all registers. */
+	for (int i = 0; i < sizeof (tx_reg_list) / sizeof (tx_reg_list[0]); i++)
+		res += mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), tx_reg_list[i][0]);
+	res += mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RX0CTRL);
+	res += mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RX1CTRL);
 
+	return (res);
 }
 
 uint8_t
 mcp2515_error_tx_count(pi_mcp2515_t *pi_mcp2515)
 {
-	uint8_t res;
+	uint8_t res = 0;
 
 	mcp2515_register_read(pi_mcp2515, &res, 1, PI_MCP2515_RGSTR_ECTX);
 
@@ -280,26 +301,37 @@ mcp2515_error_tx_count(pi_mcp2515_t *pi_mcp2515)
 uint8_t
 mcp2515_error_rx_count(pi_mcp2515_t *pi_mcp2515)
 {
-	uint8_t res;
+	uint8_t res = 0;
 
 	mcp2515_register_read(pi_mcp2515, &res, 1, PI_MCP2515_RGSTR_ECRX);
 
 	return (res);
 }
 
-void
+int
 mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint8_t tx_pin, uint8_t rx_pin,
 		uint8_t sck_pin, uint32_t spi_clock)
 {
+	int res;
+
 	pi_mcp2515->spi_channel = spi_channel;
 	pi_mcp2515->cs_pin = cs_pin;
 	pi_mcp2515->sck_pin = sck_pin;
 	pi_mcp2515->tx_pin = tx_pin;
 	pi_mcp2515->rx_pin = rx_pin;
 	pi_mcp2515->spi_clock = spi_clock;
-	pi_mcp2515->gpio_params = NULL;
+	memset(&pi_mcp2515->gpio_pin_fd_map, 0 , sizeof(pi_mcp2515->gpio_pin_fd_map));
 
-	mcp2515_gpio_spi_init(pi_mcp2515, spi_channel, spi_clock);
+	if ((res = mcp2515_gpio_spi_init(pi_mcp2515, spi_channel, spi_clock)))
+		return (res);
 
 	UNSET_CS(pi_mcp2515);
+	return (0);
+}
+
+void
+mcp2515_free(pi_mcp2515_t *pi_mcp2515)
+{
+	mcp2515_gpio_spi_free(pi_mcp2515);
+	/* TODO incomplete */
 }

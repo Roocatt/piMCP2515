@@ -65,6 +65,8 @@
 #define PI_MCP2515_ID_MASK_SFF 0x000007FFUL
 #define PI_MCP2515_ID_MASK_EFF 0x1FFFFFFFUL
 
+#define PI_MCP2515_GPIO_PIN_MAP_LEN 40
+
 typedef struct {
 	uint32_t id;
 	uint8_t dlc;
@@ -78,24 +80,33 @@ typedef struct {
 	uint8_t rx_pin;
 	uint8_t sck_pin;
 	uint32_t spi_clock;
-	void *gpio_params;
+#ifdef USE_PICO_LIB
+	spi_inst_t *spi_inst;
+#elifdef USE_SPIDEV
+	int gpio_spidev_fd;
+	int gpio_gpio_fd;
+	uint8_t gpio_spi_mode;
+	uint8_t gpio_spi_bits_per_word;
+	uint16_t gpio_spi_delay_usec;
+	int gpio_pin_fd_map[PI_MCP2515_GPIO_PIN_MAP_LEN]; /* TODO Info on GPIO pin/line mapping seems unclear. Verify size, etc. later. */
+#endif
 } pi_mcp2515_t;
 
 int	mcp2515_can_message_send(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
 int	mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
 uint8_t	mcp2515_status(pi_mcp2515_t *);
-void	mcp2515_register_read(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
-void	mcp2515_register_write(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
-void	mcp2515_register_bitmod(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t);
-void	mcp2515_reqop(pi_mcp2515_t *, uint8_t);
+int	mcp2515_register_read(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
+int	mcp2515_register_write(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
+int	mcp2515_register_bitmod(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t);
+int	mcp2515_reqop(pi_mcp2515_t *, uint8_t);
 int	mcp2515_bitrate_default_16mhz_1000kbps(pi_mcp2515_t *);
 int	mcp2515_bitrate_default_8mhz_500kbps(pi_mcp2515_t *);
 int	mcp2515_bitrate_simplified(pi_mcp2515_t *, uint16_t, uint8_t);
 int	mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,
 	bool, bool, bool, bool);
-void	mcp2515_reset(pi_mcp2515_t *);
+int	mcp2515_reset(pi_mcp2515_t *);
 uint8_t	mcp2515_error_tx_count(pi_mcp2515_t *);
 uint8_t	mcp2515_error_rx_count(pi_mcp2515_t *);
-void	mcp2515_init(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t);
+int	mcp2515_init(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t);
 
 #endif /* PI_MCP2515_H */
