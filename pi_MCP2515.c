@@ -320,7 +320,6 @@ mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint
 	pi_mcp2515->tx_pin = tx_pin;
 	pi_mcp2515->rx_pin = rx_pin;
 	pi_mcp2515->spi_clock = spi_clock;
-	memset(&pi_mcp2515->gpio_pin_fd_map, 0 , sizeof(pi_mcp2515->gpio_pin_fd_map));
 
 	if ((res = mcp2515_gpio_spi_init(pi_mcp2515, spi_channel, spi_clock)))
 		return (res);

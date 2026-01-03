@@ -16,6 +16,12 @@
 #ifndef PI_MCP2515_H
 #define PI_MCP2515_H
 
+#ifdef USE_PICO_LIB
+
+#include "hardware/spi.h"
+
+#endif /* USE_PICO_LIB */
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -81,7 +87,7 @@ typedef struct {
 	uint8_t sck_pin;
 	uint32_t spi_clock;
 #ifdef USE_PICO_LIB
-	spi_inst_t *spi_inst;
+	spi_inst_t *gpio_spi_inst;
 #elifdef USE_SPIDEV
 	int gpio_spidev_fd;
 	int gpio_gpio_fd;
@@ -92,7 +98,7 @@ typedef struct {
 #endif
 } pi_mcp2515_t;
 
-int	mcp2515_can_message_send(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
+int	mcp2515_can_message_send(pi_mcp2515_t *, const pi_mcp2515_can_frame_t *);
 int	mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
 uint8_t	mcp2515_status(pi_mcp2515_t *);
 int	mcp2515_register_read(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);

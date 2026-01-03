@@ -137,7 +137,7 @@ mcp2515_gpio_spi_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint32_t ba
 #ifdef USE_PICO_LIB
 	spi_inst_t *spi_inst;
 
-	switch (index) {
+	switch (spi_channel) {
 	case 0:
 		spi_inst = spi0;
 		break;
@@ -145,7 +145,7 @@ mcp2515_gpio_spi_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint32_t ba
 		spi_inst = spi1;
 		break;
 	default:
-		return; /* TODO handle bad value */
+		return (-1);
 	}
 
 	pi_mcp2515->gpio_spi_inst = spi_inst,
@@ -162,6 +162,8 @@ mcp2515_gpio_spi_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint32_t ba
 #elifdef USE_SPIDEV
 	int res, spidev_fd, gpio_fd;
 	uint8_t mode, bits_per_word;
+
+	memset(&pi_mcp2515->gpio_pin_fd_map, 0 , sizeof(pi_mcp2515->gpio_pin_fd_map));
 
 	mode = 0; /* TODO mode, bits_per_word, and delay_usec value configurable or defaults?*/
 	bits_per_word = 8;
@@ -204,7 +206,7 @@ int
 mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t len)
 {
 #ifdef USE_PICO_LIB
-	spi_write_blocking(spi_inst_from_index(pi_mcp2515->spi_channel), data, len);
+	spi_write_blocking(pi_mcp2515->gpio_spi_inst, data, len);
 	return (0);
 #elifdef USE_SPIDEV
 	/* TODO incomplete */
@@ -237,7 +239,7 @@ mcp2515_gpio_spi_read_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t 
 {
 #ifdef USE_PICO_LIB
 	/* Note: For now, repeated_tx_data is not used anywhere in the library so we just skip it. */
-	spi_read_blocking(spi_inst_from_index(pi_mcp2515->spi_channel), 0x00, data, len);
+	spi_read_blocking(pi_mcp2515->gpio_spi_inst, 0x00, data, len);
 	return (0);
 #elifdef USE_SPIDEV
 	/* TODO incomplete */
