@@ -10,7 +10,7 @@ env:
   PICO_SDK_PATH: "~/pico-sdk"
 
 jobs:
-  build-with-linux-spidev:
+  build-with-linux-spidev-aarch64:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,5 +19,29 @@ jobs:
       - uses: actions/checkout@v4
       - name: Configure CMake
         run: cmake -DUSE_SPIDEV=true -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+  build-with-linux-spidev-armv7:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+        run: sudo apt install -y cmake gcc-armv7-linux-gnu g++-armv7-linux-gnu libnewlib-arm-none-eabi python3 git tar build-essential
+      - uses: actions/checkout@v4
+      - name: Configure CMake
+        run: cmake -DUSE_SPIDEV=true -DUSE_ARMV7_CC=true -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+  build-with-linux-spidev-arm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+        run: sudo apt install -y cmake gcc-arm-linux-gnu g++-arm-linux-gnu libnewlib-arm-none-eabi python3 git tar build-essential
+      - uses: actions/checkout@v4
+      - name: Configure CMake
+        run: cmake -DUSE_SPIDEV=true -DUSE_ARM_CC=true -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}

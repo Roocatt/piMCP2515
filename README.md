@@ -19,7 +19,7 @@ reading the code as many are intended slightly more as personal notes.
   - [ ] With Linux
   - [ ] With BSD
 - [ ] Unit testing
-- [ ] Easy cross-compiling
+- [x] Easy cross-compiling
 
 ## License
 This project is available under the ISC license.

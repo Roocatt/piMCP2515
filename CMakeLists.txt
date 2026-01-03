@@ -17,12 +17,16 @@ cmake_minimum_required(VERSION 3.24)
 set(CMAKE_CXX_COMPILER_FORCED True)
 set(CMAKE_C_COMPILER_FORCED True)
 
-# TODO Better build option logic/defaults.
-if (USE_PICO_LIB)
+if (USE_SPIDEV)
+    if (USE_ARM_CC)
+        include("cmake/linux-arm-cross-compile.cmake")
+    elseif (USE_ARMV7_CC)
+        include("cmake/linux-armv7-cross-compile.cmake")
+    else ()
+        include("cmake/linux-aarch64-cross-compile.cmake")
+    endif ()
+elseif (NOT USE_PRINT_DEBUG) # USE_PICO_LIB as default, for USE_PRINT_DEBUG just skip
     include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
-else ()
-    # TODO Not sure if I want to set up crosscompiling this way, and it should automatically select.
-    include("cmake/linux-aarch64-cross-compile.cmake")
 endif ()
 
 project(piMCP2515 C CXX ASM)
@@ -37,18 +41,19 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_library(piMCP2515 STATIC src/pi_MCP2515.c src/gpio.c src/pi_MCP2515.h src/gpio.h)
 
-if (USE_PICO_LIB)
+if (USE_SPIDEV)
+    target_compile_definitions(piMCP2515 PRIVATE USE_SPIDEV=1)
+elseif (USE_PRINT_DEBUG)
+    target_compile_definitions(piMCP2515 PRIVATE USE_PRINT_DEBUG=1)
+else () # USE_PICO_LIB
     target_compile_definitions(piMCP2515 PRIVATE USE_PICO_LIB=1)
 
     target_link_libraries(${PROJECT_NAME}
-        pico_stdlib
-        hardware_spi
+            pico_stdlib
+            hardware_spi
     )
-endif ()
-
-if (USE_SPIDEV)
-    target_compile_definitions(piMCP2515 PRIVATE USE_SPIDEV=1)
 endif ()
 
 unset(USE_PICO_LIB CACHE)
 unset(USE_SPIDEV CACHE)
+unset(USE_PRINT_DEBUG CACHE)
