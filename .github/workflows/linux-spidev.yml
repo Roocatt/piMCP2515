@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Install dependencies
-        run: sudo apt install -y cmake gcc-arm-linux-gnueabihf libnewlib-arm-none-eabi python3 git tar build-essential
+        run: sudo apt install -y cmake gcc-arm-linux-gnueabihf gcc-defaults-armhf-cross libnewlib-arm-none-eabi python3 git tar build-essential
       - uses: actions/checkout@v4
       - name: Configure CMake
         run: cmake -DUSE_SPIDEV=true -DUSE_ARM_CC=true -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
