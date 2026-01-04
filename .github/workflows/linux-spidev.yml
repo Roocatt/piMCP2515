@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: sudo apt install -y cmake gcc-arm-linux-gnueabihf g++-13-arm-linux-gnueabihf libnewlib-arm-none-eabi python3 git tar build-essential
       - name: Create
-        run: ln -s /usr/bin/arm-linux-gnueabihf-g++-13 /usr/bin/arm-linux-gnueabihf-g++
+        run: sudo ln -s /usr/bin/arm-linux-gnueabihf-g++-13 /usr/bin/arm-linux-gnueabihf-g++
       - uses: actions/checkout@v4
       - name: Configure CMake
         run: cmake -DUSE_SPIDEV=true -DUSE_ARM_CC=true -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
