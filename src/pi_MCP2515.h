@@ -24,6 +24,15 @@
 #include <stdint.h>
 
 /* Register Definitions */
+#define PI_MCP2515_RGSTR_RXF0SIDH 0x00
+#define PI_MCP2515_RGSTR_RXF1SIDH 0x04
+#define PI_MCP2515_RGSTR_RXF2SIDH 0x08
+#define PI_MCP2515_RGSTR_RXF3SIDH 0x10
+#define PI_MCP2515_RGSTR_RXF4SIDH 0x14
+#define PI_MCP2515_RGSTR_RXF5SIDH 0x18
+#define PI_MCP2515_RGSTR_RXM0SIDH 0x20
+#define PI_MCP2515_RGSTR_RXM1SIDH 0x24
+#define PI_MCP2515_RGSTR_CANSTAT 0x0E
 #define PI_MCP2515_RGSTR_CANCTRL 0x0F
 #define PI_MCP2515_RGSTR_CANINTF 0x2C
 #define PI_MCP2515_RGSTR_ECRX 0x1D
@@ -53,6 +62,7 @@
 #define PI_MCP2515_REQOP_LISTENONLY 0x60
 #define PI_MCP2515_REQOP_CONFIG 0x80
 #define PI_MCP2515_REQOP_POWERUP 0xE0
+#define PI_MCP2515_REQOP_MASK_CANSTAT 0xE0
 
 /* CTRL Definitions */
 #define PI_MCP2515_CTRL_RTR 0x08
@@ -118,6 +128,8 @@ int		mcp2515_bitrate_default_8mhz_500kbps(pi_mcp2515_t *);
 int		mcp2515_bitrate_simplified(pi_mcp2515_t *, uint16_t, uint8_t);
 int		mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,
     uint8_t, bool, bool, bool, bool);
+int		mcp2515_filter(pi_mcp2515_t *, uint8_t, uint32_t, bool);
+int		mcp2515_filter_mask(pi_mcp2515_t *, uint8_t, int32_t, bool);
 int		mcp2515_reset(pi_mcp2515_t *);
 uint8_t		mcp2515_error_tx_count(pi_mcp2515_t *);
 uint8_t		mcp2515_error_rx_count(pi_mcp2515_t *);

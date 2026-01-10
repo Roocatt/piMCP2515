@@ -38,6 +38,29 @@ static const uint8_t tx_reg_list[][2] = {
 	{ 0x50, 0x51 }
 };
 
+inline static uint32_t
+id_build(uint32_t id, bool extended_id)
+{
+	uint16_t id_tmp = 0;
+	uint8_t result[4] = {0};
+
+	id_tmp = (uint16_t)((id & (extended_id ? PI_MCP2515_ID_MASK_EFF : PI_MCP2515_ID_MASK_SFF)) & 0x0FFFF);
+	if (extended_id) {
+		result[3] = (uint8_t)(id_tmp & 0xFF);
+		result[2] = (uint8_t)(id_tmp >> 8);
+		id_tmp = (uint16_t)(id_tmp >> 16);
+		result[1] = ((uint8_t)(id_tmp & 0x03) + (uint8_t)((id_tmp & 0x1C) << 3)) | 0x08;
+		result[0] = (uint8_t)(id_tmp >> 5);
+	} else {
+		result[0] = (uint8_t)(id_tmp >> 3);
+		result[1] = (uint8_t)((id_tmp & 0x07) << 5);
+		result[2] = 0;
+		result[3] = 0;
+	}
+
+	return (*((uint32_t *)result));
+}
+
 int
 mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t *can_frame)
 {
@@ -208,10 +231,29 @@ mcp2515_register_bitmod(pi_mcp2515_t *pi_mcp2515, uint8_t data, uint8_t mask, ui
 	return (res);
 }
 
+/* Change operating mode.
+ */
 int
 mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, uint8_t reqop)
 {
-	return (mcp2515_register_bitmod(pi_mcp2515, reqop, PI_MCP2515_REQOP_MASK, PI_MCP2515_RGSTR_CANCTRL));
+	int res;
+
+	res = mcp2515_register_bitmod(pi_mcp2515, reqop, PI_MCP2515_REQOP_MASK, PI_MCP2515_RGSTR_CANCTRL);
+	MICRO_SLEEP(mcp2515_osc_time(pi_mcp2515, 128));
+
+	return (res);
+}
+
+/* Get current operating mode.
+ */
+int
+mcp2515_reqop_get(pi_mcp2515_t *pi_mcp2515)
+{
+	uint8_t reqop;
+
+	mcp2515_register_read(pi_mcp2515, &reqop, 1, PI_MCP2515_RGSTR_CANSTAT);
+
+	return (reqop & PI_MCP2515_REQOP_MASK_CANSTAT);
 }
 
 /* TODO These defaults are untested. Make sure this all makes sense. */
@@ -275,6 +317,34 @@ mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps,
 	pi_mcp2515->osc_mhz = osc_mhz;
 
 err:
+	return (res);
+}
+
+/* Must be in config mode
+ */
+int
+mcp2515_filter(pi_mcp2515_t *pi_mcp2515, uint8_t filter_reg, uint32_t id, bool extended_id)
+{
+	int res;
+	uint32_t data;
+
+	data = id_build(id, extended_id);
+	res = mcp2515_register_write(pi_mcp2515, (uint8_t *)&data, 4, filter_reg);
+
+	return (res);
+}
+
+/* Must be in config mode
+ */
+int
+mcp2515_filter_mask(pi_mcp2515_t *pi_mcp2515, uint8_t filter_mask_reg, int32_t id_mask, bool extended_id)
+{
+	int res;
+	uint32_t data;
+
+	data = id_build(id_mask, extended_id);
+	res = mcp2515_register_write(pi_mcp2515, (uint8_t *)&data, 4, filter_mask_reg);
+
 	return (res);
 }
 
