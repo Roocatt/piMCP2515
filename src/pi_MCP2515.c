@@ -99,13 +99,13 @@ mcp2515_can_message_read(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_f
 	status = mcp2515_status(pi_mcp2515);
 	if (status & PI_MCP2515_STATUS_RX0BF) {
 		ctrl_reg = PI_MCP2515_RGSTR_RX0CTRL;
-		sidh_reg = 0x61;
-		data_reg = 0x66;
+		sidh_reg = PI_MCP2515_RGSTR_RX0SIDH;
+		data_reg = PI_MCP2515_RGSTR_RX0DATA;
 		canintf = 0x01;
 	} else if (status & PI_MCP2515_STATUS_RX1BF) {
 		ctrl_reg = PI_MCP2515_RGSTR_RX1CTRL;
-		sidh_reg = 0x71;
-		data_reg = 0x76;
+		sidh_reg = PI_MCP2515_RGSTR_RX1SIDH;
+		data_reg = PI_MCP2515_RGSTR_RX1DATA;
 		canintf = 0x02;
 	} else {
 		res = -1;
@@ -130,6 +130,7 @@ mcp2515_can_message_read(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_f
 	mcp2515_register_bitmod(pi_mcp2515, 0, canintf, PI_MCP2515_RGSTR_CANINTF);
 end:
 	UNSET_CS(pi_mcp2515);
+
 	return (res);
 }
 
@@ -163,6 +164,7 @@ mcp2515_register_read(pi_mcp2515_t *pi_mcp2515, uint8_t data[], uint8_t len, uin
 
 err:
 	UNSET_CS(pi_mcp2515);
+
 	return (res);
 }
 
@@ -207,8 +209,7 @@ mcp2515_register_bitmod(pi_mcp2515_t *pi_mcp2515, uint8_t data, uint8_t mask, ui
 int
 mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, uint8_t reqop)
 {
-	return (mcp2515_register_bitmod(pi_mcp2515, reqop, PI_MCP2515_REQOP_MASK,
-		PI_MCP2515_RGSTR_CANCTRL));
+	return (mcp2515_register_bitmod(pi_mcp2515, reqop, PI_MCP2515_REQOP_MASK, PI_MCP2515_RGSTR_CANCTRL));
 }
 
 /* TODO These defaults are untested. Make sure this all makes sense. */
@@ -241,10 +242,8 @@ mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps,
 
 	if (baud_rate_kbps > 1000 || baud_rate_kbps == 0 || osc_mhz > 40|| osc_mhz == 0 || sjw > 4 || sjw == 0
 	    || prescaler > 63 || prseg_tqps == 0 || prseg_tqps > 8 || phseg_tqps1 == 0 || phseg_tqps1 > 8
-	    || phseg_tqps2 == 0 || phseg_tqps2 > 8 || phseg_tqps2 <= sjw
-	    || prseg_tqps + phseg_tqps1 < phseg_tqps2) {
+	    || phseg_tqps2 == 0 || phseg_tqps2 > 8 || phseg_tqps2 <= sjw || prseg_tqps + phseg_tqps1 < phseg_tqps2)
 		return (1);
-	}
 
 	cnf1 = ((sjw - 1) << 6) | (prescaler & 0x3f);
 	cnf2 = (((phseg_tqps1 - 1) & 0x07) << 3) | (prseg_tqps & 0x7);
@@ -279,7 +278,7 @@ mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
 	UNSET_CS(pi_mcp2515);
 
 	if (res)
-		return (res);
+		goto err;
 
 	MICRO_SLEEP(mcp2515_osc_time(pi_mcp2515, 128));
 
@@ -289,6 +288,7 @@ mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
 	res += mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RX0CTRL);
 	res += mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RX1CTRL);
 
+err:
 	return (res);
 }
 
@@ -316,7 +316,7 @@ int
 mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint8_t tx_pin, uint8_t rx_pin,
     uint8_t sck_pin, uint32_t spi_clock)
 {
-	int res;
+	int res = 0;
 
 	pi_mcp2515->spi_channel = spi_channel;
 	pi_mcp2515->cs_pin = cs_pin;
@@ -326,10 +326,12 @@ mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint
 	pi_mcp2515->spi_clock = spi_clock;
 
 	if ((res = mcp2515_gpio_spi_init(pi_mcp2515, spi_channel, spi_clock)))
-		return (res);
+		goto err;
 
 	UNSET_CS(pi_mcp2515);
-	return (0);
+
+err:
+	return (res);
 }
 
 uint64_t
@@ -339,7 +341,7 @@ mcp2515_osc_time(const pi_mcp2515_t *pi_mcp2515, uint32_t num_cycles)
 
 	cycle_len_nano_sec = 1000000000 / (pi_mcp2515->osc_mhz * 1000000);
 
-	return (num_cycles * cycle_len_nano_sec / 1000); /* return milliseconds */
+	return (num_cycles * cycle_len_nano_sec / 1000); /* return microseconds */
 }
 
 void

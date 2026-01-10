@@ -20,8 +20,6 @@
 
 #ifdef USE_PICO_LIB
 
-#include <stdbool.h>
-
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 
@@ -39,9 +37,7 @@
 #endif
 
 #elif defined(USE_PRINT_DEBUG)
-
 #include <stdio.h>
-
 #endif
 
 #ifdef USE_SPIDEV_LINUX
@@ -50,6 +46,7 @@
 /* TODO Add BSD OS support things*/
 #endif
 
+#include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
 
@@ -58,7 +55,6 @@
 #include "gpio.h"
 
 #ifdef USE_SPIDEV
-
 static int	spidev_duplex_com(const pi_mcp2515_t *, char[sizeof(uint64_t)], char[sizeof(uint64_t)]);
 
 /* spidev only does duplex communication. So, we split that off to this function. */
@@ -76,7 +72,6 @@ spidev_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t
 
 	return (ioctl(pi_mcp2515->gpio_spidev_fd, SPI_IOC_MESSAGE(1), &tr));
 }
-
 #endif /* USE_SPIDEV */
 
 int
@@ -224,6 +219,7 @@ mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t
 {
 #ifdef USE_PICO_LIB
 	spi_write_blocking(pi_mcp2515->gpio_spi_inst, data, len);
+
 	return (0);
 #elif defined(USE_SPIDEV)
 	/* TODO incomplete */
@@ -231,22 +227,22 @@ mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t
 	char tx_buffer[sizeof(uint64_t)] = { 0 }, rx_buffer[sizeof(tx_buffer)] = { 0 };
 
 	for (uint8_t i = 0; i < len; i += sizeof(uint64_t)) {
-		if (len - i > sizeof(uint64_t)) {
+		if (len - i > sizeof(uint64_t))
 			memcpy(&tx_buffer, &data[i], sizeof(tx_buffer));
-		} else {
+		else {
 			tail_len = len - i;
 			memcpy(&tx_buffer, &data[i], tail_len);
 			memset(&tx_buffer[tail_len], 0, sizeof(tx_buffer) - tail_len);
 		}
-		if ((res = spidev_duplex_com(pi_mcp2515, tx_buffer, rx_buffer))) {
+		if ((res = spidev_duplex_com(pi_mcp2515, tx_buffer, rx_buffer)))
 			return (res);
-		}
 	}
 
 	return (0);
 #elif defined(USE_PRINT_DEBUG)
 	printf("spi_write_blocking(0x%02x, 0x%02x%s, 0x%02x)\n", pi_mcp2515->spi_channel, data[0],
-		len == 1 ? "" : "...", len);
+	    len == 1 ? "" : "...", len);
+
 	return (0);
 #endif
 }
@@ -257,6 +253,7 @@ mcp2515_gpio_spi_read_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t 
 #ifdef USE_PICO_LIB
 	/* Note: For now, repeated_tx_data is not used anywhere in the library so we just skip it. */
 	spi_read_blocking(pi_mcp2515->gpio_spi_inst, 0x00, data, len);
+
 	return (0);
 #elif defined(USE_SPIDEV)
 	/* TODO incomplete */
@@ -271,7 +268,8 @@ mcp2515_gpio_spi_read_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t 
 	return (0);
 #elif defined(USE_PRINT_DEBUG)
 	printf("spi_read_blocking(0x%02x, 0x00, 0x%02x%s, 0x%02x)\n", pi_mcp2515->spi_channel, data[0],
-		len == 1 ? "" : "...", len);
+	    len == 1 ? "" : "...", len);
+
 	return (0);
 #endif
 }
@@ -281,6 +279,7 @@ mcp2515_gpio_put(const pi_mcp2515_t *pi_mcp2515, uint8_t pin, uint8_t value)
 {
 #ifdef USE_PICO_LIB
 	gpio_put(pin, value);
+
 	return (0);
 #elif defined(USE_SPIDEV)
 	struct gpio_v2_line_values values;
@@ -291,6 +290,7 @@ mcp2515_gpio_put(const pi_mcp2515_t *pi_mcp2515, uint8_t pin, uint8_t value)
 	return (ioctl(pi_mcp2515->gpio_pin_fd_map[pin], GPIO_V2_LINE_SET_VALUES_IOCTL, &values));
 #elif defined(USE_PRINT_DEBUG)
 	printf("gpio_put(0x%02x, 0x%02x)\n", pin, value);
+
 	return (0);
 #endif
 }
