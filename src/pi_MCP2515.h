@@ -69,10 +69,15 @@
 #define PI_MCP2515_STATUS_RX0BF 0x01
 #define PI_MCP2515_STATUS_RX1BF 0x02
 
+/* CANINTF Definitions */
+#define PI_MCP2515_CANINTF_RX0 0x01
+#define PI_MCP2515_CANINTF_RX1 0x02
+
 /* ID Mask Definitions */
 #define PI_MCP2515_ID_MASK_SFF 0x000007FFUL
 #define PI_MCP2515_ID_MASK_EFF 0x1FFFFFFFUL
 
+/* Library Definitions */
 #define PI_MCP2515_GPIO_PIN_MAP_LEN 40
 
 typedef struct {

@@ -41,14 +41,14 @@ static const uint8_t tx_reg_list[][2] = {
 int
 mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t *can_frame)
 {
-	int res;
+	int res, i;
 	uint16_t id_tmp;
 	uint8_t payload[13], ctrl;
 	bool extended_id;
 
 	res = -1;
 
-	for (int i = 0; i < (sizeof(tx_reg_list) / sizeof(tx_reg_list[0])); i++) {
+	for (i = 0; i < (sizeof(tx_reg_list) / sizeof(tx_reg_list[0])); i++) {
 		mcp2515_register_read(pi_mcp2515, &ctrl, 1, tx_reg_list[i][0]);
 		if (ctrl & PI_MCP2515_CTRL_TXREQ) {
 			extended_id = can_frame->id & PI_MCP2515_FLAG_EFF;
@@ -71,7 +71,7 @@ mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t 
 			memcpy(&payload[4], can_frame->payload, can_frame->dlc);
 			mcp2515_register_write(pi_mcp2515, payload, can_frame->dlc + 5, tx_reg_list[i][1]);
 			mcp2515_register_bitmod(pi_mcp2515, PI_MCP2515_CTRL_TXREQ, PI_MCP2515_CTRL_TXREQ,
-				tx_reg_list[i][1]);
+			    tx_reg_list[i][1]);
 
 			/* Check status again for errors */
 			mcp2515_register_read(pi_mcp2515, &ctrl, 1, tx_reg_list[i][0]);
@@ -94,19 +94,19 @@ mcp2515_can_message_read(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_f
 
 	res = 0;
 
-	/* TODO There is a lot of clutter and hardcoded values. This should be more tidy. */
 	SET_CS(pi_mcp2515);
+
 	status = mcp2515_status(pi_mcp2515);
 	if (status & PI_MCP2515_STATUS_RX0BF) {
 		ctrl_reg = PI_MCP2515_RGSTR_RX0CTRL;
 		sidh_reg = PI_MCP2515_RGSTR_RX0SIDH;
 		data_reg = PI_MCP2515_RGSTR_RX0DATA;
-		canintf = 0x01;
+		canintf = PI_MCP2515_CANINTF_RX0;
 	} else if (status & PI_MCP2515_STATUS_RX1BF) {
 		ctrl_reg = PI_MCP2515_RGSTR_RX1CTRL;
 		sidh_reg = PI_MCP2515_RGSTR_RX1SIDH;
 		data_reg = PI_MCP2515_RGSTR_RX1DATA;
-		canintf = 0x02;
+		canintf = PI_MCP2515_CANINTF_RX1;
 	} else {
 		res = -1;
 		goto end;
@@ -114,6 +114,7 @@ mcp2515_can_message_read(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_f
 	mcp2515_register_read(pi_mcp2515, buffer, 5, sidh_reg);
 
 	id = (buffer[0] << 3) | (buffer[1] >> 5);
+
 	if (buffer[1] & 0x08) /* Uses expanded ID */
 		id = (((((id << 2) + (buffer[1] & 0x03)) << 8) + buffer[2]) << 8) + buffer[3];
 
@@ -128,6 +129,7 @@ mcp2515_can_message_read(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_f
 
 	mcp2515_register_read(pi_mcp2515, can_frame->payload, dlc, data_reg);
 	mcp2515_register_bitmod(pi_mcp2515, 0, canintf, PI_MCP2515_RGSTR_CANINTF);
+
 end:
 	UNSET_CS(pi_mcp2515);
 
@@ -238,12 +240,17 @@ mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps,
     uint8_t prescaler, uint8_t prseg_tqps, uint8_t phseg_tqps1, uint8_t phseg_tqps2, bool sof, bool wakfil, bool sam,
     bool btlmode)
 {
+	int res;
 	uint8_t cnf1, cnf2, cnf3;
+
+	res = 0;
 
 	if (baud_rate_kbps > 1000 || baud_rate_kbps == 0 || osc_mhz > 40|| osc_mhz == 0 || sjw > 4 || sjw == 0
 	    || prescaler > 63 || prseg_tqps == 0 || prseg_tqps > 8 || phseg_tqps1 == 0 || phseg_tqps1 > 8
-	    || phseg_tqps2 == 0 || phseg_tqps2 > 8 || phseg_tqps2 <= sjw || prseg_tqps + phseg_tqps1 < phseg_tqps2)
-		return (1);
+	    || phseg_tqps2 == 0 || phseg_tqps2 > 8 || phseg_tqps2 <= sjw || prseg_tqps + phseg_tqps1 < phseg_tqps2) {
+		res = 1;
+		goto err;
+	}
 
 	cnf1 = ((sjw - 1) << 6) | (prescaler & 0x3f);
 	cnf2 = (((phseg_tqps1 - 1) & 0x07) << 3) | (prseg_tqps & 0x7);
@@ -258,19 +265,23 @@ mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps,
 	if (wakfil)
 		cnf3 |= 0x40;
 
-	mcp2515_register_write(pi_mcp2515, &cnf1, 1, PI_MCP2515_RGSTR_CNF1);
-	mcp2515_register_write(pi_mcp2515, &cnf2, 1, PI_MCP2515_RGSTR_CNF2);
-	mcp2515_register_write(pi_mcp2515, &cnf3, 1, PI_MCP2515_RGSTR_CNF3);
+	if ((res = mcp2515_register_write(pi_mcp2515, &cnf1, 1, PI_MCP2515_RGSTR_CNF1)))
+		goto err;
+	if ((res = mcp2515_register_write(pi_mcp2515, &cnf2, 1, PI_MCP2515_RGSTR_CNF2)))
+		goto err;
+	if ((res = mcp2515_register_write(pi_mcp2515, &cnf3, 1, PI_MCP2515_RGSTR_CNF3)))
+		goto err;
 
 	pi_mcp2515->osc_mhz = osc_mhz;
 
-	return (0);
+err:
+	return (res);
 }
 
 int
 mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
 {
-	int res;
+	int res, i;
 	uint8_t instr = PI_MCP2515_INSTR_RESET, blank[14] = { 0 };
 
 	SET_CS(pi_mcp2515);
@@ -282,11 +293,12 @@ mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
 
 	MICRO_SLEEP(mcp2515_osc_time(pi_mcp2515, 128));
 
-	/* Return a sum of all return values. This is a reset function, so try and reset all registers. */
-	for (int i = 0; i < sizeof (tx_reg_list) / sizeof (tx_reg_list[0]); i++)
-		res += mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), tx_reg_list[i][0]);
-	res += mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RX0CTRL);
-	res += mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RX1CTRL);
+	for (i = 0; i < sizeof (tx_reg_list) / sizeof (tx_reg_list[0]); i++)
+		if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), tx_reg_list[i][0])))
+			goto err;
+	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RX0CTRL)))
+		goto err;
+	res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RX1CTRL);
 
 err:
 	return (res);
