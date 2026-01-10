@@ -38,6 +38,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
 add_library(piMCP2515 STATIC src/pi_MCP2515.c src/gpio.c src/pi_MCP2515.h src/gpio.h)
+add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
 if (USE_SPIDEV)
     target_compile_definitions(piMCP2515 PRIVATE USE_SPIDEV=1)

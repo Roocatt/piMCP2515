@@ -109,10 +109,11 @@ int	mcp2515_bitrate_default_16mhz_1000kbps(pi_mcp2515_t *);
 int	mcp2515_bitrate_default_8mhz_500kbps(pi_mcp2515_t *);
 int	mcp2515_bitrate_simplified(pi_mcp2515_t *, uint16_t, uint8_t);
 int	mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,
-	bool, bool, bool, bool);
+    bool, bool, bool, bool);
 int	mcp2515_reset(pi_mcp2515_t *);
 uint8_t	mcp2515_error_tx_count(pi_mcp2515_t *);
 uint8_t	mcp2515_error_rx_count(pi_mcp2515_t *);
+void	mcp2515_free(const pi_mcp2515_t *);
 int	mcp2515_init(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t);
 
 #endif /* PI_MCP2515_H */

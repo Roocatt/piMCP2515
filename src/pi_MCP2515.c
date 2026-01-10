@@ -47,7 +47,7 @@ mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t 
 			extended_id = can_frame->id & PI_MCP2515_FLAG_EFF;
 
 			id_tmp = (uint16_t)((can_frame->id & (extended_id ? PI_MCP2515_ID_MASK_EFF
-				: PI_MCP2515_ID_MASK_SFF)) & 0x0FFFF);
+			    : PI_MCP2515_ID_MASK_SFF)) & 0x0FFFF);
 			if (extended_id) {
 				payload[3] = (uint8_t)(id_tmp & 0xFF);
 				payload[2] = (uint8_t)(id_tmp >> 8);
@@ -107,15 +107,14 @@ mcp2515_can_message_read(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_f
 	mcp2515_register_read(pi_mcp2515, buffer, 5, sidh_reg);
 
 	id = (buffer[0] << 3) | (buffer[1] >> 5);
-	if (buffer[1] & 0x08) { /* Uses expanded ID */
+	if (buffer[1] & 0x08) /* Uses expanded ID */
 		id = (((((id << 2) + (buffer[1] & 0x03)) << 8) + buffer[2]) << 8) + buffer[3];
-	}
+
 	dlc = buffer[4] & 0x0F;
 
 	mcp2515_register_read(pi_mcp2515, &ctrl, 1, ctrl_reg);
-	if (ctrl & PI_MCP2515_CTRL_RTR) {
+	if (ctrl & PI_MCP2515_CTRL_RTR)
 		id |= PI_MCP2515_FLAG_RTR;
-	}
 
 	can_frame->id = id;
 	can_frame->dlc = dlc;
@@ -194,6 +193,7 @@ mcp2515_register_bitmod(pi_mcp2515_t *pi_mcp2515, uint8_t data, uint8_t mask, ui
 	message[3] = data;
 	res = mcp2515_gpio_spi_write_blocking(pi_mcp2515, message, 4);
 	UNSET_CS(pi_mcp2515);
+
 	return (res);
 }
 
@@ -218,24 +218,24 @@ mcp2515_bitrate_default_8mhz_500kbps(pi_mcp2515_t *pi_mcp2515)
 }
 
 int
-mcp2515_bitrate_simplified(pi_mcp2515_t *pi_mcp2515, uint16_t baudrate_kbps, uint8_t osc_mhz)
+mcp2515_bitrate_simplified(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps, uint8_t osc_mhz)
 {
-	return (mcp2515_bitrate_full_optional(pi_mcp2515, baudrate_kbps, osc_mhz, 2, 0, 2,
-		2, 3, false, false, false, true));
+	return (mcp2515_bitrate_full_optional(pi_mcp2515, baud_rate_kbps, osc_mhz, 2, 0, 2,
+	    2, 3, false, false, false, true));
 }
 
 /* TODO first draft. Test/validate/fix. Make sure this is right. */
 int
-mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baudrate_kbps, uint8_t osc_mhz, uint8_t sjw,
-	uint8_t prescaler, uint8_t prseg_tqps, uint8_t phseg_tqps1, uint8_t phseg_tqps2, bool sof, bool wakfil,
-	bool sam, bool btlmode)
+mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps, uint8_t osc_mhz, uint8_t sjw,
+    uint8_t prescaler, uint8_t prseg_tqps, uint8_t phseg_tqps1, uint8_t phseg_tqps2, bool sof, bool wakfil, bool sam,
+    bool btlmode)
 {
 	uint8_t cnf1, cnf2, cnf3;
 
-	if (baudrate_kbps > 1000 || baudrate_kbps == 0 || osc_mhz > 40|| osc_mhz == 0 || sjw > 4 || sjw == 0
-			|| prescaler > 63 || prseg_tqps == 0 || prseg_tqps > 8 || phseg_tqps1 == 0 || phseg_tqps1 > 8
-			|| phseg_tqps2 == 0 || phseg_tqps2 > 8 || phseg_tqps2 <= sjw
-			|| prseg_tqps + phseg_tqps1 < phseg_tqps2) {
+	if (baud_rate_kbps > 1000 || baud_rate_kbps == 0 || osc_mhz > 40|| osc_mhz == 0 || sjw > 4 || sjw == 0
+	    || prescaler > 63 || prseg_tqps == 0 || prseg_tqps > 8 || phseg_tqps1 == 0 || phseg_tqps1 > 8
+	    || phseg_tqps2 == 0 || phseg_tqps2 > 8 || phseg_tqps2 <= sjw
+	    || prseg_tqps + phseg_tqps1 < phseg_tqps2) {
 		return (1);
 	}
 
@@ -243,18 +243,14 @@ mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baudrate_kbps, 
 	cnf2 = (((phseg_tqps1 - 1) & 0x07) << 3) | (prseg_tqps & 0x7);
 	cnf3 = (phseg_tqps2 - 1) & 0x07;
 
-	if (btlmode) {
+	if (btlmode)
 		cnf2 |= 0x80;
-	}
-	if (sam) {
+	if (sam)
 		cnf2 |= 0x40;
-	}
-	if (sof) {
+	if (sof)
 		cnf3 |= 0x80;
-	}
-	if (wakfil) {
+	if (wakfil)
 		cnf3 |= 0x40;
-	}
 
 	mcp2515_register_write(pi_mcp2515, &cnf1, 1, PI_MCP2515_RGSTR_CNF1);
 	mcp2515_register_write(pi_mcp2515, &cnf2, 1, PI_MCP2515_RGSTR_CNF2);
@@ -309,7 +305,7 @@ mcp2515_error_rx_count(pi_mcp2515_t *pi_mcp2515)
 
 int
 mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint8_t tx_pin, uint8_t rx_pin,
-		uint8_t sck_pin, uint32_t spi_clock)
+    uint8_t sck_pin, uint32_t spi_clock)
 {
 	int res;
 
@@ -328,7 +324,7 @@ mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint
 }
 
 void
-mcp2515_free(pi_mcp2515_t *pi_mcp2515)
+mcp2515_free(const pi_mcp2515_t *pi_mcp2515)
 {
 	mcp2515_gpio_spi_free(pi_mcp2515);
 	/* TODO incomplete */
