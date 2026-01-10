@@ -24,6 +24,13 @@
 
 #include "pi_MCP2515.h"
 
+#ifdef USE_PICO_LIB
+#define MICRO_SLEEP(x) sleep_us(x)
+#else
+#include <unistd.h>
+#define MICRO_SLEEP(x) usleep(x);
+#endif
+
 static const uint8_t tx_reg_list[][2] = {
 	/* CTRL, SIDH */
 	{ 0x30, 0x31 },
@@ -256,6 +263,8 @@ mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps,
 	mcp2515_register_write(pi_mcp2515, &cnf2, 1, PI_MCP2515_RGSTR_CNF2);
 	mcp2515_register_write(pi_mcp2515, &cnf3, 1, PI_MCP2515_RGSTR_CNF3);
 
+	pi_mcp2515->osc_mhz = osc_mhz;
+
 	return (0);
 }
 
@@ -272,7 +281,7 @@ mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
 	if (res)
 		return (res);
 
-	/* TODO wait? */
+	MICRO_SLEEP(mcp2515_osc_time(pi_mcp2515, 128));
 
 	/* Return a sum of all return values. This is a reset function, so try and reset all registers. */
 	for (int i = 0; i < sizeof (tx_reg_list) / sizeof (tx_reg_list[0]); i++)
@@ -323,9 +332,18 @@ mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint
 	return (0);
 }
 
+uint64_t
+mcp2515_osc_time(const pi_mcp2515_t *pi_mcp2515, uint32_t num_cycles)
+{
+	uint64_t cycle_len_nano_sec;
+
+	cycle_len_nano_sec = 1000000000 / (pi_mcp2515->osc_mhz * 1000000);
+
+	return (num_cycles * cycle_len_nano_sec / 1000); /* return milliseconds */
+}
+
 void
 mcp2515_free(const pi_mcp2515_t *pi_mcp2515)
 {
 	mcp2515_gpio_spi_free(pi_mcp2515);
-	/* TODO incomplete */
 }

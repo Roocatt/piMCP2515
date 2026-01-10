@@ -17,9 +17,7 @@
 #define PI_MCP2515_H
 
 #ifdef USE_PICO_LIB
-
 #include "hardware/spi.h"
-
 #endif /* USE_PICO_LIB */
 
 #include <stdbool.h>
@@ -86,6 +84,7 @@ typedef struct {
 	uint8_t rx_pin;
 	uint8_t sck_pin;
 	uint32_t spi_clock;
+	uint8_t osc_mhz;
 #ifdef USE_PICO_LIB
 	spi_inst_t *gpio_spi_inst;
 #elifdef USE_SPIDEV
@@ -98,22 +97,23 @@ typedef struct {
 #endif
 } pi_mcp2515_t;
 
-int	mcp2515_can_message_send(pi_mcp2515_t *, const pi_mcp2515_can_frame_t *);
-int	mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
-uint8_t	mcp2515_status(pi_mcp2515_t *);
-int	mcp2515_register_read(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
-int	mcp2515_register_write(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
-int	mcp2515_register_bitmod(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t);
-int	mcp2515_reqop(pi_mcp2515_t *, uint8_t);
-int	mcp2515_bitrate_default_16mhz_1000kbps(pi_mcp2515_t *);
-int	mcp2515_bitrate_default_8mhz_500kbps(pi_mcp2515_t *);
-int	mcp2515_bitrate_simplified(pi_mcp2515_t *, uint16_t, uint8_t);
-int	mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,
-    bool, bool, bool, bool);
-int	mcp2515_reset(pi_mcp2515_t *);
-uint8_t	mcp2515_error_tx_count(pi_mcp2515_t *);
-uint8_t	mcp2515_error_rx_count(pi_mcp2515_t *);
-void	mcp2515_free(const pi_mcp2515_t *);
-int	mcp2515_init(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t);
+int		mcp2515_can_message_send(pi_mcp2515_t *, const pi_mcp2515_can_frame_t *);
+int		mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
+uint8_t		mcp2515_status(pi_mcp2515_t *);
+int		mcp2515_register_read(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
+int		mcp2515_register_write(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
+int		mcp2515_register_bitmod(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t);
+int		mcp2515_reqop(pi_mcp2515_t *, uint8_t);
+int		mcp2515_bitrate_default_16mhz_1000kbps(pi_mcp2515_t *);
+int		mcp2515_bitrate_default_8mhz_500kbps(pi_mcp2515_t *);
+int		mcp2515_bitrate_simplified(pi_mcp2515_t *, uint16_t, uint8_t);
+int		mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,
+    uint8_t, bool, bool, bool, bool);
+int		mcp2515_reset(pi_mcp2515_t *);
+uint8_t		mcp2515_error_tx_count(pi_mcp2515_t *);
+uint8_t		mcp2515_error_rx_count(pi_mcp2515_t *);
+uint64_t	mcp2515_osc_time(const pi_mcp2515_t *, uint32_t);
+void		mcp2515_free(const pi_mcp2515_t *);
+int		mcp2515_init(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t);
 
 #endif /* PI_MCP2515_H */

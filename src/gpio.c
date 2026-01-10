@@ -20,6 +20,8 @@
 
 #ifdef USE_PICO_LIB
 
+#include <stdbool.h>
+
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 
@@ -82,6 +84,7 @@ mcp2515_gpio_init(pi_mcp2515_t *pi_mcp2515, uint8_t pin)
 {
 #ifdef USE_PICO_LIB
 	gpio_init(pin);
+
 	return (0);
 #elif defined(USE_SPIDEV)
 	struct gpio_v2_line_request rq = { 0 };
@@ -94,13 +97,13 @@ mcp2515_gpio_init(pi_mcp2515_t *pi_mcp2515, uint8_t pin)
 	strncpy(rq.consumer, "pi_mcp2515", sizeof(rq.consumer));
 
 	res = ioctl(pi_mcp2515->gpio_gpio_fd, GPIO_GET_LINEHANDLE_IOCTL, &rq);
-	if (!res) {
+	if (!res)
 		pi_mcp2515->gpio_pin_fd_map[pin] = rq.fd;
-	}
 
 	return (res);
 #elif defined(USE_PRINT_DEBUG)
 	printf("gpio_init(0x%02x)\n", pin);
+
 	return (0);
 #endif
 }
@@ -108,13 +111,13 @@ mcp2515_gpio_init(pi_mcp2515_t *pi_mcp2515, uint8_t pin)
 void
 mcp2515_gpio_spi_free(const pi_mcp2515_t *pi_mcp2515)
 {
-#ifdef USE_PICO_LIB
-	/* TODO */
-#elif defined(USE_SPIDEV)
+#ifdef USE_SPIDEV
 	if (pi_mcp2515->gpio_spidev_fd > 0)
 		close(pi_mcp2515->gpio_spidev_fd);
+
 	if (pi_mcp2515->gpio_gpio_fd > 0)
 		close(pi_mcp2515->gpio_gpio_fd);
+
 	for (uint8_t i = 0; i < PI_MCP2515_GPIO_PIN_MAP_LEN; i++)
 		if (pi_mcp2515->gpio_pin_fd_map[i] > 0)
 			close(pi_mcp2515->gpio_pin_fd_map[i]);
@@ -123,6 +126,13 @@ mcp2515_gpio_spi_free(const pi_mcp2515_t *pi_mcp2515)
 
 int
 mcp2515_gpio_spi_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint32_t baud_rate)
+{
+	return (mcp2515_gpio_spi_init_full_optional(pi_mcp2515, spi_channel, baud_rate, 0, 8));
+}
+
+int
+mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint32_t baud_rate, uint8_t mode,
+    uint8_t bits_per_word)
 {
 #ifdef USE_PICO_LIB
 	spi_inst_t *spi_inst;
@@ -146,22 +156,17 @@ mcp2515_gpio_spi_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint32_t ba
 	gpio_set_function(pi_mcp2515->sck_pin, PI_MCP2515_GPIO_FUNC_SPI);
 	mcp2515_gpio_init(pi_mcp2515, pi_mcp2515->cs_pin);
 
-	/* TODO Sort conditional building with '1u' / GPIO_OUT */
-	mcp2515_gpio_set_dir(pi_mcp2515, pi_mcp2515->cs_pin, GPIO_OUT);
+	mcp2515_gpio_set_dir(pi_mcp2515, pi_mcp2515->cs_pin, true);
+
 	return (0);
 #elif defined(USE_SPIDEV)
 	int res, spidev_fd, gpio_fd;
-	uint8_t mode, bits_per_word;
 
 	memset(&pi_mcp2515->gpio_pin_fd_map, 0 , sizeof(pi_mcp2515->gpio_pin_fd_map));
 
-	mode = 0; /* TODO mode, bits_per_word, and delay_usec value configurable or defaults?*/
-	bits_per_word = 8;
-
 	gpio_fd = open("/dev/gpio0", O_RDWR); /* TODO configure path and handle error */
-	if (gpio_fd < 0) {
+	if (gpio_fd < 0)
 		return (-1);
-	}
 	spidev_fd = open("/dev/spi0", O_RDWR); /* TODO configure path and handle error */
 	if (spidev_fd < 0) {
 		close(gpio_fd);
