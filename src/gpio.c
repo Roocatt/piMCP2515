@@ -147,7 +147,7 @@ mcp2515_gpio_spi_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint32_t ba
 	mcp2515_gpio_init(pi_mcp2515, pi_mcp2515->cs_pin);
 
 	/* TODO Sort conditional building with '1u' / GPIO_OUT */
-	mcp2515_gpio_set_dir(pi_mcp2515->cs_pin, GPIO_OUT);
+	mcp2515_gpio_set_dir(pi_mcp2515, pi_mcp2515->cs_pin, GPIO_OUT);
 	return (0);
 #elif defined(USE_SPIDEV)
 	int res, spidev_fd, gpio_fd;
