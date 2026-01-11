@@ -160,6 +160,24 @@ end:
 }
 
 uint8_t
+mcp2515_interrupts_get(pi_mcp2515_t *pi_mcp2515)
+{
+	uint8_t intf;
+
+	mcp2515_register_read(pi_mcp2515, &intf, 1, PI_MCP2515_RGSTR_CANINTF);
+
+	return (intf);
+}
+
+void
+mcp2515_interrupts_clear(pi_mcp2515_t *pi_mcp2515)
+{
+	uint8_t zero = 0;
+
+	mcp2515_register_write(pi_mcp2515, &zero, 1, PI_MCP2515_RGSTR_CANINTF);
+}
+
+uint8_t
 mcp2515_status(pi_mcp2515_t *pi_mcp2515)
 {
 	uint8_t instruction, res;
@@ -246,7 +264,7 @@ mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, uint8_t reqop)
 
 /* Get current operating mode.
  */
-int
+uint8_t
 mcp2515_reqop_get(pi_mcp2515_t *pi_mcp2515)
 {
 	uint8_t reqop;

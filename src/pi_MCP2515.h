@@ -120,11 +120,14 @@ typedef struct {
 
 int		mcp2515_can_message_send(pi_mcp2515_t *, const pi_mcp2515_can_frame_t *);
 int		mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
+uint8_t		mcp2515_interrupts_get(pi_mcp2515_t *);
+void		mcp2515_interrupts_clear(pi_mcp2515_t *);
 uint8_t		mcp2515_status(pi_mcp2515_t *);
 int		mcp2515_register_read(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
 int		mcp2515_register_write(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
 int		mcp2515_register_bitmod(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t);
 int		mcp2515_reqop(pi_mcp2515_t *, uint8_t);
+uint8_t		mcp2515_reqop_get(pi_mcp2515_t *);
 int		mcp2515_bitrate_default_16mhz_1000kbps(pi_mcp2515_t *);
 int		mcp2515_bitrate_default_8mhz_500kbps(pi_mcp2515_t *);
 int		mcp2515_bitrate_simplified(pi_mcp2515_t *, uint16_t, uint8_t);
