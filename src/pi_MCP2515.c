@@ -169,6 +169,16 @@ mcp2515_interrupts_get(pi_mcp2515_t *pi_mcp2515)
 	return (intf);
 }
 
+uint8_t
+mcp2515_interrupts_mask(pi_mcp2515_t *pi_mcp2515)
+{
+	uint8_t mask;
+
+	mcp2515_register_read(pi_mcp2515, &mask, 1, PI_MCP2515_RGSTR_CANINTE);
+
+	return (mask);
+}
+
 void
 mcp2515_interrupts_clear(pi_mcp2515_t *pi_mcp2515)
 {
@@ -410,6 +420,22 @@ mcp2515_error_rx_count(pi_mcp2515_t *pi_mcp2515)
 	mcp2515_register_read(pi_mcp2515, &res, 1, PI_MCP2515_RGSTR_ECRX);
 
 	return (res);
+}
+
+uint8_t
+mcp2515_error_flags(pi_mcp2515_t *pi_mcp2515)
+{
+	uint8_t flags = 0;
+
+	mcp2515_register_read(pi_mcp2515, &flags, 1, PI_MCP2515_RGSTR_EFLG);
+
+	return (flags);
+}
+
+bool
+mcp2515_error(pi_mcp2515_t *pi_mcp2515)
+{
+	return (mcp2515_error_flags(pi_mcp2515) & PI_MCP2515_EFLG_MASK);
 }
 
 int

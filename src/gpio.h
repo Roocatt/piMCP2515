@@ -37,6 +37,10 @@
 #define PI_MCP2515_GPIO_FUNC_USB 9
 #define PI_MCP2515_GPIO_FUNC_NULL 0x1f
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 int	mcp2515_gpio_init(pi_mcp2515_t *, uint8_t);
 int	mcp2515_gpio_set_dir(const pi_mcp2515_t *, uint8_t gpio, bool out);
 void mcp2515_gpio_spi_free(const pi_mcp2515_t *);
@@ -45,5 +49,9 @@ int	mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *, uint8_t, uint32_t, uint8
 int	mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *, uint8_t[], uint8_t);
 int	mcp2515_gpio_spi_read_blocking(pi_mcp2515_t *, uint8_t[], uint8_t);
 int	mcp2515_gpio_put(const pi_mcp2515_t *, uint8_t, uint8_t);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* GPIO_H */

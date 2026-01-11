@@ -34,7 +34,9 @@
 #define PI_MCP2515_RGSTR_RXM1SIDH 0x24
 #define PI_MCP2515_RGSTR_CANSTAT 0x0E
 #define PI_MCP2515_RGSTR_CANCTRL 0x0F
+#define PI_MCP2515_RGSTR_CANINTE 0x2B
 #define PI_MCP2515_RGSTR_CANINTF 0x2C
+#define PI_MCP2515_RGSTR_EFLG 0x2D
 #define PI_MCP2515_RGSTR_ECRX 0x1D
 #define PI_MCP2515_RGSTR_ECTX 0x1C
 #define PI_MCP2515_RGSTR_CNF1 0x2A
@@ -47,14 +49,14 @@
 #define PI_MCP2515_RGSTR_RX1SIDH 0x71
 #define PI_MCP2515_RGSTR_RX1DATA 0x76
 
-/* Instruction definitions */
+/* Instruction Definitions */
 #define PI_MCP2515_INSTR_WRITE 0x02
 #define PI_MCP2515_INSTR_READ 0x03
 #define PI_MCP2515_INSTR_BITMOD 0x05
 #define PI_MCP2515_INSTR_READ_STATUS 0xA0
 #define PI_MCP2515_INSTR_RESET 0xC0
 
-/* REQOP definitions */
+/* REQOP Definitions */
 #define PI_MCP2515_REQOP_MASK 0xE0
 #define PI_MCP2515_REQOP_NORMAL 0x00
 #define PI_MCP2515_REQOP_SLEEP 0x20
@@ -71,11 +73,22 @@
 #define PI_MCP2515_CTRL_MLOA 0x20
 #define PI_MCP2515_CTRL_ABTF 0x40
 
-/* Flag definitions */
+/* Flag Definitions */
 #define PI_MCP2515_FLAG_RTR 0x40000000UL
 #define PI_MCP2515_FLAG_EFF 0x80000000UL
 
-/* RX/TX Status */
+/* Error Flag Definitions */
+#define PI_MCP2515_EFLG_EWARN 0x01
+#define PI_MCP2515_EFLG_RXWAR 0x02
+#define PI_MCP2515_EFLG_TXWAR 0x04
+#define PI_MCP2515_EFLG_RXEP 0x08
+#define PI_MCP2515_EFLG_TXEP 0x10
+#define PI_MCP2515_EFLG_TXBO 0x20
+#define PI_MCP2515_EFLG_RX0OVR 0x40
+#define PI_MCP2515_EFLG_RX1OVR 0x80
+#define PI_MCP2515_EFLG_MASK 0xF8
+
+/* RX/TX Status Definitions */
 #define PI_MCP2515_STATUS_RX0BF 0x01
 #define PI_MCP2515_STATUS_RX1BF 0x02
 
@@ -118,9 +131,14 @@ typedef struct {
 #endif
 } pi_mcp2515_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 int		mcp2515_can_message_send(pi_mcp2515_t *, const pi_mcp2515_can_frame_t *);
 int		mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
 uint8_t		mcp2515_interrupts_get(pi_mcp2515_t *);
+uint8_t		mcp2515_interrupts_mask(pi_mcp2515_t *);
 void		mcp2515_interrupts_clear(pi_mcp2515_t *);
 uint8_t		mcp2515_status(pi_mcp2515_t *);
 int		mcp2515_register_read(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
@@ -138,8 +156,15 @@ int		mcp2515_filter_mask(pi_mcp2515_t *, uint8_t, int32_t, bool);
 int		mcp2515_reset(pi_mcp2515_t *);
 uint8_t		mcp2515_error_tx_count(pi_mcp2515_t *);
 uint8_t		mcp2515_error_rx_count(pi_mcp2515_t *);
+uint8_t		mcp2515_error_flags(pi_mcp2515_t *);
+bool		mcp2515_error(pi_mcp2515_t *);
 uint64_t	mcp2515_osc_time(const pi_mcp2515_t *, uint32_t);
 void		mcp2515_free(const pi_mcp2515_t *);
 int		mcp2515_init(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 
 #endif /* PI_MCP2515_H */
