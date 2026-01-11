@@ -159,10 +159,10 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channe
 
 	memset(&pi_mcp2515->gpio_pin_fd_map, 0 , sizeof(pi_mcp2515->gpio_pin_fd_map));
 
-	gpio_fd = open("/dev/gpio0", O_RDWR); /* TODO configure path and handle error */
+	gpio_fd = open(pi_mcp2515->gpio_dev_gpio_path == NULL ? "/dev/gpio0" : pi_mcp2515->gpio_dev_gpio_path, O_RDWR);
 	if (gpio_fd < 0)
 		return (-1);
-	spidev_fd = open("/dev/spi0", O_RDWR); /* TODO configure path and handle error */
+	spidev_fd = open(pi_mcp2515->gpio_dev_spi_path == NULL ? "/dev/spi0" : pi_mcp2515->gpio_dev_spi_path, O_RDWR);
 	if (spidev_fd < 0) {
 		close(gpio_fd);
 		return (-1);

@@ -107,6 +107,8 @@ typedef struct {
 #ifdef USE_PICO_LIB
 	spi_inst_t *gpio_spi_inst;
 #elifdef USE_SPIDEV
+	char *gpio_dev_spi_path;
+	char *gpio_dev_gpio_path;
 	int gpio_spidev_fd;
 	int gpio_gpio_fd;
 	uint8_t gpio_spi_mode;
