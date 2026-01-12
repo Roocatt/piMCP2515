@@ -159,6 +159,12 @@ end:
 	return (res);
 }
 
+bool
+mcp2515_can_message_received(pi_mcp2515_t *pi_mcp2515)
+{
+	return (!!(mcp2515_status(pi_mcp2515) & (PI_MCP2515_STATUS_RX0BF | PI_MCP2515_STATUS_RX0BF)));
+}
+
 uint8_t
 mcp2515_interrupts_get(pi_mcp2515_t *pi_mcp2515)
 {
@@ -284,40 +290,25 @@ mcp2515_reqop_get(pi_mcp2515_t *pi_mcp2515)
 	return (reqop & PI_MCP2515_REQOP_MASK_CANSTAT);
 }
 
-/* TODO These defaults are untested. Make sure this all makes sense. */
 int
-mcp2515_bitrate_default_16mhz_1000kbps(pi_mcp2515_t *pi_mcp2515)
+mcp2515_bitrate_simplified(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps)
 {
-	return (mcp2515_bitrate_simplified(pi_mcp2515, 1000, 16));
-}
-
-int
-mcp2515_bitrate_default_8mhz_500kbps(pi_mcp2515_t *pi_mcp2515)
-{
-	return (mcp2515_bitrate_simplified(pi_mcp2515, 500, 8));
-}
-
-int
-mcp2515_bitrate_simplified(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps, uint8_t osc_mhz)
-{
-	return (mcp2515_bitrate_full_optional(pi_mcp2515, baud_rate_kbps, osc_mhz, 2, 0, 2,
-	    2, 3, false, false, false, true));
+	return (mcp2515_bitrate_full_optional(pi_mcp2515, baud_rate_kbps, 2, 0, 2, 2, 3, false, false, false, true));
 }
 
 /* TODO first draft. Test/validate/fix. Make sure this is right. */
 int
-mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps, uint8_t osc_mhz, uint8_t sjw,
-    uint8_t prescaler, uint8_t prseg_tqps, uint8_t phseg_tqps1, uint8_t phseg_tqps2, bool sof, bool wakfil, bool sam,
-    bool btlmode)
+mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps, uint8_t sjw, uint8_t prescaler,
+    uint8_t prseg_tqps, uint8_t phseg_tqps1, uint8_t phseg_tqps2, bool sof, bool wakfil, bool sam, bool btlmode)
 {
 	int res;
 	uint8_t cnf1, cnf2, cnf3;
 
 	res = 0;
 
-	if (baud_rate_kbps > 1000 || baud_rate_kbps == 0 || osc_mhz > 40|| osc_mhz == 0 || sjw > 4 || sjw == 0
-	    || prescaler > 63 || prseg_tqps == 0 || prseg_tqps > 8 || phseg_tqps1 == 0 || phseg_tqps1 > 8
-	    || phseg_tqps2 == 0 || phseg_tqps2 > 8 || phseg_tqps2 <= sjw || prseg_tqps + phseg_tqps1 < phseg_tqps2) {
+	if (baud_rate_kbps > 1000 || baud_rate_kbps == 0 || sjw > 4 || sjw == 0 || prescaler > 63 || prseg_tqps == 0
+	    || prseg_tqps > 8 || phseg_tqps1 == 0 || phseg_tqps1 > 8 || phseg_tqps2 == 0 || phseg_tqps2 > 8
+	    || phseg_tqps2 <= sjw || prseg_tqps + phseg_tqps1 < phseg_tqps2) {
 		res = 1;
 		goto err;
 	}
@@ -339,10 +330,50 @@ mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps,
 		goto err;
 	if ((res = mcp2515_register_write(pi_mcp2515, &cnf2, 1, PI_MCP2515_RGSTR_CNF2)))
 		goto err;
-	if ((res = mcp2515_register_write(pi_mcp2515, &cnf3, 1, PI_MCP2515_RGSTR_CNF3)))
-		goto err;
+	res = mcp2515_register_write(pi_mcp2515, &cnf3, 1, PI_MCP2515_RGSTR_CNF3);
 
-	pi_mcp2515->osc_mhz = osc_mhz;
+err:
+	return (res);
+}
+
+int
+mcp2515_cnf_set(pi_mcp2515_t *pi_mcp2515, uint8_t cnf1, uint8_t cnf2, uint8_t cnf3)
+{
+	int res;
+
+	if ((res = mcp2515_register_write(pi_mcp2515, &cnf1, 1, PI_MCP2515_RGSTR_CNF1)))
+		goto err;
+	if ((res = mcp2515_register_write(pi_mcp2515, &cnf2, 1, PI_MCP2515_RGSTR_CNF2)))
+		goto err;
+	res = mcp2515_register_write(pi_mcp2515, &cnf3, 1, PI_MCP2515_RGSTR_CNF3);
+
+	err:
+		return (res);
+}
+
+/* Get the value of a CNF register enumerated by the variable 'cnf'.
+ */
+uint8_t
+mcp2515_cnf_get(pi_mcp2515_t *pi_mcp2515, uint8_t cnf)
+{
+	uint8_t res = 0, rgstr;
+
+	/* CNF register numbers aren't zero indexed for some indiscernible reason. Start with 1 here for consistency. */
+	switch (cnf) {
+	case 1:
+		rgstr = PI_MCP2515_RGSTR_CNF1;
+		break;
+	case 2:
+		rgstr = PI_MCP2515_RGSTR_CNF2;
+		break;
+	case 3:
+		rgstr = PI_MCP2515_RGSTR_CNF3;
+		break;
+	default:
+		goto err;
+	}
+
+	mcp2515_register_read(pi_mcp2515, &res, 1, rgstr);
 
 err:
 	return (res);
@@ -440,9 +471,14 @@ mcp2515_error(pi_mcp2515_t *pi_mcp2515)
 
 int
 mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint8_t tx_pin, uint8_t rx_pin,
-    uint8_t sck_pin, uint32_t spi_clock)
+    uint8_t sck_pin, uint32_t spi_clock, uint8_t osc_mhz)
 {
 	int res = 0;
+
+	if (osc_mhz > 40|| osc_mhz == 0) {
+		res = 1;
+		goto err;
+	}
 
 	pi_mcp2515->spi_channel = spi_channel;
 	pi_mcp2515->cs_pin = cs_pin;
@@ -450,6 +486,7 @@ mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint
 	pi_mcp2515->tx_pin = tx_pin;
 	pi_mcp2515->rx_pin = rx_pin;
 	pi_mcp2515->spi_clock = spi_clock;
+	pi_mcp2515->osc_mhz = osc_mhz;
 
 	if ((res = mcp2515_gpio_spi_init(pi_mcp2515, spi_channel, spi_clock)))
 		goto err;

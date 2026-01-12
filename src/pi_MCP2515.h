@@ -137,6 +137,7 @@ extern "C" {
 
 int		mcp2515_can_message_send(pi_mcp2515_t *, const pi_mcp2515_can_frame_t *);
 int		mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
+bool		mcp2515_can_message_received(pi_mcp2515_t *);
 uint8_t		mcp2515_interrupts_get(pi_mcp2515_t *);
 uint8_t		mcp2515_interrupts_mask(pi_mcp2515_t *);
 void		mcp2515_interrupts_clear(pi_mcp2515_t *);
@@ -148,9 +149,9 @@ int		mcp2515_reqop(pi_mcp2515_t *, uint8_t);
 uint8_t		mcp2515_reqop_get(pi_mcp2515_t *);
 int		mcp2515_bitrate_default_16mhz_1000kbps(pi_mcp2515_t *);
 int		mcp2515_bitrate_default_8mhz_500kbps(pi_mcp2515_t *);
-int		mcp2515_bitrate_simplified(pi_mcp2515_t *, uint16_t, uint8_t);
+int		mcp2515_bitrate_simplified(pi_mcp2515_t *, uint16_t);
 int		mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,
-    uint8_t, bool, bool, bool, bool);
+    bool, bool, bool, bool);
 int		mcp2515_filter(pi_mcp2515_t *, uint8_t, uint32_t, bool);
 int		mcp2515_filter_mask(pi_mcp2515_t *, uint8_t, int32_t, bool);
 int		mcp2515_reset(pi_mcp2515_t *);
@@ -160,11 +161,10 @@ uint8_t		mcp2515_error_flags(pi_mcp2515_t *);
 bool		mcp2515_error(pi_mcp2515_t *);
 uint64_t	mcp2515_osc_time(const pi_mcp2515_t *, uint32_t);
 void		mcp2515_free(const pi_mcp2515_t *);
-int		mcp2515_init(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t);
+int		mcp2515_init(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t, uint8_t);
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
 
 #endif /* PI_MCP2515_H */
