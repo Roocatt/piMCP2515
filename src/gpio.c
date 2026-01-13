@@ -13,7 +13,9 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* This is a nightmare C file from hell with about as much C preprocessor as actual C code. I may work on making this
+/* This is excluded from Doxygen as this is only used for internal functionality.
+ *
+ * This is a nightmare C file from hell with about as much C preprocessor as actual C code. I may work on making this
  * better, but this file exists to add a shim between the actual GPIO/SPI backing so it may just be used to isolate the
  * horrors from the rest of the project.
  */
@@ -57,7 +59,16 @@
 #ifdef USE_SPIDEV
 static int	spidev_duplex_com(const pi_mcp2515_t *, char[sizeof(uint64_t)], char[sizeof(uint64_t)]);
 
-/* spidev only does duplex communication. So, we split that off to this function. */
+/**
+ * @brief Perform a round of full duplex comunication over SPI.
+ *
+ * spidev only does duplex communication. So, we split that off to this function.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param tx_buffer the buffer to use for transmitting.
+ * @param rx_buffer the buffer to use for receiving.
+ * @return zero if success, otherwise non-zero.
+ */
 static int
 spidev_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t)], char rx_buffer[sizeof(uint64_t)])
 {
@@ -74,6 +85,16 @@ spidev_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t
 }
 #endif /* USE_SPIDEV */
 
+/**
+ * @brief Set up a GPIO pin.
+ *
+ * When compiled for Pico, it will simply call `gpio_init(pin)`.
+ *
+ * With spidev, this will open a file descriptor for the specified pin to prepare it for future use.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param pin the GPIO pin to set up.
+ */
 int
 mcp2515_gpio_init(pi_mcp2515_t *pi_mcp2515, uint8_t pin)
 {
@@ -87,7 +108,8 @@ mcp2515_gpio_init(pi_mcp2515_t *pi_mcp2515, uint8_t pin)
 
 	rq.offsets[0] = pin;
 	rq.num_lines = 1;
-	rq.config.flags = GPIOHANDLE_REQUEST_OUTPUT;
+	/* TODO Pico SDK sets to input by default. Also need to determine the fd direction/updatability. */
+	rq.config.flags = GPIOHANDLE_REQUEST_INPUT;
 	rq.config.num_attrs = 0;
 	strncpy(rq.consumer, "pi_mcp2515", sizeof(rq.consumer));
 
@@ -103,6 +125,13 @@ mcp2515_gpio_init(pi_mcp2515_t *pi_mcp2515, uint8_t pin)
 #endif
 }
 
+/**
+ * @brief Cleanup everything GPIO for the specified handle.
+ *
+ * Currently, this is a NOP except for when using spidev.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ */
 void
 mcp2515_gpio_spi_free(const pi_mcp2515_t *pi_mcp2515)
 {

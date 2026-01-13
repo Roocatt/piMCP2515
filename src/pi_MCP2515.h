@@ -142,7 +142,7 @@ uint8_t		mcp2515_interrupts_get(pi_mcp2515_t *);
 uint8_t		mcp2515_interrupts_mask(pi_mcp2515_t *);
 void		mcp2515_interrupts_clear(pi_mcp2515_t *);
 uint8_t		mcp2515_status(pi_mcp2515_t *);
-int		mcp2515_register_read(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
+int		mcp2515_register_read(pi_mcp2515_t *, uint8_t *, uint8_t, uint8_t);
 int		mcp2515_register_write(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
 int		mcp2515_register_bitmod(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t);
 int		mcp2515_reqop(pi_mcp2515_t *, uint8_t);

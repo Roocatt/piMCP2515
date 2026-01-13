@@ -12,6 +12,11 @@ CMakeCache.txt
 CopyOfCMakeCache.txt
 Makefile
 pico_flash_region.ld
+CMakeDoxyfile.in
+CMakeDoxygenDefaults.cmake
+Doxyfile
+Doxyfile.docs
+doxygen/*
 
 *.a
 *.o

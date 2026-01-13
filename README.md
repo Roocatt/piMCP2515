@@ -23,5 +23,10 @@ reading the code as many are intended slightly more as personal notes.
 - [ ] Unit testing
 - [x] Easy cross-compiling
 
-## License
-This project is available under the ISC license.
+# Documentation
+
+Documentation can be found under the `/docs` directory. This includes
+man pages (`/docs/man`) and automatically generated API documentation.
+
+## Licence
+This project is available under the ISC licence.

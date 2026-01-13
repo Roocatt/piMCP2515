@@ -31,6 +31,9 @@
 #define MICRO_SLEEP(x) usleep(x);
 #endif
 
+/* A map of CTRL and SIDH TX registers. This is used by `mcp2515_can_message_send` to find an available TX buffer, and
+ * by `mcp2515_reset` to iterate over all TX buffers.
+ */
 static const uint8_t tx_reg_list[][2] = {
 	/* CTRL, SIDH */
 	{ 0x30, 0x31 },
@@ -38,6 +41,13 @@ static const uint8_t tx_reg_list[][2] = {
 	{ 0x50, 0x51 }
 };
 
+/**
+ * @brief Assemble a CAN bus message frame ID.
+ *
+ * @param id the ID to assemble
+ * @param extended_id if it is using an extended ID
+ * @return 4 bytes representing the ID as a uint32_t.
+ */
 inline static uint32_t
 id_build(uint32_t id, bool extended_id)
 {
@@ -61,6 +71,13 @@ id_build(uint32_t id, bool extended_id)
 	return (*((uint32_t *)result));
 }
 
+/**
+ * @brief Send a CAN bus message.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param can_frame the CAN bus frame to send.
+ * @return zero if success, otherwise non-zero.
+ */
 int
 mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t *can_frame)
 {
@@ -108,6 +125,13 @@ mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t 
 	return (res);
 }
 
+/**
+ * @brief Read a CAN bus message.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param can_frame a pointer to the structure to store the received CAN bus frame.
+ * @return zero if success, otherwise non-zero.
+ */
 int
 mcp2515_can_message_read(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_frame)
 {
@@ -159,12 +183,28 @@ end:
 	return (res);
 }
 
+/**
+ * @brief Check if there is a CAN bus message received.
+ *
+ * The message can then be read with `mcp2515_can_message_read`.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return true if a message is received in one of the RX buffers.
+ */
 bool
 mcp2515_can_message_received(pi_mcp2515_t *pi_mcp2515)
 {
 	return (!!(mcp2515_status(pi_mcp2515) & (PI_MCP2515_STATUS_RX0BF | PI_MCP2515_STATUS_RX0BF)));
 }
 
+/**
+ * @brief Check for interrupts.
+ *
+ * The CANINTF register holds the interrupt flags.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return the value of the interrupts flags.
+ */
 uint8_t
 mcp2515_interrupts_get(pi_mcp2515_t *pi_mcp2515)
 {
@@ -175,6 +215,12 @@ mcp2515_interrupts_get(pi_mcp2515_t *pi_mcp2515)
 	return (intf);
 }
 
+/**
+ * @brief Retrieve the interrupt mask.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return the interrupt mask value.
+ */
 uint8_t
 mcp2515_interrupts_mask(pi_mcp2515_t *pi_mcp2515)
 {
@@ -185,6 +231,11 @@ mcp2515_interrupts_mask(pi_mcp2515_t *pi_mcp2515)
 	return (mask);
 }
 
+/**
+ * @brief Clear all interrupts.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ */
 void
 mcp2515_interrupts_clear(pi_mcp2515_t *pi_mcp2515)
 {
@@ -193,6 +244,12 @@ mcp2515_interrupts_clear(pi_mcp2515_t *pi_mcp2515)
 	mcp2515_register_write(pi_mcp2515, &zero, 1, PI_MCP2515_RGSTR_CANINTF);
 }
 
+/**
+ * @brief Check status via the STATUS instruction.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return the current status value.
+ */
 uint8_t
 mcp2515_status(pi_mcp2515_t *pi_mcp2515)
 {
@@ -207,8 +264,17 @@ mcp2515_status(pi_mcp2515_t *pi_mcp2515)
 	return (res);
 }
 
+/**
+ * @brief Read a value from a specified register.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param data the destination to copy the read data to.
+ * @param len the length of the destination buffer.
+ * @param rgstr the register to read.
+ * @return zero if success, otherwise non-zero.
+ */
 int
-mcp2515_register_read(pi_mcp2515_t *pi_mcp2515, uint8_t data[], uint8_t len, uint8_t rgstr)
+mcp2515_register_read(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t len, uint8_t rgstr)
 {
 	int res;
 	uint8_t message[2];
@@ -227,6 +293,15 @@ err:
 	return (res);
 }
 
+/**
+ * @brief Write a value to the specified register.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param values the data to write to the register.
+ * @param len the length of the data to write.
+ * @param rgstr the register to write to.
+ * @return zero if success, otherwise non-zero.
+ */
 int
 mcp2515_register_write(pi_mcp2515_t *pi_mcp2515, uint8_t values[], uint8_t len, uint8_t rgstr)
 {
@@ -248,6 +323,15 @@ err:
 	return (res);
 }
 
+/**
+ * @brief Change the value of a register via an SPI bit modify.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param data the data to use for the bitmod.
+ * @param mask the mask to apply where only bits with a 1 value will be updated in the register with the data values.
+ * @param rgstr the register to perform the bitmod against.
+ * @return zero if success, otherwise non-zero.
+ */
 int
 mcp2515_register_bitmod(pi_mcp2515_t *pi_mcp2515, uint8_t data, uint8_t mask, uint8_t rgstr)
 {
@@ -265,7 +349,23 @@ mcp2515_register_bitmod(pi_mcp2515_t *pi_mcp2515, uint8_t data, uint8_t mask, ui
 	return (res);
 }
 
-/* Change operating mode.
+/**
+ * @brief Change the operating mode.
+ *
+ * After the mode change, this code will then sleep for a 128 oscillator cycles delay before continuing operations as
+ * defined by the MCP2515 manual.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param reqop the new operating mode.
+ *              Acceptable values being:
+ *              - PI_MCP2515_REQOP_MASK
+ *              - PI_MCP2515_REQOP_NORMAL
+ *              - PI_MCP2515_REQOP_SLEEP
+ *              - PI_MCP2515_REQOP_LOOPBACK
+ *              - PI_MCP2515_REQOP_LISTENONLY
+ *              - PI_MCP2515_REQOP_CONFIG
+ *              - PI_MCP2515_REQOP_POWERUP
+ * @return zero if success, otherwise non-zero.
  */
 int
 mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, uint8_t reqop)
@@ -278,7 +378,11 @@ mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, uint8_t reqop)
 	return (res);
 }
 
-/* Get current operating mode.
+/**
+ * @brief Get the current operating mode.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return the current operating mode.
  */
 uint8_t
 mcp2515_reqop_get(pi_mcp2515_t *pi_mcp2515)
@@ -290,13 +394,43 @@ mcp2515_reqop_get(pi_mcp2515_t *pi_mcp2515)
 	return (reqop & PI_MCP2515_REQOP_MASK_CANSTAT);
 }
 
+/**
+ * @brief A simplified bitrate setting function.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param baud_rate_kbps the baud rate to use in kbps. Commonly either 500 or 1000.
+ * @return zero if success, otherwise non-zero.
+ */
 int
 mcp2515_bitrate_simplified(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps)
 {
-	return (mcp2515_bitrate_full_optional(pi_mcp2515, baud_rate_kbps, 2, 0, 2, 2, 3, false, false, false, true));
+	return (mcp2515_bitrate_full_optional(pi_mcp2515, baud_rate_kbps, 2, 0, 2, 2,
+	    3, false, false, false, true));
 }
 
-/* TODO first draft. Test/validate/fix. Make sure this is right. */
+/**
+ * @brief Configure the bitrate and all other CNF register stored parameters.
+ *
+ * This function accepts all possible configurable
+ * options, while `mcp2515_bitrate_simplified` can be used for a simplified process.
+ *
+ * TODO first draft. Test/validate/fix. Make sure this is right.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param baud_rate_kbps the baud rate to use in kbps. Commonly either 500 or 1000.
+ * @param sjw the synchronization jump width in Tqs (1-4).
+ * @param prescaler the prescaler divisor (0-63)
+ * @param prseg_tqps the prop segment Tqs/segment
+ * @param phseg_tqps1 the phase segment 1 Tqs/segment
+ * @param phseg_tqps2 the phase segment 2 Tqs/segment
+ * @param sof if start-of-frame signal is enabled.
+ * @param wakfil if wakeup filter should be enabled.
+ * @param sam is bus line should be sampled 3 times at sample point (otherwise it is sampled once).
+ * @param btlmode if BTLMODE is enabled.
+ *                true:  PS2 length is determined by PHSEG2[2:0] (PHSEG2 values originate from @p phseg_tqps2).
+ *                false: PS2 length is the greater of PS1 and IPT (2 Tqs)
+ * @return zero if success, otherwise non-zero.
+ */
 int
 mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps, uint8_t sjw, uint8_t prescaler,
     uint8_t prseg_tqps, uint8_t phseg_tqps1, uint8_t phseg_tqps2, bool sof, bool wakfil, bool sam, bool btlmode)
@@ -336,6 +470,15 @@ err:
 	return (res);
 }
 
+/**
+ * @brief Set the values of all CNF register.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param cnf1 the value to use for the CNF1 register.
+ * @param cnf2 the value to use for the CNF2 register.
+ * @param cnf3 the value to use for the CNF3 register.
+ * @return zero if success, otherwise non-zero.
+ */
 int
 mcp2515_cnf_set(pi_mcp2515_t *pi_mcp2515, uint8_t cnf1, uint8_t cnf2, uint8_t cnf3)
 {
@@ -351,7 +494,12 @@ mcp2515_cnf_set(pi_mcp2515_t *pi_mcp2515, uint8_t cnf1, uint8_t cnf2, uint8_t cn
 		return (res);
 }
 
-/* Get the value of a CNF register enumerated by the variable 'cnf'.
+/**
+ * @brief Get the value of a CNF register.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param cnf The CNF register index such that `cnf` being `1` will fetch from CNF1, etc.
+ * @return The value of the register.
  */
 uint8_t
 mcp2515_cnf_get(pi_mcp2515_t *pi_mcp2515, uint8_t cnf)
@@ -379,7 +527,24 @@ err:
 	return (res);
 }
 
-/* Must be in config mode
+/**
+ * @brief Set one of the filters specified by its register.
+ *
+ * The MCP2515 must be in config mode to use this (see mcp2515_reqop
+ * and mcp2515_reqop_get).
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param filter_reg the filter register.
+ *                   This may be any of the following:
+ *                   - PI_MCP2515_RGSTR_RXF0SIDH
+ *                   - PI_MCP2515_RGSTR_RXF1SIDH
+ *                   - PI_MCP2515_RGSTR_RXF2SIDH
+ *                   - PI_MCP2515_RGSTR_RXF3SIDH
+ *                   - PI_MCP2515_RGSTR_RXF4SIDH
+ *                   - PI_MCP2515_RGSTR_RXF5SIDH
+ * @param id
+ * @param extended_id
+ * @return zero if success, otherwise non-zero.
  */
 int
 mcp2515_filter(pi_mcp2515_t *pi_mcp2515, uint8_t filter_reg, uint32_t id, bool extended_id)
@@ -393,7 +558,15 @@ mcp2515_filter(pi_mcp2515_t *pi_mcp2515, uint8_t filter_reg, uint32_t id, bool e
 	return (res);
 }
 
-/* Must be in config mode
+/**
+ * @brief Set the filter mask. The MCP2515 must be in config mode to use this (see mcp2515_reqop/mcp2515_reqop_get).
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param filter_mask_reg the filter mask register to use.
+ *                        Acceptable values are PI_MCP2515_RGSTR_RXM0SIDH and PI_MCP2515_RGSTR_RXM1SIDH.
+ * @param id_mask the ID mask to use.
+ * @param extended_id if the ID is extended.
+ * @return zero if success, otherwise non-zero.
  */
 int
 mcp2515_filter_mask(pi_mcp2515_t *pi_mcp2515, uint8_t filter_mask_reg, int32_t id_mask, bool extended_id)
@@ -407,6 +580,12 @@ mcp2515_filter_mask(pi_mcp2515_t *pi_mcp2515, uint8_t filter_mask_reg, int32_t i
 	return (res);
 }
 
+/**
+ * @brief Issue a reset command to the MCP2515 via the SPI interface.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return zero if success, otherwise non-zero.
+ */
 int
 mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
 {
@@ -433,6 +612,12 @@ err:
 	return (res);
 }
 
+/**
+ * @brief Check the value of the 'transmit' (TX) error counter.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return the TX error count.
+ */
 uint8_t
 mcp2515_error_tx_count(pi_mcp2515_t *pi_mcp2515)
 {
@@ -443,6 +628,12 @@ mcp2515_error_tx_count(pi_mcp2515_t *pi_mcp2515)
 	return (res);
 }
 
+/**
+ * @brief Check the value of the 'receive' (RX) error counter.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return the RX error count.
+ */
 uint8_t
 mcp2515_error_rx_count(pi_mcp2515_t *pi_mcp2515)
 {
@@ -453,6 +644,12 @@ mcp2515_error_rx_count(pi_mcp2515_t *pi_mcp2515)
 	return (res);
 }
 
+/**
+ * @brief Fetch the contents of the error flag (EFLG) register.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return contents of the error flag (EFLG) register.
+ */
 uint8_t
 mcp2515_error_flags(pi_mcp2515_t *pi_mcp2515)
 {
@@ -463,12 +660,31 @@ mcp2515_error_flags(pi_mcp2515_t *pi_mcp2515)
 	return (flags);
 }
 
+/**
+ * @brief Check error flags in the EFLG register.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return true if any error flags are set.
+ */
 bool
 mcp2515_error(pi_mcp2515_t *pi_mcp2515)
 {
 	return (mcp2515_error_flags(pi_mcp2515) & PI_MCP2515_EFLG_MASK);
 }
 
+/**
+ * @brief Setup and prepare a pi_mcp2515_t structure based on the parameters provided.
+ *
+ * This will still require one of the bitrate setting functions or mcp2515_cnf_set to be used to set up the CNF
+ * registers.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ *
+ * @param osc_mhz the frequency of the oscillator in MHz.
+ * @param spi_channel the SPI channel to use which may be `0` or `1`.
+ * @param cs_pin the GPIO pin to use for SPI chip select.
+ * @return zero if success, otherwise non-zero
+ */
 int
 mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint8_t tx_pin, uint8_t rx_pin,
     uint8_t sck_pin, uint32_t spi_clock, uint8_t osc_mhz)
@@ -482,10 +698,10 @@ mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint
 
 	pi_mcp2515->spi_channel = spi_channel;
 	pi_mcp2515->cs_pin = cs_pin;
-	pi_mcp2515->sck_pin = sck_pin;
-	pi_mcp2515->tx_pin = tx_pin;
-	pi_mcp2515->rx_pin = rx_pin;
-	pi_mcp2515->spi_clock = spi_clock;
+	pi_mcp2515->sck_pin = sck_pin;/* TODO this is only used for Pico. Figure out a cleaner way. */
+	pi_mcp2515->tx_pin = tx_pin; /* TODO this is only used for Pico. Figure out a cleaner way. */
+	pi_mcp2515->rx_pin = rx_pin; /* TODO this is only used for Pico. Figure out a cleaner way. */
+	pi_mcp2515->spi_clock = spi_clock; /* TODO this is only used for spidev. Figure out a cleaner way. */
 	pi_mcp2515->osc_mhz = osc_mhz;
 
 	if ((res = mcp2515_gpio_spi_init(pi_mcp2515, spi_channel, spi_clock)))
@@ -497,6 +713,13 @@ err:
 	return (res);
 }
 
+/**
+ * @brief Calculate the time for the number of oscillator cycles supplied, and based on the oscillator frequency.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param num_cycles The number of oscillator cycles to calculate time for.
+ * @return The calculated time in microseconds.
+ */
 uint64_t
 mcp2515_osc_time(const pi_mcp2515_t *pi_mcp2515, uint32_t num_cycles)
 {
@@ -507,6 +730,11 @@ mcp2515_osc_time(const pi_mcp2515_t *pi_mcp2515, uint32_t num_cycles)
 	return (num_cycles * cycle_len_nano_sec / 1000); /* return microseconds */
 }
 
+/**
+ * @brief Cleanup after everything.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ */
 void
 mcp2515_free(const pi_mcp2515_t *pi_mcp2515)
 {
