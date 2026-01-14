@@ -25,6 +25,7 @@
 #include "pi_MCP2515.h"
 
 #ifdef USE_PICO_LIB
+#include "pico/time.h"
 #define MICRO_SLEEP(x) sleep_us(x)
 #else
 #include <unistd.h>
@@ -351,7 +352,7 @@ mcp2515_register_bitmod(pi_mcp2515_t *pi_mcp2515, uint8_t data, uint8_t mask, ui
 
 /**
  * @defgroup piMCP2515_filter_functions Filter Functions
- * @brief These functions handle filter functionallity.
+ * @brief These functions handle filter functionality.
  * @{
  */
 /**
@@ -408,31 +409,12 @@ mcp2515_filter_mask(pi_mcp2515_t *pi_mcp2515, uint8_t filter_mask_reg, int32_t i
 }
 /** @} */
 
+
 /**
- * @defgroup piMCP2515_mode_error_status_functions Mode/Error/Status Functions
- * @brief These functions handle REQOP (Operating Mode), Status, and Errors.
+ * @defgroup piMCP2515_reqop_functions REQOP (Operating Mode) Functions
+ * @brief These functions handle REQOP (operating mode) functionality.
  * @{
  */
-/**
- * @brief Check status via the STATUS instruction.
- *
- * @param pi_mcp2515 the piMCP2515 handle.
- * @return the current status value.
- */
-uint8_t
-mcp2515_status(pi_mcp2515_t *pi_mcp2515)
-{
-	uint8_t instruction, res;
-
-	SET_CS(pi_mcp2515);
-	instruction = PI_MCP2515_INSTR_READ_STATUS;
-	mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instruction, 1);
-	mcp2515_gpio_spi_read_blocking(pi_mcp2515, &res, 1);
-	UNSET_CS(pi_mcp2515);
-
-	return (res);
-}
-
 /**
  * @brief Change the operating mode.
  *
@@ -475,7 +457,33 @@ mcp2515_reqop_get(pi_mcp2515_t *pi_mcp2515)
 
 	mcp2515_register_read(pi_mcp2515, &reqop, 1, PI_MCP2515_RGSTR_CANSTAT);
 
-	return (reqop & PI_MCP2515_REQOP_MASK_CANSTAT);
+	return (reqop & PI_MCP2515_REQOP_MASK);
+}
+/** @} */
+
+/**
+ * @defgroup piMCP2515_error_status_functions Error/Status Functions
+ * @brief These functions handle Status and Errors.
+ * @{
+ */
+/**
+ * @brief Check status via the STATUS instruction.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return the current status value.
+ */
+uint8_t
+mcp2515_status(pi_mcp2515_t *pi_mcp2515)
+{
+	uint8_t instruction, res;
+
+	SET_CS(pi_mcp2515);
+	instruction = PI_MCP2515_INSTR_READ_STATUS;
+	mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instruction, 1);
+	mcp2515_gpio_spi_read_blocking(pi_mcp2515, &res, 1);
+	UNSET_CS(pi_mcp2515);
+
+	return (res);
 }
 
 /**
@@ -718,7 +726,8 @@ err:
  *
  * @param pi_mcp2515 the piMCP2515 handle.
  *
- * @param osc_mhz the frequency of the oscillator in MHz.
+ * @param spi_clock the frequency to use for SPI communication in Hz.
+ * @param osc_mhz the frequency of the MCP2515 oscillator in MHz.
  * @param spi_channel the SPI channel to use which may be `0` or `1`.
  * @param cs_pin the GPIO pin to use for SPI chip select.
  * @return zero if success, otherwise non-zero
@@ -727,7 +736,7 @@ int
 mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint8_t tx_pin, uint8_t rx_pin,
     uint8_t sck_pin, uint32_t spi_clock, uint8_t osc_mhz)
 {
-	int res = 0;
+	int res;
 
 	if (osc_mhz > 40|| osc_mhz == 0) {
 		res = 1;
@@ -736,13 +745,16 @@ mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint
 
 	pi_mcp2515->spi_channel = spi_channel;
 	pi_mcp2515->cs_pin = cs_pin;
-	pi_mcp2515->sck_pin = sck_pin;/* TODO this is only used for Pico. Figure out a cleaner way. */
-	pi_mcp2515->tx_pin = tx_pin; /* TODO this is only used for Pico. Figure out a cleaner way. */
-	pi_mcp2515->rx_pin = rx_pin; /* TODO this is only used for Pico. Figure out a cleaner way. */
-	pi_mcp2515->spi_clock = spi_clock; /* TODO this is only used for spidev. Figure out a cleaner way. */
+
+	/* TODO these are only used for Pico. Figure out a cleaner way. */
+	pi_mcp2515->sck_pin = sck_pin;
+	pi_mcp2515->tx_pin = tx_pin;
+	pi_mcp2515->rx_pin = rx_pin;
+
+	pi_mcp2515->spi_clock = spi_clock;
 	pi_mcp2515->osc_mhz = osc_mhz;
 
-	if ((res = mcp2515_gpio_spi_init(pi_mcp2515, spi_channel, spi_clock)))
+	if ((res = mcp2515_gpio_spi_init(pi_mcp2515)))
 		goto err;
 
 	UNSET_CS(pi_mcp2515);

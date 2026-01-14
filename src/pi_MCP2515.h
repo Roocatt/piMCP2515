@@ -16,12 +16,10 @@
 #ifndef PI_MCP2515_H
 #define PI_MCP2515_H
 
-#ifdef USE_PICO_LIB
-#include "hardware/spi.h"
-#endif /* USE_PICO_LIB */
-
 #include <stdbool.h>
 #include <stdint.h>
+
+#include "pi_MCP2515_handle.h"
 
 /**
  * @defgroup piMCP2515_register_addresses Register Addresses
@@ -71,14 +69,13 @@
  * @brief These definitions hold the REQOP (operating mode) codes.
  * @{
  */
-#define PI_MCP2515_REQOP_MASK 0xE0
 #define PI_MCP2515_REQOP_NORMAL 0x00
 #define PI_MCP2515_REQOP_SLEEP 0x20
 #define PI_MCP2515_REQOP_LOOPBACK 0x40
 #define PI_MCP2515_REQOP_LISTENONLY 0x60
 #define PI_MCP2515_REQOP_CONFIG 0x80
 #define PI_MCP2515_REQOP_POWERUP 0xE0
-#define PI_MCP2515_REQOP_MASK_CANSTAT 0xE0
+#define PI_MCP2515_REQOP_MASK 0xE0
 /** @} */
 
 /* CTRL Definitions */
@@ -115,39 +112,11 @@
 #define PI_MCP2515_ID_MASK_SFF 0x000007FFUL
 #define PI_MCP2515_ID_MASK_EFF 0x1FFFFFFFUL
 
-/* Library Definitions */
-#define PI_MCP2515_GPIO_PIN_MAP_LEN 40
-
 typedef struct {
 	uint32_t id;
 	uint8_t dlc;
 	uint8_t payload[8];
 } pi_mcp2515_can_frame_t;
-
-/**
- *
- */
-typedef struct {
-	uint8_t spi_channel;
-	uint8_t cs_pin;
-	uint8_t tx_pin;
-	uint8_t rx_pin;
-	uint8_t sck_pin;
-	uint32_t spi_clock;
-	uint8_t osc_mhz;
-#ifdef USE_PICO_LIB
-	spi_inst_t *gpio_spi_inst;
-#elifdef USE_SPIDEV
-	char *gpio_dev_spi_path;
-	char *gpio_dev_gpio_path;
-	int gpio_spidev_fd;
-	int gpio_gpio_fd;
-	uint8_t gpio_spi_mode;
-	uint8_t gpio_spi_bits_per_word;
-	uint16_t gpio_spi_delay_usec;
-	int gpio_pin_fd_map[PI_MCP2515_GPIO_PIN_MAP_LEN]; /* TODO Info on GPIO pin/line mapping seems unclear. Verify size, etc. later. */
-#endif
-} pi_mcp2515_t;
 
 #ifdef __cplusplus
 extern "C" {
