@@ -57,7 +57,7 @@
 #include "gpio.h"
 
 #ifdef USE_SPIDEV
-static int	spidev_duplex_com(const pi_mcp2515_t *, char[sizeof(uint64_t)], char[sizeof(uint64_t)]);
+static int	spidev_duplex_com(const pi_mcp2515_t *, const char[sizeof(uint64_t)], const char[sizeof(uint64_t)]);
 
 /**
  * @brief Perform a round of full duplex communication over SPI.
@@ -70,11 +70,11 @@ static int	spidev_duplex_com(const pi_mcp2515_t *, char[sizeof(uint64_t)], char[
  * @return zero if success, otherwise non-zero.
  */
 static int
-spidev_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t)], char rx_buffer[sizeof(uint64_t)])
+spidev_duplex_com(const pi_mcp2515_t *pi_mcp2515, const char tx_buffer[sizeof(uint64_t)], const char rx_buffer[sizeof(uint64_t)])
 {
 	struct spi_ioc_transfer tr = {
-		.tx_buf = (uint64_t)tx_buffer,
-		.rx_buf = (uint64_t)rx_buffer,
+		.tx_buf = *(uint64_t *)tx_buffer,
+		.rx_buf = *(uint64_t *)rx_buffer,
 		.len = sizeof(uint64_t),
 		.delay_usecs = pi_mcp2515->gpio_spi_delay_usec,
 		.speed_hz = pi_mcp2515->spi_clock,
@@ -126,7 +126,7 @@ mcp2515_gpio_init(pi_mcp2515_t *pi_mcp2515, uint8_t pin)
 }
 
 /**
- * @brief Cleanup everything GPIO for the specified handle.
+ * @brief Clean up everything GPIO for the specified handle.
  *
  * Currently, this is a NOP except for when using spidev.
  *
@@ -321,4 +321,21 @@ mcp2515_gpio_put(const pi_mcp2515_t *pi_mcp2515, uint8_t pin, uint8_t value)
 
 	return (0);
 #endif
+}
+
+/**
+ * @brief Calculate the time for the number of oscillator cycles supplied, and based on the oscillator frequency.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param num_cycles The number of oscillator cycles to calculate time for.
+ * @return The calculated time in microseconds.
+ */
+uint64_t
+mcp2515_osc_time(const pi_mcp2515_t *pi_mcp2515, uint32_t num_cycles)
+{
+	uint64_t cycle_len_nano_sec;
+
+	cycle_len_nano_sec = 1000000000 / (pi_mcp2515->osc_mhz * 1000000);
+
+	return (num_cycles * cycle_len_nano_sec / 1000); /* return microseconds */
 }

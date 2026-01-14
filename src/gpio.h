@@ -20,6 +20,8 @@
 #ifndef GPIO_H
 #define GPIO_H
 
+#include <stdbool.h>
+
 #include "pi_MCP2515_handle.h"
 
 #define SET_CS(x) mcp2515_gpio_put(x, x->cs_pin, 1)
@@ -49,6 +51,7 @@ int	mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *, uint8_t, uint8_t);
 int	mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *, uint8_t[], uint8_t);
 int	mcp2515_gpio_spi_read_blocking(pi_mcp2515_t *, uint8_t[], uint8_t);
 int	mcp2515_gpio_put(const pi_mcp2515_t *, uint8_t, uint8_t);
+uint64_t	mcp2515_osc_time(const pi_mcp2515_t *, uint32_t);
 
 #ifdef __cplusplus
 }

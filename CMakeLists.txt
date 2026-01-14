@@ -67,8 +67,16 @@ endif ()
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-add_library(piMCP2515 STATIC src/pi_MCP2515.c src/gpio.c src/pi_MCP2515.h src/gpio.h
-        src/pi_MCP2515_handle.h)
+add_library(piMCP2515 STATIC
+        src/pi_MCP2515.c src/pi_MCP2515.h
+        src/gpio.c src/gpio.h
+        src/can.c src/can.h
+        src/status_error.c src/status_error.h
+        src/interrupt.c src/interrupt.h
+        src/filter.c src/filter.h
+        src/reqop.c src/reqop.h
+        src/registers.c src/registers.h
+        src/pi_MCP2515_handle.h src/pi_MCP2515_defs.h)
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
 if (USE_SPIDEV)

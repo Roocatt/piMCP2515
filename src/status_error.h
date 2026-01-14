@@ -13,28 +13,21 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef PI_MCP2515_H
-#define PI_MCP2515_H
-
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "pi_MCP2515_handle.h"
+#ifndef PIMCP2515_STATUS_ERROR_H
+#define PIMCP2515_STATUS_ERROR_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-int	mcp2515_bitrate_default_16mhz_1000kbps(pi_mcp2515_t *);
-int	mcp2515_bitrate_default_8mhz_500kbps(pi_mcp2515_t *);
-int	mcp2515_bitrate_simplified(pi_mcp2515_t *, uint16_t);
-int	mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, bool, bool,
-    bool, bool);
-void	mcp2515_free(const pi_mcp2515_t *);
-int	mcp2515_init(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t, uint8_t);
+uint8_t		mcp2515_status(pi_mcp2515_t *);
+uint8_t		mcp2515_error_tx_count(pi_mcp2515_t *);
+uint8_t		mcp2515_error_rx_count(pi_mcp2515_t *);
+uint8_t		mcp2515_error_flags(pi_mcp2515_t *);
+bool		mcp2515_error(pi_mcp2515_t *);
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
-#endif /* PI_MCP2515_H */
+#endif /* PIMCP2515_STATUS_ERROR_H */

@@ -13,8 +13,8 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef PI_MCP2515_H
-#define PI_MCP2515_H
+#ifndef PIMCP2515_FILTER_H
+#define PIMCP2515_FILTER_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -25,16 +25,11 @@
 extern "C" {
 #endif /* __cplusplus */
 
-int	mcp2515_bitrate_default_16mhz_1000kbps(pi_mcp2515_t *);
-int	mcp2515_bitrate_default_8mhz_500kbps(pi_mcp2515_t *);
-int	mcp2515_bitrate_simplified(pi_mcp2515_t *, uint16_t);
-int	mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, bool, bool,
-    bool, bool);
-void	mcp2515_free(const pi_mcp2515_t *);
-int	mcp2515_init(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t, uint8_t);
+int	mcp2515_filter(pi_mcp2515_t *, uint8_t, uint32_t, bool);
+int	mcp2515_filter_mask(pi_mcp2515_t *, uint8_t, int32_t, bool);
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
-#endif /* PI_MCP2515_H */
+#endif /* PIMCP2515_FILTER_H */
