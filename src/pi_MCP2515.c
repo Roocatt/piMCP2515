@@ -72,6 +72,11 @@ id_build(uint32_t id, bool extended_id)
 }
 
 /**
+ * @defgroup piMCP2515_can_functions CAN Bus Functions
+ * @brief These functions handle CAN bus functionality.
+ * @{
+ */
+/**
  * @brief Send a CAN bus message.
  *
  * @param pi_mcp2515 the piMCP2515 handle.
@@ -196,7 +201,13 @@ mcp2515_can_message_received(pi_mcp2515_t *pi_mcp2515)
 {
 	return (!!(mcp2515_status(pi_mcp2515) & (PI_MCP2515_STATUS_RX0BF | PI_MCP2515_STATUS_RX0BF)));
 }
+/** @} */
 
+/**
+ * @defgroup piMCP2515_interrupt_functions Interrupt Functions
+ * @brief These functions handle interrupt related functionality.
+ * @{
+ */
 /**
  * @brief Check for interrupts.
  *
@@ -243,27 +254,14 @@ mcp2515_interrupts_clear(pi_mcp2515_t *pi_mcp2515)
 
 	mcp2515_register_write(pi_mcp2515, &zero, 1, PI_MCP2515_RGSTR_CANINTF);
 }
+/** @} */
+
 
 /**
- * @brief Check status via the STATUS instruction.
- *
- * @param pi_mcp2515 the piMCP2515 handle.
- * @return the current status value.
+ * @defgroup piMCP2515_register_functions Register Functions
+ * @brief These functions handle manipulating values in the MCP2515's registers.
+ * @{
  */
-uint8_t
-mcp2515_status(pi_mcp2515_t *pi_mcp2515)
-{
-	uint8_t instruction, res;
-
-	SET_CS(pi_mcp2515);
-	instruction = PI_MCP2515_INSTR_READ_STATUS;
-	mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instruction, 1);
-	mcp2515_gpio_spi_read_blocking(pi_mcp2515, &res, 1);
-	UNSET_CS(pi_mcp2515);
-
-	return (res);
-}
-
 /**
  * @brief Read a value from a specified register.
  *
@@ -348,6 +346,92 @@ mcp2515_register_bitmod(pi_mcp2515_t *pi_mcp2515, uint8_t data, uint8_t mask, ui
 
 	return (res);
 }
+/** @} */
+
+
+/**
+ * @defgroup piMCP2515_filter_functions Filter Functions
+ * @brief These functions handle filter functionallity.
+ * @{
+ */
+/**
+ * @brief Set one of the filters specified by its register.
+ *
+ * The MCP2515 must be in config mode to use this (see mcp2515_reqop
+ * and mcp2515_reqop_get).
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param filter_reg the filter register.
+ *                   This may be any of the following:
+ *                   - PI_MCP2515_RGSTR_RXF0SIDH
+ *                   - PI_MCP2515_RGSTR_RXF1SIDH
+ *                   - PI_MCP2515_RGSTR_RXF2SIDH
+ *                   - PI_MCP2515_RGSTR_RXF3SIDH
+ *                   - PI_MCP2515_RGSTR_RXF4SIDH
+ *                   - PI_MCP2515_RGSTR_RXF5SIDH
+ * @param id
+ * @param extended_id
+ * @return zero if success, otherwise non-zero.
+ */
+int
+mcp2515_filter(pi_mcp2515_t *pi_mcp2515, uint8_t filter_reg, uint32_t id, bool extended_id)
+{
+	int res;
+	uint32_t data;
+
+	data = id_build(id, extended_id);
+	res = mcp2515_register_write(pi_mcp2515, (uint8_t *)&data, 4, filter_reg);
+
+	return (res);
+}
+
+/**
+ * @brief Set the filter mask. The MCP2515 must be in config mode to use this (see mcp2515_reqop/mcp2515_reqop_get).
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param filter_mask_reg the filter mask register to use.
+ *                        Acceptable values are PI_MCP2515_RGSTR_RXM0SIDH and PI_MCP2515_RGSTR_RXM1SIDH.
+ * @param id_mask the ID mask to use.
+ * @param extended_id if the ID is extended.
+ * @return zero if success, otherwise non-zero.
+ */
+int
+mcp2515_filter_mask(pi_mcp2515_t *pi_mcp2515, uint8_t filter_mask_reg, int32_t id_mask, bool extended_id)
+{
+	int res;
+	uint32_t data;
+
+	data = id_build(id_mask, extended_id);
+	res = mcp2515_register_write(pi_mcp2515, (uint8_t *)&data, 4, filter_mask_reg);
+
+	return (res);
+}
+/** @} */
+
+/**
+ * @defgroup piMCP2515_mode_error_status_functions Mode/Error/Status Functions
+ * @brief These functions handle REQOP (Operating Mode), Status, and Errors.
+ * @{
+ */
+/**
+ * @brief Check status via the STATUS instruction.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return the current status value.
+ */
+uint8_t
+mcp2515_status(pi_mcp2515_t *pi_mcp2515)
+{
+	uint8_t instruction, res;
+
+	SET_CS(pi_mcp2515);
+	instruction = PI_MCP2515_INSTR_READ_STATUS;
+	mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instruction, 1);
+	mcp2515_gpio_spi_read_blocking(pi_mcp2515, &res, 1);
+	UNSET_CS(pi_mcp2515);
+
+	return (res);
+}
 
 /**
  * @brief Change the operating mode.
@@ -394,6 +478,73 @@ mcp2515_reqop_get(pi_mcp2515_t *pi_mcp2515)
 	return (reqop & PI_MCP2515_REQOP_MASK_CANSTAT);
 }
 
+/**
+ * @brief Check the value of the 'transmit' (TX) error counter.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return the TX error count.
+ */
+uint8_t
+mcp2515_error_tx_count(pi_mcp2515_t *pi_mcp2515)
+{
+	uint8_t res = 0;
+
+	mcp2515_register_read(pi_mcp2515, &res, 1, PI_MCP2515_RGSTR_ECTX);
+
+	return (res);
+}
+
+/**
+ * @brief Check the value of the 'receive' (RX) error counter.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return the RX error count.
+ */
+uint8_t
+mcp2515_error_rx_count(pi_mcp2515_t *pi_mcp2515)
+{
+	uint8_t res = 0;
+
+	mcp2515_register_read(pi_mcp2515, &res, 1, PI_MCP2515_RGSTR_ECRX);
+
+	return (res);
+}
+
+/**
+ * @brief Fetch the contents of the error flag (EFLG) register.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return contents of the error flag (EFLG) register.
+ */
+uint8_t
+mcp2515_error_flags(pi_mcp2515_t *pi_mcp2515)
+{
+	uint8_t flags = 0;
+
+	mcp2515_register_read(pi_mcp2515, &flags, 1, PI_MCP2515_RGSTR_EFLG);
+
+	return (flags);
+}
+
+/**
+ * @brief Check error flags in the EFLG register.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return true if any error flags are set.
+ */
+bool
+mcp2515_error(pi_mcp2515_t *pi_mcp2515)
+{
+	return (mcp2515_error_flags(pi_mcp2515) & PI_MCP2515_EFLG_MASK);
+}
+/** @} */
+
+
+/**
+ * @defgroup piMCP2515_config_init_functions Init and Config Functions
+ * @brief These functions handle initialization and configuration.
+ * @{
+ */
 /**
  * @brief A simplified bitrate setting function.
  *
@@ -528,59 +679,6 @@ err:
 }
 
 /**
- * @brief Set one of the filters specified by its register.
- *
- * The MCP2515 must be in config mode to use this (see mcp2515_reqop
- * and mcp2515_reqop_get).
- *
- * @param pi_mcp2515 the piMCP2515 handle.
- * @param filter_reg the filter register.
- *                   This may be any of the following:
- *                   - PI_MCP2515_RGSTR_RXF0SIDH
- *                   - PI_MCP2515_RGSTR_RXF1SIDH
- *                   - PI_MCP2515_RGSTR_RXF2SIDH
- *                   - PI_MCP2515_RGSTR_RXF3SIDH
- *                   - PI_MCP2515_RGSTR_RXF4SIDH
- *                   - PI_MCP2515_RGSTR_RXF5SIDH
- * @param id
- * @param extended_id
- * @return zero if success, otherwise non-zero.
- */
-int
-mcp2515_filter(pi_mcp2515_t *pi_mcp2515, uint8_t filter_reg, uint32_t id, bool extended_id)
-{
-	int res;
-	uint32_t data;
-
-	data = id_build(id, extended_id);
-	res = mcp2515_register_write(pi_mcp2515, (uint8_t *)&data, 4, filter_reg);
-
-	return (res);
-}
-
-/**
- * @brief Set the filter mask. The MCP2515 must be in config mode to use this (see mcp2515_reqop/mcp2515_reqop_get).
- *
- * @param pi_mcp2515 the piMCP2515 handle.
- * @param filter_mask_reg the filter mask register to use.
- *                        Acceptable values are PI_MCP2515_RGSTR_RXM0SIDH and PI_MCP2515_RGSTR_RXM1SIDH.
- * @param id_mask the ID mask to use.
- * @param extended_id if the ID is extended.
- * @return zero if success, otherwise non-zero.
- */
-int
-mcp2515_filter_mask(pi_mcp2515_t *pi_mcp2515, uint8_t filter_mask_reg, int32_t id_mask, bool extended_id)
-{
-	int res;
-	uint32_t data;
-
-	data = id_build(id_mask, extended_id);
-	res = mcp2515_register_write(pi_mcp2515, (uint8_t *)&data, 4, filter_mask_reg);
-
-	return (res);
-}
-
-/**
  * @brief Issue a reset command to the MCP2515 via the SPI interface.
  *
  * @param pi_mcp2515 the piMCP2515 handle.
@@ -610,66 +708,6 @@ mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
 
 err:
 	return (res);
-}
-
-/**
- * @brief Check the value of the 'transmit' (TX) error counter.
- *
- * @param pi_mcp2515 the piMCP2515 handle.
- * @return the TX error count.
- */
-uint8_t
-mcp2515_error_tx_count(pi_mcp2515_t *pi_mcp2515)
-{
-	uint8_t res = 0;
-
-	mcp2515_register_read(pi_mcp2515, &res, 1, PI_MCP2515_RGSTR_ECTX);
-
-	return (res);
-}
-
-/**
- * @brief Check the value of the 'receive' (RX) error counter.
- *
- * @param pi_mcp2515 the piMCP2515 handle.
- * @return the RX error count.
- */
-uint8_t
-mcp2515_error_rx_count(pi_mcp2515_t *pi_mcp2515)
-{
-	uint8_t res = 0;
-
-	mcp2515_register_read(pi_mcp2515, &res, 1, PI_MCP2515_RGSTR_ECRX);
-
-	return (res);
-}
-
-/**
- * @brief Fetch the contents of the error flag (EFLG) register.
- *
- * @param pi_mcp2515 the piMCP2515 handle.
- * @return contents of the error flag (EFLG) register.
- */
-uint8_t
-mcp2515_error_flags(pi_mcp2515_t *pi_mcp2515)
-{
-	uint8_t flags = 0;
-
-	mcp2515_register_read(pi_mcp2515, &flags, 1, PI_MCP2515_RGSTR_EFLG);
-
-	return (flags);
-}
-
-/**
- * @brief Check error flags in the EFLG register.
- *
- * @param pi_mcp2515 the piMCP2515 handle.
- * @return true if any error flags are set.
- */
-bool
-mcp2515_error(pi_mcp2515_t *pi_mcp2515)
-{
-	return (mcp2515_error_flags(pi_mcp2515) & PI_MCP2515_EFLG_MASK);
 }
 
 /**
@@ -740,3 +778,4 @@ mcp2515_free(const pi_mcp2515_t *pi_mcp2515)
 {
 	mcp2515_gpio_spi_free(pi_mcp2515);
 }
+/** @} */

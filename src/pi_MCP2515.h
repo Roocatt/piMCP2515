@@ -23,7 +23,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-/* Register Definitions */
+/**
+ * @defgroup piMCP2515_register_addresses Register Addresses
+ * @brief These definitions hold the MCP2515 register addresses.
+ * @{
+ */
 #define PI_MCP2515_RGSTR_RXF0SIDH 0x00
 #define PI_MCP2515_RGSTR_RXF1SIDH 0x04
 #define PI_MCP2515_RGSTR_RXF2SIDH 0x08
@@ -48,15 +52,25 @@
 #define PI_MCP2515_RGSTR_RX1CTRL 0x70
 #define PI_MCP2515_RGSTR_RX1SIDH 0x71
 #define PI_MCP2515_RGSTR_RX1DATA 0x76
+/** @} */
 
-/* Instruction Definitions */
+/**
+ * @defgroup piMCP2515_instructions Instruction Codes
+ * @brief These definitions hold the instruction codes.
+ * @{
+ */
 #define PI_MCP2515_INSTR_WRITE 0x02
 #define PI_MCP2515_INSTR_READ 0x03
 #define PI_MCP2515_INSTR_BITMOD 0x05
 #define PI_MCP2515_INSTR_READ_STATUS 0xA0
 #define PI_MCP2515_INSTR_RESET 0xC0
+/** @} */
 
-/* REQOP Definitions */
+/**
+ * @defgroup piMCP2515_reqops REQOP Codes
+ * @brief These definitions hold the REQOP (operating mode) codes.
+ * @{
+ */
 #define PI_MCP2515_REQOP_MASK 0xE0
 #define PI_MCP2515_REQOP_NORMAL 0x00
 #define PI_MCP2515_REQOP_SLEEP 0x20
@@ -65,6 +79,7 @@
 #define PI_MCP2515_REQOP_CONFIG 0x80
 #define PI_MCP2515_REQOP_POWERUP 0xE0
 #define PI_MCP2515_REQOP_MASK_CANSTAT 0xE0
+/** @} */
 
 /* CTRL Definitions */
 #define PI_MCP2515_CTRL_RTR 0x08
@@ -109,6 +124,9 @@ typedef struct {
 	uint8_t payload[8];
 } pi_mcp2515_can_frame_t;
 
+/**
+ *
+ */
 typedef struct {
 	uint8_t spi_channel;
 	uint8_t cs_pin;
@@ -138,27 +156,33 @@ extern "C" {
 int		mcp2515_can_message_send(pi_mcp2515_t *, const pi_mcp2515_can_frame_t *);
 int		mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
 bool		mcp2515_can_message_received(pi_mcp2515_t *);
+
 uint8_t		mcp2515_interrupts_get(pi_mcp2515_t *);
 uint8_t		mcp2515_interrupts_mask(pi_mcp2515_t *);
 void		mcp2515_interrupts_clear(pi_mcp2515_t *);
-uint8_t		mcp2515_status(pi_mcp2515_t *);
+
+int		mcp2515_filter(pi_mcp2515_t *, uint8_t, uint32_t, bool);
+int		mcp2515_filter_mask(pi_mcp2515_t *, uint8_t, int32_t, bool);
+
 int		mcp2515_register_read(pi_mcp2515_t *, uint8_t *, uint8_t, uint8_t);
 int		mcp2515_register_write(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
 int		mcp2515_register_bitmod(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t);
+
 int		mcp2515_reqop(pi_mcp2515_t *, uint8_t);
 uint8_t		mcp2515_reqop_get(pi_mcp2515_t *);
+uint8_t		mcp2515_status(pi_mcp2515_t *);
+uint8_t		mcp2515_error_tx_count(pi_mcp2515_t *);
+uint8_t		mcp2515_error_rx_count(pi_mcp2515_t *);
+uint8_t		mcp2515_error_flags(pi_mcp2515_t *);
+bool		mcp2515_error(pi_mcp2515_t *);
+
 int		mcp2515_bitrate_default_16mhz_1000kbps(pi_mcp2515_t *);
 int		mcp2515_bitrate_default_8mhz_500kbps(pi_mcp2515_t *);
 int		mcp2515_bitrate_simplified(pi_mcp2515_t *, uint16_t);
 int		mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,
     bool, bool, bool, bool);
-int		mcp2515_filter(pi_mcp2515_t *, uint8_t, uint32_t, bool);
-int		mcp2515_filter_mask(pi_mcp2515_t *, uint8_t, int32_t, bool);
 int		mcp2515_reset(pi_mcp2515_t *);
-uint8_t		mcp2515_error_tx_count(pi_mcp2515_t *);
-uint8_t		mcp2515_error_rx_count(pi_mcp2515_t *);
-uint8_t		mcp2515_error_flags(pi_mcp2515_t *);
-bool		mcp2515_error(pi_mcp2515_t *);
+
 uint64_t	mcp2515_osc_time(const pi_mcp2515_t *, uint32_t);
 void		mcp2515_free(const pi_mcp2515_t *);
 int		mcp2515_init(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t, uint8_t);
