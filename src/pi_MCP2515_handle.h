@@ -18,6 +18,10 @@
 
 #include <stdint.h>
 
+#ifdef USE_PICO_LIB
+#include "hardware/spi.h"
+#endif /* USE_PICO_LIB */
+
 /* Library Definitions */
 #define PI_MCP2515_GPIO_PIN_MAP_LEN 40
 
@@ -31,7 +35,7 @@ typedef struct {
 	uint8_t osc_mhz;
 #ifdef USE_PICO_LIB
 	spi_inst_t *gpio_spi_inst;
-#  elif defined(USE_SPIDEV)
+#elif defined(USE_SPIDEV)
 	char *gpio_dev_spi_path;
 	char *gpio_dev_gpio_path;
 	int gpio_spidev_fd;

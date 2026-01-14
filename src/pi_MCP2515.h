@@ -16,10 +16,6 @@
 #ifndef PI_MCP2515_H
 #define PI_MCP2515_H
 
-#ifdef USE_PICO_LIB
-#include "hardware/spi.h"
-#endif /* USE_PICO_LIB */
-
 #include <stdbool.h>
 #include <stdint.h>
 

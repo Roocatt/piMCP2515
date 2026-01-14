@@ -25,6 +25,7 @@
 #include "pi_MCP2515.h"
 
 #ifdef USE_PICO_LIB
+#include "pico/time.h"
 #define MICRO_SLEEP(x) sleep_us(x)
 #else
 #include <unistd.h>
