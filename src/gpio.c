@@ -160,7 +160,7 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 #ifdef USE_PICO_LIB
 	spi_inst_t *spi_inst;
 
-	switch (spi_channel) {
+	switch (pi_mcp2515->spi_channel) {
 	case 0:
 		spi_inst = spi0;
 		break;
