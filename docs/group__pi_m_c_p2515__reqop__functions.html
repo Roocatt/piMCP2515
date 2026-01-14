@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.14.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>piMCP2515: Interrupt Functions</title>
+<title>piMCP2515: REQOP (Operating Mode) Functions</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -63,7 +63,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(function(){initNavTree('group__pi_m_c_p2515__interrupt__functions.html','',''); });
+$(function(){initNavTree('group__pi_m_c_p2515__reqop__functions.html','',''); });
 </script>
 <div id="container">
 <div id="doc-content">
@@ -89,33 +89,72 @@ $(function(){initNavTree('group__pi_m_c_p2515__interrupt__functions.html','','')
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">Interrupt Functions </div></div>
+  <div class="headertitle"><div class="title">REQOP (Operating Mode) Functions </div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>These functions handle interrupt related functionality.  
+<p>These functions handle REQOP (operating mode) functionality.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gaf9bfb7c7ed84e0628e7987a92ae18c34" id="r_gaf9bfb7c7ed84e0628e7987a92ae18c34"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaf9bfb7c7ed84e0628e7987a92ae18c34">mcp2515_interrupts_get</a> (pi_mcp2515_t *pi_mcp2515)</td></tr>
-<tr class="memdesc:gaf9bfb7c7ed84e0628e7987a92ae18c34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check for interrupts.  <br /></td></tr>
-<tr class="memitem:ga1d96695fd9ccab26f54beff14e2a6ffa" id="r_ga1d96695fd9ccab26f54beff14e2a6ffa"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga1d96695fd9ccab26f54beff14e2a6ffa">mcp2515_interrupts_mask</a> (pi_mcp2515_t *pi_mcp2515)</td></tr>
-<tr class="memdesc:ga1d96695fd9ccab26f54beff14e2a6ffa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the interrupt mask.  <br /></td></tr>
-<tr class="memitem:ga3996b62019915949d1d5ff97e2056e57" id="r_ga3996b62019915949d1d5ff97e2056e57"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga3996b62019915949d1d5ff97e2056e57">mcp2515_interrupts_clear</a> (pi_mcp2515_t *pi_mcp2515)</td></tr>
-<tr class="memdesc:ga3996b62019915949d1d5ff97e2056e57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear all interrupts.  <br /></td></tr>
+<tr class="memitem:gaae01aa187b5fde6752fced35afff8aa3" id="r_gaae01aa187b5fde6752fced35afff8aa3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaae01aa187b5fde6752fced35afff8aa3">mcp2515_reqop</a> (pi_mcp2515_t *pi_mcp2515, uint8_t reqop)</td></tr>
+<tr class="memdesc:gaae01aa187b5fde6752fced35afff8aa3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the operating mode.  <br /></td></tr>
+<tr class="memitem:ga3bec6d85776e2eb13351186fa41eaf28" id="r_ga3bec6d85776e2eb13351186fa41eaf28"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga3bec6d85776e2eb13351186fa41eaf28">mcp2515_reqop_get</a> (pi_mcp2515_t *pi_mcp2515)</td></tr>
+<tr class="memdesc:ga3bec6d85776e2eb13351186fa41eaf28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current operating mode.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<p>These functions handle interrupt related functionality. </p>
+<p>These functions handle REQOP (operating mode) functionality. </p>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="ga3996b62019915949d1d5ff97e2056e57" name="ga3996b62019915949d1d5ff97e2056e57"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga3996b62019915949d1d5ff97e2056e57">&#9670;&#160;</a></span>mcp2515_interrupts_clear()</h2>
+<a id="gaae01aa187b5fde6752fced35afff8aa3" name="gaae01aa187b5fde6752fced35afff8aa3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaae01aa187b5fde6752fced35afff8aa3">&#9670;&#160;</a></span>mcp2515_reqop()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void mcp2515_interrupts_clear </td>
+          <td class="memname">int mcp2515_reqop </td>
+          <td>(</td>
+          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>reqop</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Change the operating mode. </p>
+<p>After the mode change, this code will then sleep for a 128 oscillator cycles delay before continuing operations as defined by the MCP2515 manual.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pi_mcp2515</td><td>the piMCP2515 handle. </td></tr>
+    <tr><td class="paramname">reqop</td><td>the new operating mode. Acceptable values being:<ul>
+<li>PI_MCP2515_REQOP_MASK</li>
+<li>PI_MCP2515_REQOP_NORMAL</li>
+<li>PI_MCP2515_REQOP_SLEEP</li>
+<li>PI_MCP2515_REQOP_LOOPBACK</li>
+<li>PI_MCP2515_REQOP_LISTENONLY</li>
+<li>PI_MCP2515_REQOP_CONFIG</li>
+<li>PI_MCP2515_REQOP_POWERUP </li>
+</ul>
+</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>zero if success, otherwise non-zero. </dd></dl>
+
+</div>
+</div>
+<a id="ga3bec6d85776e2eb13351186fa41eaf28" name="ga3bec6d85776e2eb13351186fa41eaf28"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3bec6d85776e2eb13351186fa41eaf28">&#9670;&#160;</a></span>mcp2515_reqop_get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t mcp2515_reqop_get </td>
           <td>(</td>
           <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
           <td></td>
@@ -123,66 +162,14 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Clear all interrupts. </p>
+<p>Get the current operating mode. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pi_mcp2515</td><td>the piMCP2515 handle. </td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a id="gaf9bfb7c7ed84e0628e7987a92ae18c34" name="gaf9bfb7c7ed84e0628e7987a92ae18c34"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaf9bfb7c7ed84e0628e7987a92ae18c34">&#9670;&#160;</a></span>mcp2515_interrupts_get()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint8_t mcp2515_interrupts_get </td>
-          <td>(</td>
-          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Check for interrupts. </p>
-<p>The CANINTF register holds the interrupt flags.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">pi_mcp2515</td><td>the piMCP2515 handle. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the value of the interrupts flags. </dd></dl>
-
-</div>
-</div>
-<a id="ga1d96695fd9ccab26f54beff14e2a6ffa" name="ga1d96695fd9ccab26f54beff14e2a6ffa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga1d96695fd9ccab26f54beff14e2a6ffa">&#9670;&#160;</a></span>mcp2515_interrupts_mask()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint8_t mcp2515_interrupts_mask </td>
-          <td>(</td>
-          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Retrieve the interrupt mask. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">pi_mcp2515</td><td>the piMCP2515 handle. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the interrupt mask value. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the current operating mode. </dd></dl>
 
 </div>
 </div>

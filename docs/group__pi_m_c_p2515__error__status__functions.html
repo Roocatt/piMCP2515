@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.14.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>piMCP2515: Mode/Error/Status Functions</title>
+<title>piMCP2515: Error/Status Functions</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -63,7 +63,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(function(){initNavTree('group__pi_m_c_p2515__mode__error__status__functions.html','',''); });
+$(function(){initNavTree('group__pi_m_c_p2515__error__status__functions.html','',''); });
 </script>
 <div id="container">
 <div id="doc-content">
@@ -89,32 +89,28 @@ $(function(){initNavTree('group__pi_m_c_p2515__mode__error__status__functions.ht
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">Mode/Error/Status Functions </div></div>
+  <div class="headertitle"><div class="title">Error/Status Functions </div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>These functions handle REQOP (Operating Mode), Status, and Errors.  
+<p>These functions handle Status and Errors.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga48a6a8a727bae0bc41d1facb02b77f31" id="r_ga48a6a8a727bae0bc41d1facb02b77f31"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga48a6a8a727bae0bc41d1facb02b77f31">mcp2515_status</a> (<a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *pi_mcp2515)</td></tr>
+<tr class="memitem:ga48a6a8a727bae0bc41d1facb02b77f31" id="r_ga48a6a8a727bae0bc41d1facb02b77f31"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga48a6a8a727bae0bc41d1facb02b77f31">mcp2515_status</a> (pi_mcp2515_t *pi_mcp2515)</td></tr>
 <tr class="memdesc:ga48a6a8a727bae0bc41d1facb02b77f31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check status via the STATUS instruction.  <br /></td></tr>
-<tr class="memitem:gaae01aa187b5fde6752fced35afff8aa3" id="r_gaae01aa187b5fde6752fced35afff8aa3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaae01aa187b5fde6752fced35afff8aa3">mcp2515_reqop</a> (<a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *pi_mcp2515, uint8_t reqop)</td></tr>
-<tr class="memdesc:gaae01aa187b5fde6752fced35afff8aa3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the operating mode.  <br /></td></tr>
-<tr class="memitem:ga3bec6d85776e2eb13351186fa41eaf28" id="r_ga3bec6d85776e2eb13351186fa41eaf28"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga3bec6d85776e2eb13351186fa41eaf28">mcp2515_reqop_get</a> (<a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *pi_mcp2515)</td></tr>
-<tr class="memdesc:ga3bec6d85776e2eb13351186fa41eaf28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current operating mode.  <br /></td></tr>
-<tr class="memitem:ga531343d1012f20fa3a27ad8c13ddeee1" id="r_ga531343d1012f20fa3a27ad8c13ddeee1"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga531343d1012f20fa3a27ad8c13ddeee1">mcp2515_error_tx_count</a> (<a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *pi_mcp2515)</td></tr>
+<tr class="memitem:ga531343d1012f20fa3a27ad8c13ddeee1" id="r_ga531343d1012f20fa3a27ad8c13ddeee1"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga531343d1012f20fa3a27ad8c13ddeee1">mcp2515_error_tx_count</a> (pi_mcp2515_t *pi_mcp2515)</td></tr>
 <tr class="memdesc:ga531343d1012f20fa3a27ad8c13ddeee1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the value of the 'transmit' (TX) error counter.  <br /></td></tr>
-<tr class="memitem:ga4c08dcd495013ad5344b5c6f37eb7efe" id="r_ga4c08dcd495013ad5344b5c6f37eb7efe"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga4c08dcd495013ad5344b5c6f37eb7efe">mcp2515_error_rx_count</a> (<a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *pi_mcp2515)</td></tr>
+<tr class="memitem:ga4c08dcd495013ad5344b5c6f37eb7efe" id="r_ga4c08dcd495013ad5344b5c6f37eb7efe"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga4c08dcd495013ad5344b5c6f37eb7efe">mcp2515_error_rx_count</a> (pi_mcp2515_t *pi_mcp2515)</td></tr>
 <tr class="memdesc:ga4c08dcd495013ad5344b5c6f37eb7efe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the value of the 'receive' (RX) error counter.  <br /></td></tr>
-<tr class="memitem:gaab7ae95dc12e0363516aebc16c7172bd" id="r_gaab7ae95dc12e0363516aebc16c7172bd"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaab7ae95dc12e0363516aebc16c7172bd">mcp2515_error_flags</a> (<a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *pi_mcp2515)</td></tr>
+<tr class="memitem:gaab7ae95dc12e0363516aebc16c7172bd" id="r_gaab7ae95dc12e0363516aebc16c7172bd"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaab7ae95dc12e0363516aebc16c7172bd">mcp2515_error_flags</a> (pi_mcp2515_t *pi_mcp2515)</td></tr>
 <tr class="memdesc:gaab7ae95dc12e0363516aebc16c7172bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fetch the contents of the error flag (EFLG) register.  <br /></td></tr>
-<tr class="memitem:ga88468a677b620eb3343adf790714d7d0" id="r_ga88468a677b620eb3343adf790714d7d0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga88468a677b620eb3343adf790714d7d0">mcp2515_error</a> (<a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *pi_mcp2515)</td></tr>
+<tr class="memitem:ga88468a677b620eb3343adf790714d7d0" id="r_ga88468a677b620eb3343adf790714d7d0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga88468a677b620eb3343adf790714d7d0">mcp2515_error</a> (pi_mcp2515_t *pi_mcp2515)</td></tr>
 <tr class="memdesc:ga88468a677b620eb3343adf790714d7d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check error flags in the EFLG register.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<p>These functions handle REQOP (Operating Mode), Status, and Errors. </p>
+<p>These functions handle Status and Errors. </p>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="ga88468a677b620eb3343adf790714d7d0" name="ga88468a677b620eb3343adf790714d7d0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga88468a677b620eb3343adf790714d7d0">&#9670;&#160;</a></span>mcp2515_error()</h2>
@@ -125,7 +121,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">bool mcp2515_error </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
+          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -151,7 +147,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">uint8_t mcp2515_error_flags </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
+          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -177,7 +173,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">uint8_t mcp2515_error_rx_count </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
+          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -203,7 +199,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">uint8_t mcp2515_error_tx_count </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
+          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -220,73 +216,6 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="gaae01aa187b5fde6752fced35afff8aa3" name="gaae01aa187b5fde6752fced35afff8aa3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaae01aa187b5fde6752fced35afff8aa3">&#9670;&#160;</a></span>mcp2515_reqop()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int mcp2515_reqop </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>reqop</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Change the operating mode. </p>
-<p>After the mode change, this code will then sleep for a 128 oscillator cycles delay before continuing operations as defined by the MCP2515 manual.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">pi_mcp2515</td><td>the piMCP2515 handle. </td></tr>
-    <tr><td class="paramname">reqop</td><td>the new operating mode. Acceptable values being:<ul>
-<li>PI_MCP2515_REQOP_MASK</li>
-<li>PI_MCP2515_REQOP_NORMAL</li>
-<li>PI_MCP2515_REQOP_SLEEP</li>
-<li>PI_MCP2515_REQOP_LOOPBACK</li>
-<li>PI_MCP2515_REQOP_LISTENONLY</li>
-<li>PI_MCP2515_REQOP_CONFIG</li>
-<li>PI_MCP2515_REQOP_POWERUP </li>
-</ul>
-</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>zero if success, otherwise non-zero. </dd></dl>
-
-</div>
-</div>
-<a id="ga3bec6d85776e2eb13351186fa41eaf28" name="ga3bec6d85776e2eb13351186fa41eaf28"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga3bec6d85776e2eb13351186fa41eaf28">&#9670;&#160;</a></span>mcp2515_reqop_get()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint8_t mcp2515_reqop_get </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the current operating mode. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">pi_mcp2515</td><td>the piMCP2515 handle. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the current operating mode. </dd></dl>
-
-</div>
-</div>
 <a id="ga48a6a8a727bae0bc41d1facb02b77f31" name="ga48a6a8a727bae0bc41d1facb02b77f31"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga48a6a8a727bae0bc41d1facb02b77f31">&#9670;&#160;</a></span>mcp2515_status()</h2>
 
@@ -296,7 +225,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">uint8_t mcp2515_status </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
+          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>

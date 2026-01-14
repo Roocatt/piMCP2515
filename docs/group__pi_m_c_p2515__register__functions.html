@@ -98,11 +98,11 @@ $(function(){initNavTree('group__pi_m_c_p2515__register__functions.html','','');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga25360c8be13f82dc531b44095a609c54" id="r_ga25360c8be13f82dc531b44095a609c54"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga25360c8be13f82dc531b44095a609c54">mcp2515_register_read</a> (<a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *pi_mcp2515, uint8_t *data, uint8_t len, uint8_t rgstr)</td></tr>
+<tr class="memitem:ga25360c8be13f82dc531b44095a609c54" id="r_ga25360c8be13f82dc531b44095a609c54"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga25360c8be13f82dc531b44095a609c54">mcp2515_register_read</a> (pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t len, uint8_t rgstr)</td></tr>
 <tr class="memdesc:ga25360c8be13f82dc531b44095a609c54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a value from a specified register.  <br /></td></tr>
-<tr class="memitem:ga735be726aea86159d16d2c85bce79641" id="r_ga735be726aea86159d16d2c85bce79641"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga735be726aea86159d16d2c85bce79641">mcp2515_register_write</a> (<a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *pi_mcp2515, uint8_t values[], uint8_t len, uint8_t rgstr)</td></tr>
+<tr class="memitem:ga735be726aea86159d16d2c85bce79641" id="r_ga735be726aea86159d16d2c85bce79641"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga735be726aea86159d16d2c85bce79641">mcp2515_register_write</a> (pi_mcp2515_t *pi_mcp2515, uint8_t values[], uint8_t len, uint8_t rgstr)</td></tr>
 <tr class="memdesc:ga735be726aea86159d16d2c85bce79641"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a value to the specified register.  <br /></td></tr>
-<tr class="memitem:ga65ee04c89edc552adf16f33fedf0273f" id="r_ga65ee04c89edc552adf16f33fedf0273f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga65ee04c89edc552adf16f33fedf0273f">mcp2515_register_bitmod</a> (<a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *pi_mcp2515, uint8_t data, uint8_t mask, uint8_t rgstr)</td></tr>
+<tr class="memitem:ga65ee04c89edc552adf16f33fedf0273f" id="r_ga65ee04c89edc552adf16f33fedf0273f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga65ee04c89edc552adf16f33fedf0273f">mcp2515_register_bitmod</a> (pi_mcp2515_t *pi_mcp2515, uint8_t data, uint8_t mask, uint8_t rgstr)</td></tr>
 <tr class="memdesc:ga65ee04c89edc552adf16f33fedf0273f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the value of a register via an SPI bit modify.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
@@ -117,7 +117,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int mcp2515_register_bitmod </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span>, </td>
+          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -160,7 +160,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int mcp2515_register_read </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span>, </td>
+          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -203,7 +203,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int mcp2515_register_write </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structpi__mcp2515__t.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span>, </td>
+          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
