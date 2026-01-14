@@ -52,7 +52,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "pi_MCP2515.h"
+#include "pi_MCP2515_handle.h"
 
 #include "gpio.h"
 
@@ -60,7 +60,7 @@
 static int	spidev_duplex_com(const pi_mcp2515_t *, char[sizeof(uint64_t)], char[sizeof(uint64_t)]);
 
 /**
- * @brief Perform a round of full duplex comunication over SPI.
+ * @brief Perform a round of full duplex communication over SPI.
  *
  * spidev only does duplex communication. So, we split that off to this function.
  *
@@ -149,14 +149,13 @@ mcp2515_gpio_spi_free(const pi_mcp2515_t *pi_mcp2515)
 }
 
 int
-mcp2515_gpio_spi_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint32_t baud_rate)
+mcp2515_gpio_spi_init(pi_mcp2515_t *pi_mcp2515)
 {
-	return (mcp2515_gpio_spi_init_full_optional(pi_mcp2515, spi_channel, baud_rate, 0, 8));
+	return (mcp2515_gpio_spi_init_full_optional(pi_mcp2515, 0, 8));
 }
 
 int
-mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint32_t baud_rate, uint8_t mode,
-    uint8_t bits_per_word)
+mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint8_t bits_per_word)
 {
 #ifdef USE_PICO_LIB
 	spi_inst_t *spi_inst;
@@ -174,7 +173,7 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channe
 
 	pi_mcp2515->gpio_spi_inst = spi_inst,
 
-	spi_init(spi_inst, baud_rate);
+	spi_init(spi_inst, pi_mcp2515->spi_clock);
 	gpio_set_function(pi_mcp2515->tx_pin, PI_MCP2515_GPIO_FUNC_SPI);
 	gpio_set_function(pi_mcp2515->rx_pin, PI_MCP2515_GPIO_FUNC_SPI);
 	gpio_set_function(pi_mcp2515->sck_pin, PI_MCP2515_GPIO_FUNC_SPI);
@@ -215,7 +214,7 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channe
 
 	return (0);
 #elif defined(USE_PRINT_DEBUG)
-	printf("spi_init(0x%02x, 0x%08x)\n", spi_channel, baud_rate);
+	printf("spi_init(0x%02x, 0x%08x)\n", pi_mcp2515->spi_channel, pi_mcp2515->spi_clock);
 	return (0);
 #endif
 }

@@ -22,6 +22,20 @@ reading the code as many are intended slightly more as personal notes.
   - [ ] With BSD
 - [ ] Unit testing
 - [x] Easy cross-compiling
+- [ ] Detailed documentation
+  - [ ] Github wiki
+  - [ ] Examples
+  - [x] Doxygen API docs
+
+## Documentation
+
+There is automatically generated API documentation available on
+[GitHub Pages](https://roocatt.github.io/piMCP2515/). There is also a
+`docgenerate` Makefile target to generate some documentation in the
+`doxygen` directory which is configured by default to generate man
+pages as well as the same HTML documentation seen on GitHub pages.
+Automated documentation generation is done using Doxygen, which must
+be installed to work.
 
 ## Licence
 This project is available under the ISC licence.
