@@ -185,7 +185,7 @@ mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t tx_pin, uint
 {
 	int res;
 
-	if (osc_mhz > 40|| osc_mhz == 0) {
+	if (osc_mhz > 40 || osc_mhz == 0 || spi_channel > 1) {
 		res = 1;
 		goto err;
 	}
@@ -205,6 +205,55 @@ mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t tx_pin, uint
 
 err:
 	return (res);
+}
+
+/* These configure functions exposed to library users, so we don't hide this in gpio.c like other platform specific
+ * functions. Although these could be masked to only exist with `#ifdef USE_SPIDEV`, it makes it easier for
+ * documentation purposes to do it like this.
+ */
+
+/**
+ * @brief Override the default path for the spi device (ex /dev/spi0).
+ *
+ * NOOP unless built for spidev.
+ *
+ * This function generally will not need to be used as the library should be able to figure out the device patch. Use
+ * this only if it can't in your use case. If it is unable to find the path for you, please open an issue on the project
+ * with the details so that can be fixed.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param spidev_path the alternate SPI device path to use.
+ */
+void
+mcp2515_conf_spi_devpath(pi_mcp2515_t *pi_mcp2515, char *spidev_path)
+{
+#ifdef USE_SPIDEV
+	pi_mcp2515->gpio_dev_spi_path = spidev_path;
+#else
+	/* NOOP */
+#endif
+}
+
+/**
+ * @brief Override the default path for the gpio device (ex /dev/gpio0).
+ *
+ * NOOP unless built for spidev.
+ *
+ * This function generally will not need to be used as the library should be able to figure out the device patch. Use
+ * this only if it can't in your use case. If it is unable to find the path for you, please open an issue on the project
+ * with the details so that can be fixed.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param gpiodev_path the alternate GPIO device path to use.
+ */
+void
+mcp2515_conf_gpio_devpath(pi_mcp2515_t *pi_mcp2515, char *gpiodev_path)
+{
+#ifdef USE_SPIDEV
+	pi_mcp2515->gpio_dev_gpio_path = gpiodev_path;
+#else
+	/* NOOP */
+#endif
 }
 
 /**
