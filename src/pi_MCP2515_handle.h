@@ -23,19 +23,19 @@
 #endif /* USE_PICO_LIB */
 
 /* Library Definitions */
-#define PI_MCP2515_GPIO_PIN_MAP_LEN 40
+#define PI_MCP2515_GPIO_PIN_MAP_LEN 26
 
-typedef struct {
-	uint8_t spi_channel;
-	uint8_t cs_pin;
-	uint8_t tx_pin;
-	uint8_t rx_pin;
+struct pi_mcp2515 {
 	uint8_t sck_pin;
 	uint32_t spi_clock;
 	uint8_t osc_mhz;
 #ifdef USE_PICO_LIB
+	uint8_t spi_channel;
 	spi_inst_t *gpio_spi_inst;
 #elif defined(USE_SPIDEV)
+	uint8_t cs_pin;
+	uint8_t tx_pin;
+	uint8_t rx_pin;
 	char *gpio_dev_spi_path;
 	char *gpio_dev_gpio_path;
 	int gpio_spidev_fd;
@@ -43,8 +43,10 @@ typedef struct {
 	uint8_t gpio_spi_mode;
 	uint8_t gpio_spi_bits_per_word;
 	uint16_t gpio_spi_delay_usec;
-	int gpio_pin_fd_map[PI_MCP2515_GPIO_PIN_MAP_LEN]; /* TODO Info on GPIO pin/line mapping seems unclear. Verify size, etc. later. */
+	int gpio_pin_fd_map[PI_MCP2515_GPIO_PIN_MAP_LEN];
 #endif
-} pi_mcp2515_t;
+};
+
+typedef struct pi_mcp2515 pi_mcp2515_t;
 
 #endif /* PIMCP2515_PI_MCP2515_HANDLE_H */

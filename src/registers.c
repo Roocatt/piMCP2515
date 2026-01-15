@@ -14,7 +14,7 @@
  */
 
 #include "gpio.h"
-#include "pi_MCP2515_defs.h"
+#include "../include/pi_MCP2515_defs.h"
 #include "pi_MCP2515_handle.h"
 
 #include "registers.h"

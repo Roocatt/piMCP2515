@@ -12,6 +12,8 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+/* This header is used to hold important definitions. It is used both internal and external to the library.
+ */
 
 #ifndef PIMCP2515_PI_MCP2515_DEFS_H
 #define PIMCP2515_PI_MCP2515_DEFS_H
@@ -52,11 +54,11 @@
  * @brief These definitions hold the instruction codes.
  * @{
  */
-#define PI_MCP2515_INSTR_WRITE 0x02
-#define PI_MCP2515_INSTR_READ 0x03
-#define PI_MCP2515_INSTR_BITMOD 0x05
-#define PI_MCP2515_INSTR_READ_STATUS 0xA0
-#define PI_MCP2515_INSTR_RESET 0xC0
+#define PI_MCP2515_INSTR_WRITE 0x02 /**< @brief SPI interface write instruction. */
+#define PI_MCP2515_INSTR_READ 0x03 /**< @brief SPI interface read instruction. */
+#define PI_MCP2515_INSTR_BITMOD 0x05 /**< @brief SPI interface bit modify instruction. */
+#define PI_MCP2515_INSTR_READ_STATUS 0xA0 /**< @brief SPI interface status instruction. */
+#define PI_MCP2515_INSTR_RESET 0xC0 /**< @brief SPI interface status instruction. */
 /** @} */
 
 /**
@@ -64,13 +66,13 @@
  * @brief These definitions hold the REQOP (operating mode) codes.
  * @{
  */
-#define PI_MCP2515_REQOP_NORMAL 0x00
-#define PI_MCP2515_REQOP_SLEEP 0x20
-#define PI_MCP2515_REQOP_LOOPBACK 0x40
-#define PI_MCP2515_REQOP_LISTENONLY 0x60
-#define PI_MCP2515_REQOP_CONFIG 0x80
-#define PI_MCP2515_REQOP_POWERUP 0xE0
-#define PI_MCP2515_REQOP_MASK 0xE0
+#define PI_MCP2515_REQOP_NORMAL 0x00 /**< @brief Normal operating mode. */
+#define PI_MCP2515_REQOP_SLEEP 0x20 /**< @brief Sleep operating mode. */
+#define PI_MCP2515_REQOP_LOOPBACK 0x40 /**< @brief Loopback operating mode. */
+#define PI_MCP2515_REQOP_LISTENONLY 0x60 /**< @brief Listenonly operating mode. */
+#define PI_MCP2515_REQOP_CONFIG 0x80 /**< @brief Config operating mode. */
+#define PI_MCP2515_REQOP_POWERUP 0xE0 /**< @brief Powerup operating mode. */
+#define PI_MCP2515_REQOP_MASK 0xE0 /**< @brief Mask for REQOP values. */
 /** @} */
 
 /* CTRL Definitions */
@@ -102,6 +104,7 @@
 /* CANINTF Definitions */
 #define PI_MCP2515_CANINTF_RX0 0x01
 #define PI_MCP2515_CANINTF_RX1 0x02
+#define PI_MCP2515_CANINTF_ERRIF 0x20 /**< @brief Error interrupt flag. */
 
 /* ID Mask Definitions */
 #define PI_MCP2515_ID_MASK_SFF 0x000007FFUL

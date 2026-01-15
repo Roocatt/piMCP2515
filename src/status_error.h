@@ -20,11 +20,12 @@
 extern "C" {
 #endif /* __cplusplus */
 
-uint8_t		mcp2515_status(pi_mcp2515_t *);
-uint8_t		mcp2515_error_tx_count(pi_mcp2515_t *);
-uint8_t		mcp2515_error_rx_count(pi_mcp2515_t *);
-uint8_t		mcp2515_error_flags(pi_mcp2515_t *);
-bool		mcp2515_error(pi_mcp2515_t *);
+uint8_t	mcp2515_status(pi_mcp2515_t *);
+uint8_t	mcp2515_error_tx_count(pi_mcp2515_t *);
+uint8_t	mcp2515_error_rx_count(pi_mcp2515_t *);
+uint8_t	mcp2515_error_flags(pi_mcp2515_t *);
+bool	mcp2515_error(pi_mcp2515_t *);
+int	mcp2515_error_clear_errif(pi_mcp2515_t *);
 
 #ifdef __cplusplus
 }

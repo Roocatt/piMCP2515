@@ -16,7 +16,7 @@
 #include <stdbool.h>
 
 #include "pi_MCP2515_handle.h"
-#include "pi_MCP2515_defs.h"
+#include "../include/pi_MCP2515_defs.h"
 #include "gpio.h"
 #include "registers.h"
 
@@ -105,5 +105,17 @@ bool
 mcp2515_error(pi_mcp2515_t *pi_mcp2515)
 {
 	return (mcp2515_error_flags(pi_mcp2515) & PI_MCP2515_EFLG_MASK);
+}
+
+/**
+ * @brief Clear error interrupt flag.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @return zero if success, otherwise non-zero.
+ */
+int
+mcp2515_error_clear_errif(pi_mcp2515_t *pi_mcp2515)
+{
+	return (mcp2515_register_bitmod(pi_mcp2515, 0, PI_MCP2515_CANINTF_ERRIF, PI_MCP2515_RGSTR_CANINTF));
 }
 /** @} */

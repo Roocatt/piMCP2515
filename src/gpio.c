@@ -108,7 +108,6 @@ mcp2515_gpio_init(pi_mcp2515_t *pi_mcp2515, uint8_t pin)
 
 	rq.offsets[0] = pin;
 	rq.num_lines = 1;
-	/* TODO Pico SDK sets to input by default. Also need to determine the fd direction/updatability. */
 	rq.config.flags = GPIOHANDLE_REQUEST_INPUT;
 	rq.config.num_attrs = 0;
 	strncpy(rq.consumer, "pi_mcp2515", sizeof(rq.consumer));
@@ -231,7 +230,7 @@ mcp2515_gpio_set_dir(const pi_mcp2515_t *pi_mcp2515, uint8_t gpio, bool out)
 
 	return (0);
 #elif defined(USE_SPIDEV)
-	struct gpio_v2_line_config config;
+	struct gpio_v2_line_config config = {0};
 
 	if (out)
 		config.flags = GPIO_V2_LINE_FLAG_OUTPUT;

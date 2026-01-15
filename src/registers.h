@@ -24,9 +24,9 @@
 extern "C" {
 #endif /* __cplusplus */
 
-int		mcp2515_register_read(pi_mcp2515_t *, uint8_t *, uint8_t, uint8_t);
-int		mcp2515_register_write(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
-int		mcp2515_register_bitmod(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t);
+int	mcp2515_register_read(pi_mcp2515_t *, uint8_t *, uint8_t, uint8_t);
+int	mcp2515_register_write(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
+int	mcp2515_register_bitmod(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t);
 
 #ifdef __cplusplus
 }

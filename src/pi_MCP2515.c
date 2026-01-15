@@ -19,7 +19,7 @@
 
 #include <stdbool.h>
 
-#include "pi_MCP2515_defs.h"
+#include "../include/pi_MCP2515_defs.h"
 #include "registers.h"
 #include "gpio.h"
 
@@ -170,16 +170,13 @@ err:
  * registers.
  *
  * @param pi_mcp2515 the piMCP2515 handle.
- *
  * @param spi_clock the frequency to use for SPI communication in Hz.
  * @param osc_mhz the frequency of the MCP2515 oscillator in MHz.
- * @param spi_channel the SPI channel to use which may be `0` or `1`.
  * @param cs_pin the GPIO pin to use for SPI chip select.
  * @return zero if success, otherwise non-zero
  */
 int
-mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint8_t tx_pin, uint8_t rx_pin,
-    uint8_t sck_pin, uint32_t spi_clock, uint8_t osc_mhz)
+mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t cs_pin, uint32_t spi_clock, uint8_t osc_mhz)
 {
 	int res;
 
@@ -188,14 +185,7 @@ mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint
 		goto err;
 	}
 
-	pi_mcp2515->spi_channel = spi_channel;
 	pi_mcp2515->cs_pin = cs_pin;
-
-	/* TODO these are only used for Pico. Figure out a cleaner way. */
-	pi_mcp2515->sck_pin = sck_pin;
-	pi_mcp2515->tx_pin = tx_pin;
-	pi_mcp2515->rx_pin = rx_pin;
-
 	pi_mcp2515->spi_clock = spi_clock;
 	pi_mcp2515->osc_mhz = osc_mhz;
 
@@ -206,6 +196,47 @@ mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t cs_pin, uint
 
 err:
 	return (res);
+}
+
+/* These configure functions exposed to library users, so we don't hide this in gpio.c like similar functions. Although
+ * these could have the same name and be masked to only the relevant function by an `#ifdef`, it makes it easier for
+ * documentation purposes to do it like this.
+ */
+
+/**
+ * Configure SPI for systems using spidev. NOOP if not built for SPIDEV.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param tx_pin the TX pin for SPI communication.
+ * @param rx_pin the RX pin for SPI communication.
+ * @param sck_pin the SCK pin for SPI communication.
+ */
+void
+mcp2515_configure_spi_spidev(pi_mcp2515_t *pi_mcp2515, uint8_t tx_pin, uint8_t rx_pin, uint8_t sck_pin)
+{
+#ifdef USE_SPIDEV
+	pi_mcp2515->sck_pin = sck_pin;
+	pi_mcp2515->tx_pin = tx_pin;
+	pi_mcp2515->rx_pin = rx_pin;
+#else
+	/* NOOP */
+#endif
+}
+
+/**
+ *Configure SPI for the Pi Pico. NOOP if not built for the Pico.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param spi_channel the SPI channel to use which may be `0` or `1`.
+ */
+void
+mcp2515_configure_spi_pico(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel)
+{
+#ifdef USE_PICO_LIB
+	pi_mcp2515->spi_channel = spi_channel;
+#else
+	/* NOOP */
+#endif
 }
 
 /**

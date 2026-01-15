@@ -20,19 +20,21 @@
 
 #include "pi_MCP2515_handle.h"
 
-typedef struct {
+struct pi_mcp2515_can_frame {
 	uint32_t id;
 	uint8_t dlc;
 	uint8_t payload[8];
-} pi_mcp2515_can_frame_t;
+};
+
+typedef struct pi_mcp2515_can_frame pi_mcp2515_can_frame_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-int		mcp2515_can_message_send(pi_mcp2515_t *, const pi_mcp2515_can_frame_t *);
-int		mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
-bool		mcp2515_can_message_received(pi_mcp2515_t *);
+int	mcp2515_can_message_send(pi_mcp2515_t *, const pi_mcp2515_can_frame_t *);
+int	mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
+bool	mcp2515_can_message_received(pi_mcp2515_t *);
 
 #ifdef __cplusplus
 }

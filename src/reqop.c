@@ -15,7 +15,7 @@
 
 #include <stdint.h>
 
-#include "pi_MCP2515_defs.h"
+#include "../include/pi_MCP2515_defs.h"
 #include "registers.h"
 
 #include "reqop.h"
