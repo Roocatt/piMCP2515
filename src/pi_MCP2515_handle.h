@@ -26,14 +26,14 @@
 #define PI_MCP2515_GPIO_PIN_MAP_LEN 26
 
 struct pi_mcp2515 {
-	uint8_t sck_pin;
+	uint8_t cs_pin;
 	uint32_t spi_clock;
 	uint8_t osc_mhz;
 #ifdef USE_PICO_LIB
 	uint8_t spi_channel;
 	spi_inst_t *gpio_spi_inst;
 #elif defined(USE_SPIDEV)
-	uint8_t cs_pin;
+	uint8_t sck_pin;
 	uint8_t tx_pin;
 	uint8_t rx_pin;
 	char *gpio_dev_spi_path;
