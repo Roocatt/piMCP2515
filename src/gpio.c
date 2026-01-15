@@ -183,13 +183,22 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 	return (0);
 #elif defined(USE_SPIDEV)
 	int res, spidev_fd, gpio_fd;
+	char *spidev_path;
 
 	memset(&pi_mcp2515->gpio_pin_fd_map, 0 , sizeof(pi_mcp2515->gpio_pin_fd_map));
+
+	if (pi_mcp2515->gpio_dev_spi_path == NULL) {
+		if (pi_mcp2515->spi_channel == 0)
+			spidev_path = "/dev/spi0.0";
+		else /* pi_mcp2515->spi_channel == 1 */
+			spidev_path = "/dev/spi0.1";
+	} else
+		spidev_path = pi_mcp2515->gpio_dev_spi_path;
 
 	gpio_fd = open(pi_mcp2515->gpio_dev_gpio_path == NULL ? "/dev/gpio0" : pi_mcp2515->gpio_dev_gpio_path, O_RDWR);
 	if (gpio_fd < 0)
 		return (-1);
-	spidev_fd = open(pi_mcp2515->gpio_dev_spi_path == NULL ? "/dev/spi0" : pi_mcp2515->gpio_dev_spi_path, O_RDWR);
+	spidev_fd = open(spidev_path, O_RDWR);
 	if (spidev_fd < 0) {
 		close(gpio_fd);
 		return (-1);

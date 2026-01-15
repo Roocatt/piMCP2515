@@ -31,7 +31,7 @@ int	mcp2515_bitrate_simplified(pi_mcp2515_t *, uint16_t);
 int	mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, bool, bool,
     bool, bool);
 void	mcp2515_free(const pi_mcp2515_t *);
-int	mcp2515_init(pi_mcp2515_t *, uint8_t, uint32_t, uint8_t);
+int	mcp2515_init(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t, uint8_t);
 
 void	mcp2515_configure_spi_spidev(pi_mcp2515_t *, uint8_t, uint8_t, uint8_t);
 void	mcp2515_configure_spi_pico(pi_mcp2515_t *, uint8_t);
