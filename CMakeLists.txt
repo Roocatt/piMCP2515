@@ -20,7 +20,7 @@ set(CMAKE_C_COMPILER_FORCED True)
 if (USE_SPIDEV)
     if (USE_ARM_CC)
         include("cmake/linux-arm-cross-compile.cmake")
-    elif (USE_AARCH64_CC)
+    elseif (USE_AARCH64_CC)
         include("cmake/linux-aarch64-cross-compile.cmake")
     endif ()
 elseif (NOT USE_PRINT_DEBUG) # USE_PICO_LIB as default, for USE_PRINT_DEBUG just skip
