@@ -32,17 +32,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-/* TODO configurable cross-compile? BSD compiler setup in cmake? Differences across BSDs? */
-#if defined(__linux__)
-#define USE_SPIDEV_LINUX
-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
-/* TODO OpenBSD documentation around SPI support has seemed unhelpful so far. Figure out if OpenBSD can be supported */
-/* ^ Note: GPIO support seems fine with the same code on all 3 BSDs. */
-#define USE_SPIDEV_BSD
-#else
-#error "Unsupported OS"
-#endif
-
 #elif defined(USE_PRINT_DEBUG)
 #include <stdio.h>
 #endif

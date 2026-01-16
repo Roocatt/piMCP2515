@@ -18,6 +18,7 @@
  */
 
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "../include/pi_MCP2515_defs.h"
 #include "registers.h"
@@ -180,28 +181,30 @@ err:
  * @return zero if success, otherwise non-zero
  */
 int
-mcp2515_init(pi_mcp2515_t *pi_mcp2515, uint8_t spi_channel, uint8_t tx_pin, uint8_t rx_pin, uint8_t sck_pin,
+mcp2515_init(pi_mcp2515_t **pi_mcp2515, uint8_t spi_channel, uint8_t tx_pin, uint8_t rx_pin, uint8_t sck_pin,
     uint8_t cs_pin, uint32_t spi_clock, uint8_t osc_mhz)
 {
 	int res;
+
+	*pi_mcp2515 = calloc(1, sizeof(pi_mcp2515_t));
 
 	if (osc_mhz > 40 || osc_mhz == 0 || spi_channel > 1) {
 		res = 1;
 		goto err;
 	}
 
-	pi_mcp2515->spi_channel = spi_channel;
-	pi_mcp2515->sck_pin = sck_pin;
-	pi_mcp2515->tx_pin = tx_pin;
-	pi_mcp2515->rx_pin = rx_pin;
-	pi_mcp2515->cs_pin = cs_pin;
-	pi_mcp2515->spi_clock = spi_clock;
-	pi_mcp2515->osc_mhz = osc_mhz;
+	(*pi_mcp2515)->spi_channel = spi_channel;
+	(*pi_mcp2515)->sck_pin = sck_pin;
+	(*pi_mcp2515)->tx_pin = tx_pin;
+	(*pi_mcp2515)->rx_pin = rx_pin;
+	(*pi_mcp2515)->cs_pin = cs_pin;
+	(*pi_mcp2515)->spi_clock = spi_clock;
+	(*pi_mcp2515)->osc_mhz = osc_mhz;
 
-	if ((res = mcp2515_gpio_spi_init(pi_mcp2515)))
+	if ((res = mcp2515_gpio_spi_init(*pi_mcp2515)))
 		goto err;
 
-	UNSET_CS(pi_mcp2515);
+	UNSET_CS((*pi_mcp2515));
 
 err:
 	return (res);
@@ -262,8 +265,9 @@ mcp2515_conf_gpio_devpath(pi_mcp2515_t *pi_mcp2515, char *gpiodev_path)
  * @param pi_mcp2515 the piMCP2515 handle.
  */
 void
-mcp2515_free(const pi_mcp2515_t *pi_mcp2515)
+mcp2515_free(pi_mcp2515_t *pi_mcp2515)
 {
 	mcp2515_gpio_spi_free(pi_mcp2515);
+	free(pi_mcp2515);
 }
 /** @} */
