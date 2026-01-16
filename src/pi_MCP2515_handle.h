@@ -25,21 +25,6 @@
 /* Library Definitions */
 #define PI_MCP2515_GPIO_PIN_MAP_LEN 26
 
-/* TODO configurable cross-compile? BSD compiler setup in cmake? Differences across BSDs?
- * This should also probably have a better home.
- */
-#ifdef USE_SPIDEV
-#if defined(__linux__)
-#define USE_SPIDEV_LINUX
-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
-/* TODO OpenBSD documentation around SPI support has seemed unhelpful so far. Figure out if OpenBSD can be supported */
-/* ^ Note: GPIO support seems fine with the same code on all 3 BSDs. */
-#define USE_SPIDEV_BSD
-#else
-#error "Unsupported OS"
-#endif
-#endif /* USE_SPIDEV */
-
 struct pi_mcp2515 {
 	uint8_t cs_pin;
 	uint32_t spi_clock;
@@ -58,9 +43,9 @@ struct pi_mcp2515 {
 	uint8_t gpio_spi_mode;
 	uint8_t gpio_spi_bits_per_word;
 	uint16_t gpio_spi_delay_usec;
-#ifdef USE_SPIDEV_LINUX
+#ifdef __linux__
 	int gpio_pin_fd_map[PI_MCP2515_GPIO_PIN_MAP_LEN];
-#endif /* USE_SPIDEV_LINUX */
+#endif /* __linux__ */
 #endif /* USE_PICO_LIB */
 };
 
