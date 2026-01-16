@@ -43,7 +43,7 @@ struct pi_mcp2515 {
 	uint8_t gpio_spi_mode;
 	uint8_t gpio_spi_bits_per_word;
 	uint16_t gpio_spi_delay_usec;
-	int gpio_pin_fd_map[PI_MCP2515_GPIO_PIN_MAP_LEN];
+	int gpio_pin_fd_map[PI_MCP2515_GPIO_PIN_MAP_LEN];  /* TODO Not used for BSD */
 #endif
 };
 

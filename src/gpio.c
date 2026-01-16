@@ -36,6 +36,8 @@
 #if defined(__linux__)
 #define USE_SPIDEV_LINUX
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+/* TODO OpenBSD documentation around SPI support has seemed unhelpful so far. Figure out if OpenBSD can be supported */
+/* ^ Note: GPIO support seems fine with the same code on all 3 BSDs. */
 #define USE_SPIDEV_BSD
 #else
 #error "Unsupported OS"
@@ -49,6 +51,7 @@
 #include <linux/gpio.h>
 #include <linux/spi/spidev.h>
 #elif defined(USE_SPIDEV_BSD)
+/* #include <sys/gpio.h> ? */
 #include <dev/gpio/gpio.h>
 #include <dev/spi/spi_io.h>
 #endif
@@ -61,7 +64,7 @@
 
 #include "gpio.h"
 
-#ifdef USE_SPIDEV
+#ifdef USE_SPIDEV_LINUX
 static int	spidev_duplex_com(const pi_mcp2515_t *, const char[sizeof(uint64_t)], const char[sizeof(uint64_t)]);
 
 /**
@@ -88,7 +91,23 @@ spidev_duplex_com(const pi_mcp2515_t *pi_mcp2515, const char tx_buffer[sizeof(ui
 
 	return (ioctl(pi_mcp2515->gpio_spidev_fd, SPI_IOC_MESSAGE(1), &tr));
 }
-#endif /* USE_SPIDEV */
+#elif defined(USE_SPIDEV_BSD)
+static int	spidev_duplex_com(const pi_mcp2515_t *, const char[sizeof(uint64_t)], const char[sizeof(uint64_t)]);
+
+static int
+spidev_duplex_com(const pi_mcp2515_t *pi_mcp2515, const char tx_buffer[sizeof(uint64_t)], const char rx_buffer[sizeof(uint64_t)])
+{
+	spi_ioctl_transfer_t tr = {
+		.sit_send = tx_buffer,
+		.sit_sendlen = sizeof(uint64_t),
+		.sit_recv = rx_buffer,
+		.sit_recvlen = sizeof(uint64_t),
+		/* .sit_addr ? */
+	};
+
+	return (ioctl(pi_mcp2515->gpio_spidev_fd, SPI_IOCTL_TRANSFER, &tr));
+}
+#endif
 
 /**
  * @brief Set up a GPIO pin.
