@@ -20,6 +20,7 @@
  * horrors from the rest of the project.
  */
 
+#include <stdio.h>
 #ifdef USE_PICO_LIB
 
 #include "pico/stdlib.h"
@@ -31,10 +32,12 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+/* TODO configurable cross-compile? BSD compiler setup in cmake? Differences across BSDs? */
 #if defined(__linux__)
 #define USE_SPIDEV_LINUX
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#define USE_SPIDEV_BSD
 #else
-/* TODO Support other Pi OS options (BSDs). Ex: defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) */
 #error "Unsupported OS"
 #endif
 
@@ -45,7 +48,9 @@
 #ifdef USE_SPIDEV_LINUX
 #include <linux/gpio.h>
 #include <linux/spi/spidev.h>
-/* TODO Add BSD OS support things*/
+#elif defined(USE_SPIDEV_BSD)
+#include <dev/gpio/gpio.h>
+#include <dev/spi/spi_io.h>
 #endif
 
 #include <stdbool.h>
@@ -117,6 +122,13 @@ mcp2515_gpio_init(pi_mcp2515_t *pi_mcp2515, uint8_t pin)
 		pi_mcp2515->gpio_pin_fd_map[pin] = rq.fd;
 
 	return (res);
+#elif defined(USE_SPIDEV_BSD)
+	struct gpio_pin_set pin_config = { 0 };
+
+	snprintf(pin_config.gp_name, GPIOPINMAXNAME, "pi_mcp2515 pin #%d", pin);
+	pin_config.gp_flags = GPIO_PIN_INPUT;
+
+	return (ioctl(pi_mcp2515->gpio_gpio_fd, GPIOPINSET, &pin_config));
 #elif defined(USE_PRINT_DEBUG)
 	printf("gpio_init(0x%02x)\n", pin);
 
@@ -182,10 +194,11 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 
 	return (0);
 #elif defined(USE_SPIDEV)
+#ifdef USE_SPIDEV_BSD
+	spi_ioctl_configure_t spi_cfg = { 0 };
+#endif
 	int res, spidev_fd, gpio_fd;
 	char *spidev_path;
-
-	memset(&pi_mcp2515->gpio_pin_fd_map, 0 , sizeof(pi_mcp2515->gpio_pin_fd_map));
 
 	if (pi_mcp2515->gpio_dev_spi_path == NULL) {
 		if (pi_mcp2515->spi_channel == 0)
@@ -201,8 +214,12 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 	spidev_fd = open(spidev_path, O_RDWR);
 	if (spidev_fd < 0) {
 		close(gpio_fd);
-		return (-1);
+		res = -1;
+		goto err;
 	}
+
+#ifdef USE_SPIDEV_LINUX
+	memset(&pi_mcp2515->gpio_pin_fd_map, 0 , sizeof(pi_mcp2515->gpio_pin_fd_map));
 
 	if ((res = ioctl(spidev_fd, SPI_IOC_WR_MODE, &mode)
 	    || ioctl(spidev_fd, SPI_IOC_WR_BITS_PER_WORD, &bits_per_word)
@@ -211,8 +228,18 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 	    || ioctl(spidev_fd, SPI_IOC_RD_MAX_SPEED_HZ, &pi_mcp2515->spi_clock))) {
 		close(gpio_fd);
 		close(spidev_fd);
-		return (res);
+		goto err;
 	}
+#elif defined(USE_SPIDEV_BSD)
+	spi_cfg.sic_mode = pi_mcp2515->gpio_spi_mode
+	spi_cfg.sic_speed = pi_mcp2515->spi_clock;
+
+	if ((res = ioctl(spidev_fd, SPI_IOCTL_CONFIGURE, &spi_cfg))) {
+		close(gpio_fd);
+		close(spidev_fd);
+		goto err;
+	}
+#endif
 
 	pi_mcp2515->gpio_gpio_fd = gpio_fd;
 	pi_mcp2515->gpio_spidev_fd = spidev_fd;
@@ -220,7 +247,8 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 	pi_mcp2515->gpio_spi_bits_per_word = bits_per_word;
 	pi_mcp2515->gpio_spi_delay_usec = 0;
 
-	return (0);
+err:
+	return (res);
 #elif defined(USE_PRINT_DEBUG)
 	printf("spi_init(0x%02x, 0x%08x)\n", pi_mcp2515->spi_channel, pi_mcp2515->spi_clock);
 	return (0);
@@ -238,8 +266,8 @@ mcp2515_gpio_set_dir(const pi_mcp2515_t *pi_mcp2515, uint8_t gpio, bool out)
 	printf("gpio_set_dir(0x%02x, %s)\n", gpio, out ? "true" : "false");
 
 	return (0);
-#elif defined(USE_SPIDEV)
-	struct gpio_v2_line_config config = {0};
+#elif defined(USE_SPIDEV_LINUX)
+	struct gpio_v2_line_config config = { 0 };
 
 	if (out)
 		config.flags = GPIO_V2_LINE_FLAG_OUTPUT;
@@ -247,6 +275,17 @@ mcp2515_gpio_set_dir(const pi_mcp2515_t *pi_mcp2515, uint8_t gpio, bool out)
 		config.flags = GPIO_V2_LINE_FLAG_INPUT;
 
 	return (ioctl(pi_mcp2515->gpio_pin_fd_map[gpio], GPIO_V2_LINE_SET_CONFIG_IOCTL, &config));
+#elif defined(USE_SPIDEV_BSD)
+	/* TODO Confirm behaviour with second GPIOSET on things like name. */
+	struct gpio_pin_set pin_config = { 0 };
+
+	pin_config.gp_pin = pin_number;
+	if (out)
+		pin_config.gp_flags = GPIO_PIN_OUTPUT;
+	else
+		pin_config.gp_flags = GPIO_PIN_INPUT;
+
+	return (ioctl(pi_mcp2515->gpio_gpio_fd, GPIOPINSET, &pin_config));
 #endif
 }
 
@@ -324,6 +363,13 @@ mcp2515_gpio_put(const pi_mcp2515_t *pi_mcp2515, uint8_t pin, uint8_t value)
 	values.bits = value ? 1 : 0;
 
 	return (ioctl(pi_mcp2515->gpio_pin_fd_map[pin], GPIO_V2_LINE_SET_VALUES_IOCTL, &values));
+#elif defined(USE_SPIDEV_BSD)
+	struct gpio_pin_op pin_op;
+
+	pin_op.gp_pin = pin;
+	pin_op.gp_value = value ? 1 : 0;
+
+	return (ioctl(pi_mcp2515->gpio_gpio_fd, GPIOPINWRITE, &pin_op));
 #elif defined(USE_PRINT_DEBUG)
 	printf("gpio_put(0x%02x, 0x%02x)\n", pin, value);
 
