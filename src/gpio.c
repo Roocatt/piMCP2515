@@ -97,6 +97,16 @@ spidev_duplex_com(const pi_mcp2515_t *pi_mcp2515, const char tx_buffer[sizeof(ui
 #elif defined(USE_SPIDEV_BSD)
 static int	spidev_duplex_com(const pi_mcp2515_t *, const char[sizeof(uint64_t)], const char[sizeof(uint64_t)]);
 
+/**
+ * @brief Perform a round of full duplex communication over SPI.
+ *
+ * Either `tx_buffer` or `rx_buffer` can be null if only sending or only receiving.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param tx_buffer the buffer to use for transmitting.
+ * @param rx_buffer the buffer to use for receiving.
+ * @return zero if success, otherwise non-zero.
+ */
 static int
 spidev_duplex_com(const pi_mcp2515_t *pi_mcp2515, const char tx_buffer[sizeof(uint64_t)], const char rx_buffer[sizeof(uint64_t)])
 {
@@ -125,13 +135,11 @@ spidev_duplex_com(const pi_mcp2515_t *pi_mcp2515, const char tx_buffer[sizeof(ui
 int
 mcp2515_gpio_init(pi_mcp2515_t *pi_mcp2515, uint8_t pin)
 {
+	int res = 0;
 #ifdef USE_PICO_LIB
 	gpio_init(pin);
-
-	return (0);
 #elif defined(USE_SPIDEV)
 	struct gpio_v2_line_request rq = { 0 };
-	int res;
 
 	rq.offsets[0] = pin;
 	rq.num_lines = 1;
@@ -142,20 +150,17 @@ mcp2515_gpio_init(pi_mcp2515_t *pi_mcp2515, uint8_t pin)
 	res = ioctl(pi_mcp2515->gpio_gpio_fd, GPIO_GET_LINEHANDLE_IOCTL, &rq);
 	if (!res)
 		pi_mcp2515->gpio_pin_fd_map[pin] = rq.fd;
-
-	return (res);
 #elif defined(USE_SPIDEV_BSD)
 	struct gpio_pin_set pin_config = { 0 };
 
 	snprintf(pin_config.gp_name, GPIOPINMAXNAME, "pi_mcp2515 pin #%d", pin);
 	pin_config.gp_flags = GPIO_PIN_INPUT;
 
-	return (ioctl(pi_mcp2515->gpio_gpio_fd, GPIOPINSET, &pin_config));
+	res = ioctl(pi_mcp2515->gpio_gpio_fd, GPIOPINSET, &pin_config);
 #elif defined(USE_PRINT_DEBUG)
 	printf("gpio_init(0x%02x)\n", pin);
-
-	return (0);
 #endif
+	return (res);
 }
 
 /**
@@ -190,6 +195,7 @@ mcp2515_gpio_spi_init(pi_mcp2515_t *pi_mcp2515)
 int
 mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint8_t bits_per_word)
 {
+	int res = 0;
 #ifdef USE_PICO_LIB
 	spi_inst_t *spi_inst;
 
@@ -201,7 +207,8 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 		spi_inst = spi1;
 		break;
 	default:
-		return (-1);
+		res = -1;
+		goto err;
 	}
 
 	pi_mcp2515->gpio_spi_inst = spi_inst,
@@ -213,13 +220,11 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 	mcp2515_gpio_init(pi_mcp2515, pi_mcp2515->cs_pin);
 
 	mcp2515_gpio_set_dir(pi_mcp2515, pi_mcp2515->cs_pin, true);
-
-	return (0);
 #elif defined(USE_SPIDEV)
 #ifdef USE_SPIDEV_BSD
 	spi_ioctl_configure_t spi_cfg = { 0 };
 #endif
-	int res, spidev_fd, gpio_fd;
+	int spidev_fd, gpio_fd;
 	char *spidev_path;
 
 	if (pi_mcp2515->gpio_dev_spi_path == NULL) {
@@ -231,8 +236,10 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 		spidev_path = pi_mcp2515->gpio_dev_spi_path;
 
 	gpio_fd = open(pi_mcp2515->gpio_dev_gpio_path == NULL ? "/dev/gpio0" : pi_mcp2515->gpio_dev_gpio_path, O_RDWR);
-	if (gpio_fd < 0)
-		return (-1);
+	if (gpio_fd < 0) {
+		res = -1;
+		goto err;
+	}
 	spidev_fd = open(spidev_path, O_RDWR);
 	if (spidev_fd < 0) {
 		close(gpio_fd);
@@ -252,6 +259,9 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 		close(spidev_fd);
 		goto err;
 	}
+
+	pi_mcp2515->gpio_spi_bits_per_word = bits_per_word;
+	pi_mcp2515->gpio_spi_delay_usec = 0;
 #elif defined(USE_SPIDEV_BSD)
 	spi_cfg.sic_mode = pi_mcp2515->gpio_spi_mode
 	spi_cfg.sic_speed = pi_mcp2515->spi_clock;
@@ -266,28 +276,21 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 	pi_mcp2515->gpio_gpio_fd = gpio_fd;
 	pi_mcp2515->gpio_spidev_fd = spidev_fd;
 	pi_mcp2515->gpio_spi_mode = mode;
-	pi_mcp2515->gpio_spi_bits_per_word = bits_per_word;
-	pi_mcp2515->gpio_spi_delay_usec = 0;
-
-err:
-	return (res);
 #elif defined(USE_PRINT_DEBUG)
 	printf("spi_init(0x%02x, 0x%08x)\n", pi_mcp2515->spi_channel, pi_mcp2515->spi_clock);
-	return (0);
 #endif
+err:
+	return (res);
 }
 
 int
 mcp2515_gpio_set_dir(const pi_mcp2515_t *pi_mcp2515, uint8_t gpio, bool out)
 {
+	int res = 0;
 #ifdef USE_PICO_LIB
 	gpio_set_dir(gpio, out);
-
-	return (0);
 #elif defined(USE_PRINT_DEBUG)
 	printf("gpio_set_dir(0x%02x, %s)\n", gpio, out ? "true" : "false");
-
-	return (0);
 #elif defined(USE_SPIDEV_LINUX)
 	struct gpio_v2_line_config config = { 0 };
 
@@ -296,7 +299,7 @@ mcp2515_gpio_set_dir(const pi_mcp2515_t *pi_mcp2515, uint8_t gpio, bool out)
 	else
 		config.flags = GPIO_V2_LINE_FLAG_INPUT;
 
-	return (ioctl(pi_mcp2515->gpio_pin_fd_map[gpio], GPIO_V2_LINE_SET_CONFIG_IOCTL, &config));
+	res = ioctl(pi_mcp2515->gpio_pin_fd_map[gpio], GPIO_V2_LINE_SET_CONFIG_IOCTL, &config);
 #elif defined(USE_SPIDEV_BSD)
 	/* TODO Confirm behaviour with second GPIOSET on things like name. */
 	struct gpio_pin_set pin_config = { 0 };
@@ -307,20 +310,20 @@ mcp2515_gpio_set_dir(const pi_mcp2515_t *pi_mcp2515, uint8_t gpio, bool out)
 	else
 		pin_config.gp_flags = GPIO_PIN_INPUT;
 
-	return (ioctl(pi_mcp2515->gpio_gpio_fd, GPIOPINSET, &pin_config));
+	res = ioctl(pi_mcp2515->gpio_gpio_fd, GPIOPINSET, &pin_config);
 #endif
+	return (res);
 }
 
 int
 mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t len)
 {
+	int res = 0;
 #ifdef USE_PICO_LIB
 	spi_write_blocking(pi_mcp2515->gpio_spi_inst, data, len);
-
-	return (0);
 #elif defined(USE_SPIDEV)
 	/* TODO incomplete */
-	int res, tail_len;
+	int tail_len;
 	char tx_buffer[sizeof(uint64_t)] = { 0 }, rx_buffer[sizeof(tx_buffer)] = { 0 };
 
 	for (uint8_t i = 0; i < len; i += sizeof(uint64_t)) {
@@ -332,71 +335,66 @@ mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t
 			memset(&tx_buffer[tail_len], 0, sizeof(tx_buffer) - tail_len);
 		}
 		if ((res = spidev_duplex_com(pi_mcp2515, tx_buffer, rx_buffer)))
-			return (res);
+			goto err;
 	}
-
-	return (0);
 #elif defined(USE_PRINT_DEBUG)
 	printf("spi_write_blocking(0x%02x, 0x%02x%s, 0x%02x)\n", pi_mcp2515->spi_channel, data[0],
 	    len == 1 ? "" : "...", len);
-
-	return (0);
 #endif
+
+err:
+	return (res);
 }
 
 int
 mcp2515_gpio_spi_read_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t len)
 {
+	int res = 0;
 #ifdef USE_PICO_LIB
 	/* Note: For now, repeated_tx_data is not used anywhere in the library so we just skip it. */
 	spi_read_blocking(pi_mcp2515->gpio_spi_inst, 0x00, data, len);
-
-	return (0);
 #elif defined(USE_SPIDEV)
 	/* TODO incomplete */
-	int res;
 	char tx_buffer[sizeof(uint64_t)] = { 0 }, rx_buffer[sizeof(tx_buffer)] = { 0 };
 
 	for (uint8_t i = 0; i < len; i += sizeof(uint64_t)) {
 		if ((res = spidev_duplex_com(pi_mcp2515, tx_buffer, rx_buffer)))
-			return (res);
+			goto err;
 		memcpy(&data[i], &rx_buffer, len - i > sizeof(uint64_t) ? sizeof(rx_buffer) : len - i);
 	}
-	return (0);
 #elif defined(USE_PRINT_DEBUG)
 	printf("spi_read_blocking(0x%02x, 0x00, 0x%02x%s, 0x%02x)\n", pi_mcp2515->spi_channel, data[0],
 	    len == 1 ? "" : "...", len);
-
-	return (0);
 #endif
+
+err:
+	return (res);
 }
 
 int
 mcp2515_gpio_put(const pi_mcp2515_t *pi_mcp2515, uint8_t pin, uint8_t value)
 {
+	int res = 0;
 #ifdef USE_PICO_LIB
 	gpio_put(pin, value);
-
-	return (0);
 #elif defined(USE_SPIDEV)
 	struct gpio_v2_line_values values;
 
 	values.mask = (1 << (pin - 1));
 	values.bits = value ? 1 : 0;
 
-	return (ioctl(pi_mcp2515->gpio_pin_fd_map[pin], GPIO_V2_LINE_SET_VALUES_IOCTL, &values));
+	res = ioctl(pi_mcp2515->gpio_pin_fd_map[pin], GPIO_V2_LINE_SET_VALUES_IOCTL, &values);
 #elif defined(USE_SPIDEV_BSD)
 	struct gpio_pin_op pin_op;
 
 	pin_op.gp_pin = pin;
 	pin_op.gp_value = value ? 1 : 0;
 
-	return (ioctl(pi_mcp2515->gpio_gpio_fd, GPIOPINWRITE, &pin_op));
+	res = ioctl(pi_mcp2515->gpio_gpio_fd, GPIOPINWRITE, &pin_op);
 #elif defined(USE_PRINT_DEBUG)
 	printf("gpio_put(0x%02x, 0x%02x)\n", pin, value);
-
-	return (0);
 #endif
+	return (res);
 }
 
 /**

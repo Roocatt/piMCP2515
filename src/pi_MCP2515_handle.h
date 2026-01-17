@@ -41,9 +41,9 @@ struct pi_mcp2515 {
 	int gpio_spidev_fd;
 	int gpio_gpio_fd;
 	uint8_t gpio_spi_mode;
+#ifdef __linux__
 	uint8_t gpio_spi_bits_per_word;
 	uint16_t gpio_spi_delay_usec;
-#ifdef __linux__
 	int gpio_pin_fd_map[PI_MCP2515_GPIO_PIN_MAP_LEN];
 #endif /* __linux__ */
 #endif /* USE_PICO_LIB */
