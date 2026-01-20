@@ -1,5 +1,5 @@
-/* Copyright 2026 Roos Catling-Tate
-*
+/* Copyright 2025-2026 Roos Catling-Tate
+ *
  * Permission to use, copy, modify, and/or distribute this software for any purpose with or
  * without fee is hereby granted, provided that the above copyright notice and this permission
  * notice appear in all copies.
@@ -23,28 +23,32 @@
 #endif /* USE_PICO_LIB */
 
 /* Library Definitions */
-#define PI_MCP2515_GPIO_PIN_MAP_LEN 40
+#define PI_MCP2515_GPIO_PIN_MAP_LEN 26
 
-typedef struct {
-	uint8_t spi_channel;
+struct pi_mcp2515 {
 	uint8_t cs_pin;
-	uint8_t tx_pin;
-	uint8_t rx_pin;
-	uint8_t sck_pin;
 	uint32_t spi_clock;
 	uint8_t osc_mhz;
+	uint8_t spi_channel;
+	uint8_t sck_pin;
+	uint8_t tx_pin;
+	uint8_t rx_pin;
 #ifdef USE_PICO_LIB
 	spi_inst_t *gpio_spi_inst;
-#elif defined(USE_SPIDEV)
+#elif defined(USE_SPI)
 	char *gpio_dev_spi_path;
 	char *gpio_dev_gpio_path;
 	int gpio_spidev_fd;
 	int gpio_gpio_fd;
 	uint8_t gpio_spi_mode;
+#ifdef __linux__
 	uint8_t gpio_spi_bits_per_word;
 	uint16_t gpio_spi_delay_usec;
-	int gpio_pin_fd_map[PI_MCP2515_GPIO_PIN_MAP_LEN]; /* TODO Info on GPIO pin/line mapping seems unclear. Verify size, etc. later. */
-#endif
-} pi_mcp2515_t;
+	int gpio_pin_fd_map[PI_MCP2515_GPIO_PIN_MAP_LEN];
+#endif /* __linux__ */
+#endif /* USE_PICO_LIB */
+};
+
+typedef struct pi_mcp2515 pi_mcp2515_t;
 
 #endif /* PIMCP2515_PI_MCP2515_HANDLE_H */
