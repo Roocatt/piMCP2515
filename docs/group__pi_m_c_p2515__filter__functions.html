@@ -98,9 +98,9 @@ $(function(){initNavTree('group__pi_m_c_p2515__filter__functions.html','',''); }
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga6f0d9b2c32814023c30ac9a3433316ca" id="r_ga6f0d9b2c32814023c30ac9a3433316ca"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga6f0d9b2c32814023c30ac9a3433316ca">mcp2515_filter</a> (pi_mcp2515_t *pi_mcp2515, uint8_t filter_reg, uint32_t id, bool extended_id)</td></tr>
+<tr class="memitem:ga6f0d9b2c32814023c30ac9a3433316ca" id="r_ga6f0d9b2c32814023c30ac9a3433316ca"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga6f0d9b2c32814023c30ac9a3433316ca">mcp2515_filter</a> (<a class="el" href="structpi__mcp2515.html">pi_mcp2515_t</a> *<a class="el" href="structpi__mcp2515.html">pi_mcp2515</a>, uint8_t filter_reg, uint32_t id, bool extended_id)</td></tr>
 <tr class="memdesc:ga6f0d9b2c32814023c30ac9a3433316ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set one of the filters specified by its register.  <br /></td></tr>
-<tr class="memitem:ga4a5e05808e87dbf802f5baf06ecc41b4" id="r_ga4a5e05808e87dbf802f5baf06ecc41b4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga4a5e05808e87dbf802f5baf06ecc41b4">mcp2515_filter_mask</a> (pi_mcp2515_t *pi_mcp2515, uint8_t filter_mask_reg, int32_t id_mask, bool extended_id)</td></tr>
+<tr class="memitem:ga4a5e05808e87dbf802f5baf06ecc41b4" id="r_ga4a5e05808e87dbf802f5baf06ecc41b4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga4a5e05808e87dbf802f5baf06ecc41b4">mcp2515_filter_mask</a> (<a class="el" href="structpi__mcp2515.html">pi_mcp2515_t</a> *<a class="el" href="structpi__mcp2515.html">pi_mcp2515</a>, uint8_t filter_mask_reg, int32_t id_mask, bool extended_id)</td></tr>
 <tr class="memdesc:ga4a5e05808e87dbf802f5baf06ecc41b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the filter mask. The MCP2515 must be in config mode to use this (see mcp2515_reqop/mcp2515_reqop_get).  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
@@ -115,7 +115,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int mcp2515_filter </td>
           <td>(</td>
-          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span>, </td>
+          <td class="paramtype"><a class="el" href="structpi__mcp2515.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -139,7 +139,7 @@ Functions</h2></td></tr>
 <p>The MCP2515 must be in config mode to use this (see mcp2515_reqop and mcp2515_reqop_get).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pi_mcp2515</td><td>the piMCP2515 handle. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structpi__mcp2515.html">pi_mcp2515</a></td><td>the piMCP2515 handle. </td></tr>
     <tr><td class="paramname">filter_reg</td><td>the filter register. This may be any of the following:<ul>
 <li>PI_MCP2515_RGSTR_RXF0SIDH</li>
 <li>PI_MCP2515_RGSTR_RXF1SIDH</li>
@@ -167,7 +167,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int mcp2515_filter_mask </td>
           <td>(</td>
-          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span>, </td>
+          <td class="paramtype"><a class="el" href="structpi__mcp2515.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -190,7 +190,7 @@ Functions</h2></td></tr>
 <p>Set the filter mask. The MCP2515 must be in config mode to use this (see mcp2515_reqop/mcp2515_reqop_get). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pi_mcp2515</td><td>the piMCP2515 handle. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structpi__mcp2515.html">pi_mcp2515</a></td><td>the piMCP2515 handle. </td></tr>
     <tr><td class="paramname">filter_mask_reg</td><td>the filter mask register to use. Acceptable values are PI_MCP2515_RGSTR_RXM0SIDH and PI_MCP2515_RGSTR_RXM1SIDH. </td></tr>
     <tr><td class="paramname">id_mask</td><td>the ID mask to use. </td></tr>
     <tr><td class="paramname">extended_id</td><td>if the ID is extended. </td></tr>

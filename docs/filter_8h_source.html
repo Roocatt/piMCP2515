@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.14.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>piMCP2515: src/pi_MCP2515.h Source File</title>
+<title>piMCP2515: src/filter.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -63,7 +63,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(function(){initNavTree('pi___m_c_p2515_8h_source.html','',''); });
+$(function(){initNavTree('filter_8h_source.html','',''); });
 </script>
 <div id="container">
 <div id="doc-content">
@@ -89,7 +89,7 @@ $(function(){initNavTree('pi___m_c_p2515_8h_source.html','',''); });
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">pi_MCP2515.h</div></div>
+  <div class="headertitle"><div class="title">filter.h</div></div>
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/* Copyright 2025-2026 Roos Catling-Tate</span></div>
@@ -107,8 +107,8 @@ $(function(){initNavTree('pi___m_c_p2515_8h_source.html','',''); });
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> */</span></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#ifndef PI_MCP2515_H</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#define PI_MCP2515_H</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#ifndef PIMCP2515_FILTER_H</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#define PIMCP2515_FILTER_H</span></div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &lt;stdbool.h&gt;</span></div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
@@ -119,35 +119,23 @@ $(function(){initNavTree('pi___m_c_p2515_8h_source.html','',''); });
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> {</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#endif </span><span class="comment">/* __cplusplus */</span><span class="preprocessor"></span></div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="keywordtype">int</span> mcp2515_bitrate_default_16mhz_1000kbps(pi_mcp2515_t *);</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="keywordtype">int</span> mcp2515_bitrate_default_8mhz_500kbps(pi_mcp2515_t *);</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="keywordtype">int</span> <a class="code hl_function" href="group__pi_m_c_p2515__config__init__functions.html#ga44e59c531658d8e58a489c4723b9b766">mcp2515_bitrate_simplified</a>(pi_mcp2515_t *, uint16_t);</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="keywordtype">int</span> <a class="code hl_function" href="group__pi_m_c_p2515__config__init__functions.html#ga92c0cb2502cd49130de2e8f276443648">mcp2515_bitrate_full_optional</a>(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, <span class="keywordtype">bool</span>, <span class="keywordtype">bool</span>,</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keywordtype">bool</span>, <span class="keywordtype">bool</span>);</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="keywordtype">void</span>    <a class="code hl_function" href="group__pi_m_c_p2515__config__init__functions.html#gaa4a5c0d11eec00a0f862b8a80117ec06">mcp2515_free</a>(pi_mcp2515_t *);</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="keywordtype">int</span> <a class="code hl_function" href="group__pi_m_c_p2515__config__init__functions.html#ga1d424b8d8fb533f38da40913a8112578">mcp2515_init</a>(pi_mcp2515_t **, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t, uint8_t);</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="keywordtype">void</span>    <a class="code hl_function" href="group__pi_m_c_p2515__config__init__functions.html#gae0a64b823ea6f746f856bc44291fb5ae">mcp2515_conf_spi_devpath</a>(pi_mcp2515_t *, <span class="keywordtype">char</span> *);</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="keywordtype">void</span>    <a class="code hl_function" href="group__pi_m_c_p2515__config__init__functions.html#ga6d4c860dd438a1b194b39e7172f7701f">mcp2515_conf_gpio_devpath</a>(pi_mcp2515_t *, <span class="keywordtype">char</span> *);</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="preprocessor">#ifdef __cplusplus</span></div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>}</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="preprocessor">#endif </span><span class="comment">/* __cplusplus */</span><span class="preprocessor"></span></div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">#endif </span><span class="comment">/* PI_MCP2515_H */</span><span class="preprocessor"></span></div>
-<div class="ttc" id="agroup__pi_m_c_p2515__config__init__functions_html_ga1d424b8d8fb533f38da40913a8112578"><div class="ttname"><a href="group__pi_m_c_p2515__config__init__functions.html#ga1d424b8d8fb533f38da40913a8112578">mcp2515_init</a></div><div class="ttdeci">int mcp2515_init(pi_mcp2515_t **, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t, uint8_t)</div><div class="ttdoc">Setup and prepare a pi_mcp2515_t structure based on the parameters provided.</div><div class="ttdef"><b>Definition</b> pi_MCP2515.c:184</div></div>
-<div class="ttc" id="agroup__pi_m_c_p2515__config__init__functions_html_ga44e59c531658d8e58a489c4723b9b766"><div class="ttname"><a href="group__pi_m_c_p2515__config__init__functions.html#ga44e59c531658d8e58a489c4723b9b766">mcp2515_bitrate_simplified</a></div><div class="ttdeci">int mcp2515_bitrate_simplified(pi_mcp2515_t *, uint16_t)</div><div class="ttdoc">A simplified bitrate setting function.</div><div class="ttdef"><b>Definition</b> pi_MCP2515.c:42</div></div>
-<div class="ttc" id="agroup__pi_m_c_p2515__config__init__functions_html_ga6d4c860dd438a1b194b39e7172f7701f"><div class="ttname"><a href="group__pi_m_c_p2515__config__init__functions.html#ga6d4c860dd438a1b194b39e7172f7701f">mcp2515_conf_gpio_devpath</a></div><div class="ttdeci">void mcp2515_conf_gpio_devpath(pi_mcp2515_t *, char *)</div><div class="ttdoc">Override the default path for the gpio device (ex /dev/gpio0).</div><div class="ttdef"><b>Definition</b> pi_MCP2515.c:253</div></div>
-<div class="ttc" id="agroup__pi_m_c_p2515__config__init__functions_html_ga92c0cb2502cd49130de2e8f276443648"><div class="ttname"><a href="group__pi_m_c_p2515__config__init__functions.html#ga92c0cb2502cd49130de2e8f276443648">mcp2515_bitrate_full_optional</a></div><div class="ttdeci">int mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, bool, bool, bool, bool)</div><div class="ttdoc">Configure the bitrate and all other CNF register stored parameters.</div><div class="ttdef"><b>Definition</b> pi_MCP2515.c:72</div></div>
-<div class="ttc" id="agroup__pi_m_c_p2515__config__init__functions_html_gaa4a5c0d11eec00a0f862b8a80117ec06"><div class="ttname"><a href="group__pi_m_c_p2515__config__init__functions.html#gaa4a5c0d11eec00a0f862b8a80117ec06">mcp2515_free</a></div><div class="ttdeci">void mcp2515_free(pi_mcp2515_t *)</div><div class="ttdoc">Cleanup after everything.</div><div class="ttdef"><b>Definition</b> pi_MCP2515.c:268</div></div>
-<div class="ttc" id="agroup__pi_m_c_p2515__config__init__functions_html_gae0a64b823ea6f746f856bc44291fb5ae"><div class="ttname"><a href="group__pi_m_c_p2515__config__init__functions.html#gae0a64b823ea6f746f856bc44291fb5ae">mcp2515_conf_spi_devpath</a></div><div class="ttdeci">void mcp2515_conf_spi_devpath(pi_mcp2515_t *, char *)</div><div class="ttdoc">Override the default path for the spi device (ex /dev/spi0).</div><div class="ttdef"><b>Definition</b> pi_MCP2515.c:231</div></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="keywordtype">int</span> <a class="code hl_function" href="group__pi_m_c_p2515__filter__functions.html#ga6f0d9b2c32814023c30ac9a3433316ca">mcp2515_filter</a>(pi_mcp2515_t *, uint8_t, uint32_t, <span class="keywordtype">bool</span>);</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="keywordtype">int</span> <a class="code hl_function" href="group__pi_m_c_p2515__filter__functions.html#ga4a5e05808e87dbf802f5baf06ecc41b4">mcp2515_filter_mask</a>(pi_mcp2515_t *, uint8_t, int32_t, <span class="keywordtype">bool</span>);</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="preprocessor">#ifdef __cplusplus</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>}</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="preprocessor">#endif </span><span class="comment">/* __cplusplus */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="preprocessor">#endif </span><span class="comment">/* PIMCP2515_FILTER_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="agroup__pi_m_c_p2515__filter__functions_html_ga4a5e05808e87dbf802f5baf06ecc41b4"><div class="ttname"><a href="group__pi_m_c_p2515__filter__functions.html#ga4a5e05808e87dbf802f5baf06ecc41b4">mcp2515_filter_mask</a></div><div class="ttdeci">int mcp2515_filter_mask(pi_mcp2515_t *, uint8_t, int32_t, bool)</div><div class="ttdoc">Set the filter mask. The MCP2515 must be in config mode to use this (see mcp2515_reqop/mcp2515_reqop_...</div><div class="ttdef"><b>Definition</b> filter.c:99</div></div>
+<div class="ttc" id="agroup__pi_m_c_p2515__filter__functions_html_ga6f0d9b2c32814023c30ac9a3433316ca"><div class="ttname"><a href="group__pi_m_c_p2515__filter__functions.html#ga6f0d9b2c32814023c30ac9a3433316ca">mcp2515_filter</a></div><div class="ttdeci">int mcp2515_filter(pi_mcp2515_t *, uint8_t, uint32_t, bool)</div><div class="ttdoc">Set one of the filters specified by its register.</div><div class="ttdef"><b>Definition</b> filter.c:77</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 </div><!-- container -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><b>pi_MCP2515.h</b></li>
+    <li class="navelem"><a href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><b>filter.h</b></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0 </li>
   </ul>
 </div>
