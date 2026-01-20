@@ -1,4 +1,4 @@
-name: Linux spidev Build
+name: Linux SPI Build
 
 on:
   push:
@@ -10,7 +10,7 @@ env:
   PICO_SDK_PATH: "~/pico-sdk"
 
 jobs:
-  build-with-bsd-spidev-aarch64:
+  build-with-linux-spi-aarch64:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,11 +18,11 @@ jobs:
         run: sudo apt install -y cmake gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libnewlib-arm-none-eabi python3 git tar build-essential
       - uses: actions/checkout@v4
       - name: Configure CMake
-        run: cmake -DUSE_SPIDEV=true -DUSE_AARCH64_LINUX_CC=true -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        run: cmake -DUSE_SPI=true -DUSE_AARCH64_LINUX_CC=true -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-  build-with-linux-spidev-arm:
+  build-with-linux-spi-arm:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,6 +32,6 @@ jobs:
         run: sudo ln -s /usr/bin/arm-linux-gnueabihf-g++-13 /usr/bin/arm-linux-gnueabihf-g++
       - uses: actions/checkout@v4
       - name: Configure CMake
-        run: cmake -DUSE_SPIDEV=true -DUSE_ARM_LINUX_CC=true -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        run: cmake -DUSE_SPI=true -DUSE_ARM_LINUX_CC=true -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}

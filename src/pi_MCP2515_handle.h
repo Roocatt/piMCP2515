@@ -35,7 +35,7 @@ struct pi_mcp2515 {
 	uint8_t rx_pin;
 #ifdef USE_PICO_LIB
 	spi_inst_t *gpio_spi_inst;
-#elif defined(USE_SPIDEV)
+#elif defined(USE_SPI)
 	char *gpio_dev_spi_path;
 	char *gpio_dev_gpio_path;
 	int gpio_spidev_fd;
