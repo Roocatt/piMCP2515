@@ -20,6 +20,7 @@
 #ifndef GPIO_H
 #define GPIO_H
 
+#include <stdint.h>
 #include <stdbool.h>
 
 #include "pi_MCP2515_handle.h"
