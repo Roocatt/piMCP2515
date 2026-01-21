@@ -17,16 +17,18 @@
 #define PIMCP2515_CAN_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "pi_MCP2515_handle.h"
 
-struct pi_mcp2515_can_frame {
+/**
+ * @brief CAN bus frame data structure.
+ */
+typedef struct {
 	uint32_t id;
 	uint8_t dlc;
 	uint8_t payload[8];
-};
-
-typedef struct pi_mcp2515_can_frame pi_mcp2515_can_frame_t;
+} pi_mcp2515_can_frame_t;
 
 #ifdef __cplusplus
 extern "C" {

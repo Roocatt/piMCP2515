@@ -25,6 +25,7 @@
 /* Library Definitions */
 #define PI_MCP2515_GPIO_PIN_MAP_LEN 26
 
+/*! @cond DOXYGEN_IGNORE */
 struct pi_mcp2515 {
 	uint8_t cs_pin;
 	uint32_t spi_clock;
@@ -48,7 +49,12 @@ struct pi_mcp2515 {
 #endif /* __linux__ */
 #endif /* USE_PICO_LIB */
 };
+/*! @endcond */
 
+/**
+ * @brief The library handle. Internal to the library itself, it stores some small, but key pieces of data for library
+ * operations. Externally, this is an opaque struct.
+ */
 typedef struct pi_mcp2515 pi_mcp2515_t;
 
 #endif /* PIMCP2515_PI_MCP2515_HANDLE_H */

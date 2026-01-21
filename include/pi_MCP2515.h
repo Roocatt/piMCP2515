@@ -15,7 +15,8 @@
 
 /* External Header.
  *
- * This is for including in projects that use the library.
+ * This is for including in projects that use the library. It must match up to the internal headers, which is currently
+ * done manually. I don't really like this approach, but it will do the job for now.
  *
  * TODO First draft. Tidy and finish the external header stuff.
  */
@@ -27,7 +28,13 @@
 #include <stdint.h>
 
 typedef struct pi_mcp2515 pi_mcp2515_t;
-typedef struct pi_mcp2515_can_frame pi_mcp2515_can_frame_t;
+
+typedef struct {
+	uint32_t id;
+	uint8_t dlc;
+	uint8_t payload[8];
+} pi_mcp2515_can_frame_t;
+
 
 int		mcp2515_can_message_send(pi_mcp2515_t *, const pi_mcp2515_can_frame_t *);
 int		mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);

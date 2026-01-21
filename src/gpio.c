@@ -132,7 +132,8 @@ static int	spi_duplex_com(const pi_mcp2515_t *, char[sizeof(uint64_t)], size_t, 
  * @return zero if success, otherwise non-zero.
  */
 static int
-spi_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t)], size_t tx_len, char rx_buffer[sizeof(uint64_t)])
+spi_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t)], /* NOLINT(*-non-const-parameter) */
+    size_t tx_len, char rx_buffer[sizeof(uint64_t)]) /* NOLINT(*-non-const-parameter) */
 {
 	int res = 0;
 
