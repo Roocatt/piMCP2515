@@ -5,7 +5,8 @@
 ![GitHub Licence](https://img.shields.io/github/license/Roocatt/piMCP2515?label=licence)
 
 <a href="README.md">🇬🇧 English</a> |
-<a href="README.sv.md">🇸🇪 Svenska</a>
+<a href="README.sv.md">🇸🇪 Svenska</a> |
+<a href="README.fr.md">🇫🇷 Français</a>
 
 A library for interacting with the MCP2515 CAN bus controller via SPI.
 This library supports the Raspberry Pi Pico, as well as regular

@@ -4,9 +4,9 @@
 [![Linux SPI Build](https://github.com/Roocatt/piMCP2515/actions/workflows/linux-spi.yml/badge.svg)](https://github.com/Roocatt/piMCP2515/actions/workflows/linux-spi.yml)
 ![GitHub Licence](https://img.shields.io/github/license/Roocatt/piMCP2515?label=licence)
 
-
 <a href="README.md">🇬🇧 English</a> |
-<a href="README.sv.md">🇸🇪 Svenska</a>
+<a href="README.sv.md">🇸🇪 Svenska</a> |
+<a href="README.fr.md">🇫🇷 Français</a>
 
 piMCP2515 är ett bibliotek för att kommunicera med en MCP2515
 CAN-styrenhet via SPI. Det här biblioteket stöder Raspberry Pi Pico,
