@@ -29,10 +29,12 @@
 
 typedef struct pi_mcp2515 pi_mcp2515_t;
 
+#define CAN_FRAME_PAYLOAD_MAX 8
+
 typedef struct {
 	uint32_t id;
 	uint8_t dlc;
-	uint8_t payload[8];
+	uint8_t payload[CAN_FRAME_PAYLOAD_MAX];
 } pi_mcp2515_can_frame_t;
 
 
@@ -67,6 +69,7 @@ int		mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, u
     bool, bool, bool, bool);
 int		mcp2515_reset(pi_mcp2515_t *);
 
+uint8_t	mcp2515_cnf_get(pi_mcp2515_t *, uint8_t);
 uint64_t	mcp2515_osc_time(const pi_mcp2515_t *, uint32_t);
 void		mcp2515_free(pi_mcp2515_t *);
 int		mcp2515_init(pi_mcp2515_t **, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t, uint8_t);

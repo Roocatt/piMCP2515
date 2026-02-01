@@ -364,9 +364,9 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 	pi_mcp2515->gpio_spi_inst = spi_inst,
 
 	spi_init(spi_inst, pi_mcp2515->spi_clock);
-	gpio_set_function(pi_mcp2515->tx_pin, PI_MCP2515_GPIO_FUNC_SPI);
-	gpio_set_function(pi_mcp2515->rx_pin, PI_MCP2515_GPIO_FUNC_SPI);
-	gpio_set_function(pi_mcp2515->sck_pin, PI_MCP2515_GPIO_FUNC_SPI);
+	gpio_set_function(pi_mcp2515->tx_pin, GPIO_FUNC_SPI);
+	gpio_set_function(pi_mcp2515->rx_pin, GPIO_FUNC_SPI);
+	gpio_set_function(pi_mcp2515->sck_pin, GPIO_FUNC_SPI);
 	mcp2515_gpio_init(pi_mcp2515, pi_mcp2515->cs_pin);
 
 	mcp2515_gpio_set_dir(pi_mcp2515, pi_mcp2515->cs_pin, true);
@@ -459,6 +459,7 @@ int
 mcp2515_gpio_set_dir(const pi_mcp2515_t *pi_mcp2515, uint8_t gpio, bool out)
 {
 	int res = 0;
+
 #ifdef USE_PICO_LIB
 	gpio_set_dir(gpio, out);
 #elif defined(USE_PRINT_DEBUG)

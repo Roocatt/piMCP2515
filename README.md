@@ -27,7 +27,7 @@ reading the code as many are intended slightly more as personal notes.
 - [ ] Supported targets:
   - [ ] Pi Pico
     - [x] Feature Complete (Compiles)
-    - [ ] Run on Device
+    - [x] Run on Device
     - [ ] Tested
   - [ ] Regular Raspberry Pi devices
     - [ ] With Linux

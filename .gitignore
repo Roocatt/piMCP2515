@@ -17,6 +17,13 @@ CMakeDoxygenDefaults.cmake
 Doxyfile
 Doxyfile.docs
 doxygen/*
+tools/**/_deps/
 
 *.a
 *.o
+*.elf
+*.bin
+*.hex
+*.map
+*.uf2
+*.dis

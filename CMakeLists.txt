@@ -65,7 +65,7 @@ endif()
 
 if (USE_PICO_LIB)
     set(PICO_BOARD pico)
-    pico_sdk_init()
+    pico_sdk_init() #TODO configurable pico board
 endif ()
 
 set(CMAKE_C_STANDARD 11)

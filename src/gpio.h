@@ -25,20 +25,8 @@
 
 #include "pi_MCP2515_handle.h"
 
-#define SET_CS(x) mcp2515_gpio_put(x, x->cs_pin, 1)
-#define UNSET_CS(x) mcp2515_gpio_put(x, x->cs_pin, 0)
-
-#define PI_MCP2515_GPIO_FUNC_XIP 0
-#define PI_MCP2515_GPIO_FUNC_SPI 1
-#define PI_MCP2515_GPIO_FUNC_UART 2
-#define PI_MCP2515_GPIO_FUNC_I2C 3
-#define PI_MCP2515_GPIO_FUNC_PWM 4
-#define PI_MCP2515_GPIO_FUNC_SIO 5
-#define PI_MCP2515_GPIO_FUNC_PIO0 6
-#define PI_MCP2515_GPIO_FUNC_PIO1 7
-#define PI_MCP2515_GPIO_FUNC_GPCK 8
-#define PI_MCP2515_GPIO_FUNC_USB 9
-#define PI_MCP2515_GPIO_FUNC_NULL 0x1f
+#define SET_CS(x) mcp2515_gpio_put(x, x->cs_pin, 0)
+#define UNSET_CS(x) mcp2515_gpio_put(x, x->cs_pin, 1)
 
 #ifdef __cplusplus
 extern "C" {
