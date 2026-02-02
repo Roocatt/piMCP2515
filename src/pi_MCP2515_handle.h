@@ -16,6 +16,7 @@
 #ifndef PIMCP2515_PI_MCP2515_HANDLE_H
 #define PIMCP2515_PI_MCP2515_HANDLE_H
 
+#include <stdarg.h>
 #include <stdint.h>
 
 #ifdef USE_PICO_LIB
@@ -27,6 +28,7 @@
 
 /*! @cond DOXYGEN_IGNORE */
 struct pi_mcp2515 {
+	void (*callback)(char *, va_list);
 	uint8_t cs_pin;
 	uint32_t spi_clock;
 	uint8_t osc_mhz;

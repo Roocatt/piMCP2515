@@ -15,14 +15,15 @@
 
 #include <string.h>
 
-#include "pi_MCP2515_handle.h"
 #include "../include/pi_MCP2515_defs.h"
+
+#include "debug.h"
+#include "pi_MCP2515_handle.h"
 #include "registers.h"
-
-#include "can.h"
-
 #include "gpio.h"
 #include "status_error.h"
+
+#include "can.h"
 
 static const uint8_t tx_reg_list[][2] = {
 	/* CTRL, SIDH */
@@ -55,7 +56,9 @@ mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t 
 
 	for (i = 0; i < (sizeof(tx_reg_list) / sizeof(tx_reg_list[0])); i++) {
 		mcp2515_register_read(pi_mcp2515, &ctrl, 1, tx_reg_list[i][0]);
-		if (ctrl & PI_MCP2515_CTRL_TXREQ) {
+		MCP2515_DEBUG(pi_mcp2515, "checking tx_reg_list[%d] CTRL: 0x%02x\n", ctrl);
+		if ((ctrl & PI_MCP2515_CTRL_TXREQ) == 0) {
+			MCP2515_DEBUG(pi_mcp2515, "Using tx_reg_list[%d]\n", i);
 			extended_id = can_frame->id & PI_MCP2515_FLAG_EFF;
 
 			id_tmp = (uint16_t)((can_frame->id & (extended_id ? PI_MCP2515_ID_MASK_EFF
@@ -81,12 +84,17 @@ mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t 
 			/* Check status again for errors */
 			mcp2515_register_read(pi_mcp2515, &ctrl, 1, tx_reg_list[i][0]);
 			if (ctrl & (PI_MCP2515_CTRL_TXERR| PI_MCP2515_CTRL_MLOA | PI_MCP2515_CTRL_ABTF)) {
+				MCP2515_DEBUG(pi_mcp2515, "TX%dCTRL has errors. Value: 0x%02x\n", ctrl);
 				res = 1;
 				break;
 			}
+			res = 0;
+			goto end;
 		}
 	}
-
+	if (res == -1)
+		MCP2515_DEBUG(pi_mcp2515, "no available tx found\n");
+end:
 	return (res);
 }
 

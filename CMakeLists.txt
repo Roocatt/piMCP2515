@@ -80,7 +80,8 @@ add_library(piMCP2515 STATIC
         src/filter.c src/filter.h
         src/reqop.c src/reqop.h
         src/registers.c src/registers.h
-        src/pi_MCP2515_handle.h include/pi_MCP2515_defs.h)
+        src/pi_MCP2515_handle.h include/pi_MCP2515_defs.h
+        src/debug.c src/debug.h)
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
 if (USE_SPI)

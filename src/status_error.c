@@ -22,6 +22,8 @@
 
 #include "status_error.h"
 
+#include "debug.h"
+
 /**
  * @defgroup piMCP2515_error_status_functions Error/Status Functions
  * @brief These functions handle Status and Errors.
@@ -43,6 +45,8 @@ mcp2515_status(pi_mcp2515_t *pi_mcp2515)
 	mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instruction, 1);
 	mcp2515_gpio_spi_read_blocking(pi_mcp2515, &res, 1);
 	UNSET_CS(pi_mcp2515);
+
+	mcp2515_debug(pi_mcp2515, "MCP2515 status %04x\n", res);
 
 	return (res);
 }

@@ -493,6 +493,7 @@ int
 mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t len)
 {
 	int res = 0;
+
 #ifdef USE_PICO_LIB
 	spi_write_blocking(pi_mcp2515->gpio_spi_inst, data, len);
 #elif defined(USE_SPI)

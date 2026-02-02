@@ -18,59 +18,80 @@
 
 #include "pico/stdlib.h"
 
-#include "pi_MCP2515.h"
-#include "pi_MCP2515_defs.h"
+#include "../../include/pi_MCP2515.h"
+#include "../../include/pi_MCP2515_defs.h"
 
 #include "pimcp2515-quicktest.h"
 
 int
-main(void)
+main()
 {
 	pi_mcp2515_t *pi_mcp2515;
 	pi_mcp2515_can_frame_t frame;
-	int res, i;
+	int i;
 	uint8_t reg_tmp = 0;
-	bool tmp;
+	bool tmp_bool;
 
 	stdio_init_all();
 
 	/* Hardcoded stuff because this is just a dev tool. Maybe improve this later, maybe not. */
-	if ((res = mcp2515_init(&pi_mcp2515, 0, 19, 16, 18, 17, 10000000, 8))) {
-		printf("mcp2515_init failed: %d\n", res);
-		return (res);
-	} else
-		printf("mcp2515_init succeeded\n");
-	if ((res = mcp2515_reqop(pi_mcp2515, PI_MCP2515_REQOP_CONFIG))) {
-		printf("mcp2515_reqop failed: %d\n", res);
-		return (res);
-	} else
-		printf("mcp2515_reqop CONFIG succeeded\n");
-	if ((res = mcp2515_bitrate_simplified(pi_mcp2515, 500))) {
-		printf("mcp2515_bitrate_simplified failed: %d\n", res);
-		return (res);
-	} else
-		printf("mcp2515_bitrate_simplified succeeded\n");
-	if ((res = mcp2515_reqop(pi_mcp2515, PI_MCP2515_REQOP_LOOPBACK))) {
-		printf("mcp2515_reqop failed: %d\n", res);
-		return (res);
-	}
+	/* This is for the Pico, so returns are always 0 */
+	mcp2515_init(&pi_mcp2515, 0, 19, 16, 18, 17, 10000000, 8);
+	mcp2515_debug_enable(pi_mcp2515, NULL);
+	printf("mcp2515_init\n");
 
-	printf("CNF1: 0x%02x\nCNF2: 0x%02x\nCNF3: 0x%02x\n\n\n", mcp2515_cnf_get(pi_mcp2515, 1),
-	    mcp2515_cnf_get(pi_mcp2515, 2), mcp2515_cnf_get(pi_mcp2515, 3));
+	printf("\n");
 
-	tmp = mcp2515_reqop_get(pi_mcp2515);
-	printf("Checking reqop after mode changes. Excpected %02x, Got %02x\n", PI_MCP2515_REQOP_LOOPBACK, tmp);
-	if (tmp != PI_MCP2515_REQOP_LOOPBACK) {
-		printf("setting reqop LOOPBACK does not appear to have worked!");
+	mcp2515_reqop(pi_mcp2515, PI_MCP2515_REQOP_CONFIG);
+	printf("mcp2515_reqop CONFIG\n");
+
+	reg_tmp = mcp2515_reqop_get(pi_mcp2515);
+	printf("Checking reqop after mode changes. Expected 0x%02x, Got 0x%02x\n", PI_MCP2515_REQOP_CONFIG, reg_tmp);
+	if (reg_tmp != PI_MCP2515_REQOP_CONFIG) {
+		printf("setting reqop LOOPBACK does not appear to have worked!\n");
 		return (-1);
 	}
+	printf("\n");
 
-	tmp = mcp2515_can_message_received(pi_mcp2515);
-	printf("Is CAN msg recieved before sending? %s\n", tmp ? "yes" : "no");
-	if (tmp) {
+	mcp2515_bitrate_simplified(pi_mcp2515, 500);
+	printf("mcp2515_bitrate_simplified\n");
+
+	printf("\n");
+
+	mcp2515_reqop(pi_mcp2515, PI_MCP2515_REQOP_LOOPBACK);
+	printf("mcp2515_reqop LOOPBACK\n");
+	reg_tmp = mcp2515_reqop_get(pi_mcp2515);
+	printf("Checking reqop after mode changes. Expected 0x%02x, Got 0x%02x\n", PI_MCP2515_REQOP_LOOPBACK, reg_tmp);
+	if (reg_tmp != PI_MCP2515_REQOP_LOOPBACK) {
+		printf("setting reqop LOOPBACK does not appear to have worked!\n");
+		return (-1);
+	}
+	printf("\n");
+
+	printf("CNF1: 0x%02x\nCNF2: 0x%02x\nCNF3: 0x%02x\n", mcp2515_cnf_get(pi_mcp2515, 1),
+	    mcp2515_cnf_get(pi_mcp2515, 2), mcp2515_cnf_get(pi_mcp2515, 3));
+
+	printf("\n");
+
+	PRINT_RES(mcp2515_filter_mask(pi_mcp2515, PI_MCP2515_RGSTR_RXM0SIDH, 0, true));
+	PRINT_RES(mcp2515_filter_mask(pi_mcp2515, PI_MCP2515_RGSTR_RXM1SIDH, 0, true));
+	PRINT_RES(mcp2515_filter(pi_mcp2515, PI_MCP2515_RGSTR_RXF0SIDH, 0, true));
+	PRINT_RES(mcp2515_filter(pi_mcp2515, PI_MCP2515_RGSTR_RXF1SIDH, 0, true));
+	PRINT_RES(mcp2515_filter(pi_mcp2515, PI_MCP2515_RGSTR_RXF2SIDH, 0, true));
+	PRINT_RES(mcp2515_filter(pi_mcp2515, PI_MCP2515_RGSTR_RXF3SIDH, 0, true));
+	PRINT_RES(mcp2515_filter(pi_mcp2515, PI_MCP2515_RGSTR_RXF4SIDH, 0, true));
+	PRINT_RES(mcp2515_filter(pi_mcp2515, PI_MCP2515_RGSTR_RXF5SIDH, 0, true));
+
+	printf("\n");
+
+	tmp_bool = mcp2515_can_message_received(pi_mcp2515);
+	printf("Is CAN msg received before sending? %s\n", tmp_bool ? "yes" : "no");
+	if (tmp_bool) {
 		printf("CAN message received, but not expected!\n");
 		return (-1);
 	}
+
+	printf("\n");
 
 	memset(&frame, 0, sizeof(frame));
 	frame.id = 0x0420;
@@ -78,32 +99,38 @@ main(void)
 	memset(frame.payload, 0x69, sizeof(frame.payload));
 	PRINT_RES(mcp2515_can_message_send(pi_mcp2515, &frame));
 
-	tmp = mcp2515_can_message_received(pi_mcp2515);
-	printf("Is CAN msg recieved after sending? %s\n", tmp ? "yes" : "no");
-	if (tmp) {
+	printf("\n");
+
+	tmp_bool = mcp2515_can_message_received(pi_mcp2515);
+	printf("Is CAN msg received after sending? %s\n\n", tmp_bool ? "yes" : "no");
+	if (!tmp_bool) {
 		printf("CAN message not received, but expected!\n");
 		return (-1);
 	}
 
+	printf("\n");
+
 	memset(&frame, 0, sizeof(frame));
 	PRINT_RES(mcp2515_can_message_read(pi_mcp2515, &frame));
-	printf("CAN msg retrieved:\n  id:  %08x\n  dlc: %02x\n  CAN data:\n   ");
+	printf("CAN msg retrieved:\n  id:  %08lx\n  dlc: 0x%02x\n  CAN data:\n   ", frame.id, frame.dlc);
 	if (frame.dlc > CAN_FRAME_PAYLOAD_MAX) {
 		printf("CAN msg received with invalid DLC length!\n");
 		return (-1);
 	}
 	for (i = 0; i < frame.dlc; i++)
-		printf(" %02x", frame.payload[i]);
-	printf("\n");
+		printf(" 0x%02x", frame.payload[i]);
+	printf("\n\n");
 
-	tmp = mcp2515_can_message_received(pi_mcp2515);
-	printf("Is CAN msg recieved after already reading? %s\n", tmp ? "yes" : "no");
-	if (tmp) {
+	tmp_bool = mcp2515_can_message_received(pi_mcp2515);
+	printf("Is CAN msg received after already reading? %s\n\n", tmp_bool ? "yes" : "no");
+	if (tmp_bool) {
 		printf("CAN message received, but not expected!\n");
 		return (-1);
 	}
 
-	printf("status details:\n  status reg: %02x\n  eflag:      %02x\n  tx err:     %02x\n  rx err:     %02x\n",
+	printf("\n");
+
+	printf("status details:\n  status reg: 0x%02x\n  eflag:      0x%02x\n  tx err:     0x%02x\n  rx err:     0x%02x\n",
 	    mcp2515_status(pi_mcp2515), mcp2515_error_flags(pi_mcp2515), mcp2515_error_tx_count(pi_mcp2515),
 	    mcp2515_error_rx_count(pi_mcp2515));
 

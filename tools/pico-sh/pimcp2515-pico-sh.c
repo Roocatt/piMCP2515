@@ -18,8 +18,8 @@
 
 #include "pico/stdlib.h"
 
-#include "pi_MCP2515.h"
-#include "pi_MCP2515_defs.h"
+#include "../../include/pi_MCP2515.h"
+#include "../../include/pi_MCP2515_defs.h"
 
 #include "pimcp2515-pico-sh.h"
 
