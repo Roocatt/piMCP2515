@@ -16,19 +16,13 @@
 #include <stdint.h>
 
 #include "../include/pi_MCP2515_defs.h"
+
 #include "registers.h"
+#include "pi_MCP2515.h"
+#include "gpio.h"
+#include "time.h"
 
 #include "reqop.h"
-
-#include "gpio.h"
-
-#ifdef USE_PICO_LIB
-#include "pico/time.h"
-#define MICRO_SLEEP(x) sleep_us(x)
-#else
-#include <unistd.h>
-#define MICRO_SLEEP(x) usleep(x);
-#endif
 
 /**
  * @defgroup piMCP2515_reqop_functions REQOP (Operating Mode) Functions
@@ -54,7 +48,7 @@ mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
 	if (res)
 		goto err;
 
-	MICRO_SLEEP(mcp2515_osc_time(pi_mcp2515, 128));
+	mcp2515_micro_sleep(mcp2515_osc_time(pi_mcp2515, MCP2515_REQOP_CHANGE_SLEEP_CYCLES));
 
 	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), 0x30)))
 		goto err;
@@ -94,7 +88,7 @@ mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, uint8_t reqop)
 	int res;
 
 	res = mcp2515_register_bitmod(pi_mcp2515, reqop, PI_MCP2515_REQOP_MASK, PI_MCP2515_RGSTR_CANCTRL);
-	MICRO_SLEEP(mcp2515_osc_time(pi_mcp2515, 128));
+	mcp2515_micro_sleep(mcp2515_osc_time(pi_mcp2515, MCP2515_REQOP_CHANGE_SLEEP_CYCLES));
 
 	return (res);
 }

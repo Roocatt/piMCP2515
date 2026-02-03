@@ -10,6 +10,14 @@ This tool is only for the Pi Pico.
 Build the core library for Pico first, then `cd` here and build with
 CMake.
 
+At the end of running the test program, it will turn the onboard Pico
+LED on solid if the test passed, or it will blink a number of times
+then pause before repeating the blinks. The number of blinks will
+correspond to a point in the test code to allow finding where it
+failed without needing to use UART. This is however not perfect and
+UART is a better way to see the results, but the blinking can help for
+some quick checks.
+
 ```shell
 # Where $PI_MCP2515_PROJ is the root of this repository
 cd $PI_MCP2515_PROJ

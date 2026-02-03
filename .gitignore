@@ -27,3 +27,4 @@ tools/**/_deps/
 *.map
 *.uf2
 *.dis
+compile_commands.json

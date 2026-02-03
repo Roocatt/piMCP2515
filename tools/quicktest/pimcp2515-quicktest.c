@@ -23,13 +23,17 @@
 
 #include "pimcp2515-quicktest.h"
 
+
+/* This is not 100% comprehensive for testing functionality, but it does call most functions. Ideally this should be
+ * expanded to really cover everything, but this will do for now.
+ */
 int
 main()
 {
 	pi_mcp2515_t *pi_mcp2515;
 	pi_mcp2515_can_frame_t frame;
 	int i;
-	uint8_t reg_tmp = 0;
+	uint8_t reg_tmp = 0, checkpoint = 1;
 	bool tmp_bool;
 
 	stdio_init_all();
@@ -39,6 +43,8 @@ main()
 	mcp2515_init(&pi_mcp2515, 0, 19, 16, 18, 17, 10000000, 8);
 	mcp2515_debug_enable(pi_mcp2515, NULL);
 	printf("mcp2515_init\n");
+	PRINT_RES(mcp2515_reset(pi_mcp2515));
+	sleep_us(mcp2515_osc_time(pi_mcp2515, 128) + 30);
 
 	printf("\n");
 
@@ -49,9 +55,11 @@ main()
 	printf("Checking reqop after mode changes. Expected 0x%02x, Got 0x%02x\n", PI_MCP2515_REQOP_CONFIG, reg_tmp);
 	if (reg_tmp != PI_MCP2515_REQOP_CONFIG) {
 		printf("setting reqop LOOPBACK does not appear to have worked!\n");
-		return (-1);
+		goto end;
 	}
 	printf("\n");
+
+	checkpoint = 2;
 
 	mcp2515_bitrate_simplified(pi_mcp2515, 500);
 	printf("mcp2515_bitrate_simplified\n");
@@ -64,9 +72,11 @@ main()
 	printf("Checking reqop after mode changes. Expected 0x%02x, Got 0x%02x\n", PI_MCP2515_REQOP_LOOPBACK, reg_tmp);
 	if (reg_tmp != PI_MCP2515_REQOP_LOOPBACK) {
 		printf("setting reqop LOOPBACK does not appear to have worked!\n");
-		return (-1);
+		goto end;
 	}
 	printf("\n");
+
+	checkpoint = 3;
 
 	printf("CNF1: 0x%02x\nCNF2: 0x%02x\nCNF3: 0x%02x\n", mcp2515_cnf_get(pi_mcp2515, 1),
 	    mcp2515_cnf_get(pi_mcp2515, 2), mcp2515_cnf_get(pi_mcp2515, 3));
@@ -88,8 +98,10 @@ main()
 	printf("Is CAN msg received before sending? %s\n", tmp_bool ? "yes" : "no");
 	if (tmp_bool) {
 		printf("CAN message received, but not expected!\n");
-		return (-1);
+		goto end;
 	}
+
+	checkpoint = 4;
 
 	printf("\n");
 
@@ -105,8 +117,10 @@ main()
 	printf("Is CAN msg received after sending? %s\n\n", tmp_bool ? "yes" : "no");
 	if (!tmp_bool) {
 		printf("CAN message not received, but expected!\n");
-		return (-1);
+		goto end;
 	}
+
+	checkpoint = 5;
 
 	printf("\n");
 
@@ -115,26 +129,51 @@ main()
 	printf("CAN msg retrieved:\n  id:  %08lx\n  dlc: 0x%02x\n  CAN data:\n   ", frame.id, frame.dlc);
 	if (frame.dlc > CAN_FRAME_PAYLOAD_MAX) {
 		printf("CAN msg received with invalid DLC length!\n");
-		return (-1);
+		goto end;
 	}
 	for (i = 0; i < frame.dlc; i++)
 		printf(" 0x%02x", frame.payload[i]);
 	printf("\n\n");
 
+	checkpoint = 6;
+
 	tmp_bool = mcp2515_can_message_received(pi_mcp2515);
 	printf("Is CAN msg received after already reading? %s\n\n", tmp_bool ? "yes" : "no");
 	if (tmp_bool) {
 		printf("CAN message received, but not expected!\n");
-		return (-1);
+		goto end;
 	}
 
 	printf("\n");
 
+	reg_tmp = mcp2515_interrupts_get(pi_mcp2515);
+	printf("interrupt flags: %02x\n", reg_tmp);
+	reg_tmp = mcp2515_interrupts_mask(pi_mcp2515);
+	printf("interrupt mask: %02x\n", reg_tmp);
+
+	checkpoint = 0;
+
+end:
 	printf("status details:\n  status reg: 0x%02x\n  eflag:      0x%02x\n  tx err:     0x%02x\n  rx err:     0x%02x\n",
 	    mcp2515_status(pi_mcp2515), mcp2515_error_flags(pi_mcp2515), mcp2515_error_tx_count(pi_mcp2515),
 	    mcp2515_error_rx_count(pi_mcp2515));
 
-	/* TODO there are more functions that should be tested. */
+	gpio_init(PICO_DEFAULT_LED_PIN);
+	gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+	
+	if (checkpoint == 0) {
+		gpio_put(PICO_DEFAULT_LED_PIN, true);
+	} else {
+		for (;;) {
+			for (i = 0; i < checkpoint; i++) {
+				gpio_put(PICO_DEFAULT_LED_PIN, true);
+				sleep_ms(200);
+				gpio_put(PICO_DEFAULT_LED_PIN, false);
+				sleep_ms(200);
+			}
+			sleep_ms(1000);
+		}
+	}
 
 	return (0);
 }

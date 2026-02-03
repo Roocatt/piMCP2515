@@ -1,4 +1,4 @@
-/* Copyright 2025-2026 Roos Catling-Tate
+/* Copyright 2026 Roos Catling-Tate
  *
  * Permission to use, copy, modify, and/or distribute this software for any purpose with or
  * without fee is hereby granted, provided that the above copyright notice and this permission
@@ -13,35 +13,16 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef PIMCP2515_CAN_H
-#define PIMCP2515_CAN_H
+#ifndef __PIMCP2515_TIME_H__
+#define __PIMCP2515_TIME_H__
 
-#include <stdbool.h>
 #include <stdint.h>
 
 #include "pi_MCP2515_handle.h"
 
-/**
- * @brief CAN bus frame data structure.
- */
-typedef struct {
-	uint32_t id;
-	uint8_t dlc;
-	uint8_t payload[8];
-} pi_mcp2515_can_frame_t;
+#define MCP2515_REQOP_CHANGE_SLEEP_CYCLES 128
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+void		mcp2515_micro_sleep(uint64_t micro_s);
+uint64_t	mcp2515_osc_time(const pi_mcp2515_t *, uint32_t);
 
-int	mcp2515_can_message_send(pi_mcp2515_t *, const pi_mcp2515_can_frame_t *);
-int	mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
-bool	mcp2515_can_message_received(pi_mcp2515_t *);
-
-int	mcp2515_rts(pi_mcp2515_t *, uint8_t);
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
-#endif /* PIMCP2515_CAN_H */
+#endif /* __PIMCP2515_TIME_H__ */

@@ -46,7 +46,7 @@ mcp2515_status(pi_mcp2515_t *pi_mcp2515)
 	mcp2515_gpio_spi_read_blocking(pi_mcp2515, &res, 1);
 	UNSET_CS(pi_mcp2515);
 
-	mcp2515_debug(pi_mcp2515, "MCP2515 status %04x\n", res);
+	MCP2515_DEBUG(pi_mcp2515, "MCP2515 status %04x\n", res);
 
 	return (res);
 }

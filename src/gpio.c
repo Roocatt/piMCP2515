@@ -576,21 +576,3 @@ mcp2515_gpio_put(const pi_mcp2515_t *pi_mcp2515, uint8_t pin, uint8_t value)
 #endif
 	return (res);
 }
-
-
-/**
- * @brief Calculate the time for the number of oscillator cycles supplied, and based on the oscillator frequency.
- *
- * @param pi_mcp2515 the piMCP2515 handle.
- * @param num_cycles The number of oscillator cycles to calculate time for.
- * @return The calculated time in microseconds.
- */
-uint64_t
-mcp2515_osc_time(const pi_mcp2515_t *pi_mcp2515, uint32_t num_cycles)
-{
-	uint64_t cycle_len_nano_sec;
-
-	cycle_len_nano_sec = 1000000000 / (pi_mcp2515->osc_mhz * 1000000);
-
-	return (num_cycles * cycle_len_nano_sec / 1000); /* return microseconds */
-}

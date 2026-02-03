@@ -59,6 +59,15 @@
 #define PI_MCP2515_INSTR_BITMOD 0x05 /**< @brief SPI interface bit modify instruction. */
 #define PI_MCP2515_INSTR_READ_STATUS 0xA0 /**< @brief SPI interface status instruction. */
 #define PI_MCP2515_INSTR_RESET 0xC0 /**< @brief SPI interface status instruction. */
+
+#define PI_MCP2515_INSTR_LOAD_TX0 0x40
+#define PI_MCP2515_INSTR_LOAD_TX1 0x42
+#define PI_MCP2515_INSTR_LOAD_TX2 0x44
+
+/* These can be `|`'d together to apply the RTS instruction to multiple buffers. */
+#define PI_MCP2515_INSTR_RTS_TX0 0x81
+#define PI_MCP2515_INSTR_RTS_TX1 0x82
+#define PI_MCP2515_INSTR_RTS_TX2 0x84
 /** @} */
 
 /**
@@ -109,5 +118,7 @@
 /* ID Mask Definitions */
 #define PI_MCP2515_ID_MASK_SFF 0x000007FFUL
 #define PI_MCP2515_ID_MASK_EFF 0x1FFFFFFFUL
+
+#define PI_MCP2515_RTR_MASK 0x40
 
 #endif /* PIMCP2515_PI_MCP2515_DEFS_H */

@@ -26,10 +26,10 @@
 #include "can.h"
 
 static const uint8_t tx_reg_list[][2] = {
-	/* CTRL, SIDH */
-	{ 0x30, 0x31 },
-	{ 0x40, 0x41 },
-	{ 0x50, 0x51 }
+	/* CTRL, INSTR */
+	{ 0x30, PI_MCP2515_INSTR_LOAD_TX0 },
+	{ 0x40, PI_MCP2515_INSTR_LOAD_TX1 },
+	{ 0x50, PI_MCP2515_INSTR_LOAD_TX2 }
 };
 
 /**
@@ -47,19 +47,20 @@ static const uint8_t tx_reg_list[][2] = {
 int
 mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t *can_frame)
 {
-	int res, i;
+	int res;
 	uint16_t id_tmp;
-	uint8_t payload[13], ctrl;
-	bool extended_id;
+	uint8_t payload[13], ctrl, instr, i;
+	bool extended_id, rtr;
 
 	res = -1;
 
-	for (i = 0; i < (sizeof(tx_reg_list) / sizeof(tx_reg_list[0])); i++) {
+	for (i = 0; i < (uint8_t)(sizeof(tx_reg_list) / sizeof(tx_reg_list[0])); i++) {
 		mcp2515_register_read(pi_mcp2515, &ctrl, 1, tx_reg_list[i][0]);
 		MCP2515_DEBUG(pi_mcp2515, "checking tx_reg_list[%d] CTRL: 0x%02x\n", ctrl);
 		if ((ctrl & PI_MCP2515_CTRL_TXREQ) == 0) {
 			MCP2515_DEBUG(pi_mcp2515, "Using tx_reg_list[%d]\n", i);
-			extended_id = can_frame->id & PI_MCP2515_FLAG_EFF;
+			extended_id = !!(can_frame->id & PI_MCP2515_FLAG_EFF);
+			rtr = !!(can_frame->id & PI_MCP2515_FLAG_RTR);
 
 			id_tmp = (uint16_t)((can_frame->id & (extended_id ? PI_MCP2515_ID_MASK_EFF
 			    : PI_MCP2515_ID_MASK_SFF)) & 0x0FFFF);
@@ -76,25 +77,27 @@ mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t 
 				payload[3] = 0;
 			}
 
+			payload[4] = rtr ? (can_frame->dlc | PI_MCP2515_RTR_MASK) : can_frame->dlc;
 			memcpy(&payload[4], can_frame->payload, can_frame->dlc);
-			mcp2515_register_write(pi_mcp2515, payload, can_frame->dlc + 5, tx_reg_list[i][1]);
-			mcp2515_register_bitmod(pi_mcp2515, PI_MCP2515_CTRL_TXREQ, PI_MCP2515_CTRL_TXREQ,
-			    tx_reg_list[i][1]);
-
-			/* Check status again for errors */
-			mcp2515_register_read(pi_mcp2515, &ctrl, 1, tx_reg_list[i][0]);
-			if (ctrl & (PI_MCP2515_CTRL_TXERR| PI_MCP2515_CTRL_MLOA | PI_MCP2515_CTRL_ABTF)) {
-				MCP2515_DEBUG(pi_mcp2515, "TX%dCTRL has errors. Value: 0x%02x\n", ctrl);
-				res = 1;
-				break;
-			}
+			instr = tx_reg_list[i][1];
+			mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instr, 1);
+			mcp2515_gpio_spi_write_blocking(pi_mcp2515, payload, can_frame->dlc + 5);
 			res = 0;
-			goto end;
+			break;
 		}
 	}
-	if (res == -1)
+	if (res != -1) {
+		mcp2515_rts(pi_mcp2515, i);
+
+		/* Check status again for errors */
+		mcp2515_register_read(pi_mcp2515, &ctrl, 1, tx_reg_list[i][0]);
+		if (ctrl & (PI_MCP2515_CTRL_TXERR | PI_MCP2515_CTRL_MLOA | PI_MCP2515_CTRL_ABTF)) {
+			MCP2515_DEBUG(pi_mcp2515, "TX%dCTRL has errors. Value: 0x%02x\n", ctrl);
+			res = 1;
+		}
+	} else
 		MCP2515_DEBUG(pi_mcp2515, "no available tx found\n");
-end:
+
 	return (res);
 }
 
@@ -170,3 +173,31 @@ mcp2515_can_message_received(pi_mcp2515_t *pi_mcp2515)
 	return (!!(mcp2515_status(pi_mcp2515) & (PI_MCP2515_STATUS_RX0BF | PI_MCP2515_STATUS_RX0BF)));
 }
 /** @} */
+
+int
+mcp2515_rts(pi_mcp2515_t *pi_mcp2515, uint8_t buffer)
+{
+	uint8_t instruction, res = -1;
+
+	SET_CS(pi_mcp2515);
+	switch (buffer) {
+	case 0:
+		instruction = PI_MCP2515_INSTR_RTS_TX0;
+		break;
+	case 1:
+		instruction = PI_MCP2515_INSTR_RTS_TX1;
+		break;
+	case 2:
+		instruction = PI_MCP2515_INSTR_RTS_TX2;
+		break;
+	default:
+		goto end;
+	}
+
+	mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instruction, 1);
+	UNSET_CS(pi_mcp2515);
+
+	MCP2515_DEBUG(pi_mcp2515, "MCP2515 RTS %04x\n", res);
+end:
+	return (res);
+}
