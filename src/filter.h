@@ -26,7 +26,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 int	mcp2515_filter(pi_mcp2515_t *, uint8_t, uint32_t, bool);
-int	mcp2515_filter_mask(pi_mcp2515_t *, uint8_t, int32_t, bool);
+int	mcp2515_filter_mask(pi_mcp2515_t *, uint8_t, uint32_t, bool);
 
 #ifdef __cplusplus
 }

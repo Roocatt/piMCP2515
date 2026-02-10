@@ -96,7 +96,7 @@ mcp2515_filter(pi_mcp2515_t *pi_mcp2515, uint8_t filter_reg, uint32_t id, bool e
  * @return zero if success, otherwise non-zero.
  */
 int
-mcp2515_filter_mask(pi_mcp2515_t *pi_mcp2515, uint8_t filter_mask_reg, int32_t id_mask, bool extended_id)
+mcp2515_filter_mask(pi_mcp2515_t *pi_mcp2515, uint8_t filter_mask_reg, uint32_t id_mask, bool extended_id)
 {
 	int res;
 	uint32_t data;

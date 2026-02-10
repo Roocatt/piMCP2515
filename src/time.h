@@ -20,8 +20,6 @@
 
 #include "pi_MCP2515_handle.h"
 
-#define MCP2515_REQOP_CHANGE_SLEEP_CYCLES 128
-
 void		mcp2515_micro_sleep(uint64_t micro_s);
 uint64_t	mcp2515_osc_time(const pi_mcp2515_t *, uint32_t);
 

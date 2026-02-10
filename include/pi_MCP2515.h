@@ -1,5 +1,5 @@
 /* Copyright 2026 Roos Catling-Tate
-*
+ *
  * Permission to use, copy, modify, and/or distribute this software for any purpose with or
  * without fee is hereby granted, provided that the above copyright notice and this permission
  * notice appear in all copies.
@@ -48,7 +48,7 @@ uint8_t		mcp2515_interrupts_mask(pi_mcp2515_t *);
 void		mcp2515_interrupts_clear(pi_mcp2515_t *);
 
 int		mcp2515_filter(pi_mcp2515_t *, uint8_t, uint32_t, bool);
-int		mcp2515_filter_mask(pi_mcp2515_t *, uint8_t, int32_t, bool);
+int		mcp2515_filter_mask(pi_mcp2515_t *, uint8_t, uint32_t, bool);
 
 int		mcp2515_register_read(pi_mcp2515_t *, uint8_t *, uint8_t, uint8_t);
 int		mcp2515_register_write(pi_mcp2515_t *, uint8_t[], uint8_t, uint8_t);
@@ -70,7 +70,8 @@ int		mcp2515_bitrate_full_optional(pi_mcp2515_t *, uint16_t, uint8_t, uint8_t, u
     bool, bool, bool, bool);
 int		mcp2515_reset(pi_mcp2515_t *);
 
-uint8_t	mcp2515_cnf_get(pi_mcp2515_t *, uint8_t);
+uint8_t		mcp2515_cnf_get(pi_mcp2515_t *, uint8_t);
+inline void	mcp2515_micro_sleep(uint64_t);
 uint64_t	mcp2515_osc_time(const pi_mcp2515_t *, uint32_t);
 void		mcp2515_free(pi_mcp2515_t *);
 int		mcp2515_init(pi_mcp2515_t **, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint32_t, uint8_t);

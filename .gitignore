@@ -18,6 +18,7 @@ Doxyfile
 Doxyfile.docs
 doxygen/*
 tools/**/_deps/
+build.ninja
 
 *.a
 *.o
