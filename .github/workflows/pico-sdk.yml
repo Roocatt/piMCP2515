@@ -19,6 +19,8 @@ jobs:
     - name: Checkout Pico SDK
       run: git clone --depth 1 https://github.com/raspberrypi/pico-sdk.git ~/pico-sdk
     - uses: actions/checkout@v4
+    - name: Ensure CMake cache is cleared
+      run: rm -f CMakeCache.txt
     - name: Configure CMake
       run: cmake -DUSE_PICO_LIB=true -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
     - name: Build
