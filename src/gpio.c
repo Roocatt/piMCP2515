@@ -178,6 +178,8 @@ err:
 static char *spi_dev_defaults[] = {
 	"/dev/spiN",
 	"/dev/spi0.N",
+	"/dev/spidevN",
+	"/dev/spidev0.N",
 #ifdef USE_SPIGEN_BSD
 	"/dev/spigenN" /* Only bother checking this if using spigen */
 #endif
