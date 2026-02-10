@@ -64,6 +64,7 @@ add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
 if (USE_PICO_LIB)
     target_compile_definitions(piMCP2515_objects PRIVATE USE_PICO_LIB=1)
+    target_link_libraries(piMCP2515_objects pico_stdlib hardware_spi) # Fixes include issue
     set_target_properties(piMCP2515_static PROPERTIES OUTPUT_NAME "piMCP2515_pico")
     target_link_libraries(piMCP2515_static pico_stdlib hardware_spi)
 else ()
@@ -75,6 +76,10 @@ else ()
     install(TARGETS piMCP2515_static ARCHIVE DESTINATION lib)
     install(FILES include/pi_MCP2515.h include/pi_MCP2515_defs.h DESTINATION include)
 endif ()
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
 
 unset(USE_PICO_LIB CACHE)
 unset(USE_SPI CACHE)
