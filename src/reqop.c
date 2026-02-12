@@ -99,7 +99,7 @@ mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, mcp2515_reqop_t reqop)
  * @param pi_mcp2515 the piMCP2515 handle.
  * @return the current operating mode.
  */
-uint8_t
+mcp2515_reqop_t
 mcp2515_reqop_get(pi_mcp2515_t *pi_mcp2515)
 {
 	uint8_t reqop;
