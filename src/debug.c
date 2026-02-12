@@ -18,9 +18,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "pi_MCP2515_handle.h"
+#include <pi_MCP2515.h>
 
-#include "debug.h"
+#include "internal.h"
 
 static void	mcp2515_debug_default_callback(char *, va_list);
 

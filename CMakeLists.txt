@@ -44,21 +44,21 @@ if (USE_PICO_LIB)
     set(CMAKE_CXX_STANDARD 17)
 endif ()
 
-set(LIB_SOURCES src/pi_MCP2515.c src/pi_MCP2515.h
-        src/gpio.c src/gpio.h
-        src/can.c src/can.h
-        src/status_error.c src/status_error.h
-        src/interrupt.c src/interrupt.h
-        src/filter.c src/filter.h
-        src/reqop.c src/reqop.h
-        src/registers.c src/registers.h
-        src/debug.c src/debug.h
-        src/time.c src/time.h
-        src/pi_MCP2515_handle.h
-        include/pi_MCP2515_defs.h)
+set(LIB_SOURCES src/pi_MCP2515.c
+        src/gpio.c
+        src/can.c
+        src/status_error.c
+        src/interrupt.c
+        src/filter.c
+        src/reqop.c
+        src/registers.c
+        src/debug.c
+        src/time.c
+        src/internal.h)
 
 add_library(piMCP2515_objects OBJECT ${LIB_SOURCES})
 set_target_properties(piMCP2515_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_include_directories(piMCP2515_objects PUBLIC include)
 add_library(piMCP2515_static STATIC $<TARGET_OBJECTS:piMCP2515_objects>)
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 

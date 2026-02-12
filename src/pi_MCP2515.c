@@ -20,11 +20,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "../include/pi_MCP2515_defs.h"
-#include "registers.h"
-#include "gpio.h"
+#include <pi_MCP2515.h>
 
-#include "pi_MCP2515.h"
+#include "internal.h"
 
 /**
  * @defgroup piMCP2515_config_init_functions Init and Config Functions

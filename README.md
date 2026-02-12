@@ -25,10 +25,10 @@ reading the code as many are intended slightly more as personal notes.
 ## Development Goals
 
 - [ ] Supported targets:
-  - [ ] Pi Pico
+  - [x] Pi Pico
     - [x] Feature Complete (Compiles)
     - [x] Run on Device
-    - [ ] Tested
+    - [x] Tested
   - [ ] Regular Raspberry Pi devices
     - [ ] With Linux
       - [x] Feature Complete (Compiles)

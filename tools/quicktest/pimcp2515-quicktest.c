@@ -18,11 +18,39 @@
 
 #include "pico/stdlib.h"
 
-#include "../../include/pi_MCP2515.h"
-#include "../../include/pi_MCP2515_defs.h"
+#include <pi_MCP2515.h>
 
 #include "pimcp2515-quicktest.h"
 
+static int checkpoint = 1;
+
+static void	banner_print(char *);
+static void
+banner_print(char *str)
+{
+	uint8_t i;
+
+	for (i = 0; i < 50; i++)
+		printf("*");
+	printf("\n");
+	printf(str);
+	printf("\n");
+	for (i = 0; i < 50; i++)
+		printf("*");
+	printf("\n\n");
+}
+
+static void
+set_checkpoint(int c)
+{
+	char buf[32] = {0};
+
+	sprintf(buf, "Checkpoint #%d", c);
+
+	checkpoint = c;
+
+	banner_print(buf);
+}
 
 /* This is not 100% comprehensive for testing functionality, but it does call most functions. Ideally this should be
  * expanded to really cover everything, but this will do for now.
@@ -38,10 +66,12 @@ main()
 	pi_mcp2515_can_frame_t frame;
 	int i;
 	uint32_t id;
-	uint8_t reg_tmp = 0, checkpoint = 1;
+	uint8_t reg_tmp = 0;
 	bool tmp_bool;
 
 	stdio_init_all();
+
+	banner_print("Starting Test Run...");
 
 	/* Hardcoded stuff because this is just a dev tool. Maybe improve this later, maybe not. */
 	/* This is for the Pico, so returns are always 0 */
@@ -64,7 +94,7 @@ main()
 	}
 	printf("\n");
 
-	checkpoint = 2;
+	set_checkpoint(2);
 
 	mcp2515_bitrate_simplified(pi_mcp2515, 500);
 	printf("mcp2515_bitrate_simplified\n");
@@ -81,21 +111,14 @@ main()
 	}
 	printf("\n");
 
-	checkpoint = 3;
+	set_checkpoint(3);
 
 	printf("CNF1: 0x%02x\nCNF2: 0x%02x\nCNF3: 0x%02x\n", mcp2515_cnf_get(pi_mcp2515, 1),
 	    mcp2515_cnf_get(pi_mcp2515, 2), mcp2515_cnf_get(pi_mcp2515, 3));
 
 	printf("\n");
 
-	PRINT_RES(mcp2515_filter_mask(pi_mcp2515, 0, 0, true));
-	PRINT_RES(mcp2515_filter_mask(pi_mcp2515, 1, 0, true));
-	PRINT_RES(mcp2515_filter(pi_mcp2515, 0, 0, true));
-	PRINT_RES(mcp2515_filter(pi_mcp2515, 1, 0, true));
-	PRINT_RES(mcp2515_filter(pi_mcp2515, 2, 0, true));
-	PRINT_RES(mcp2515_filter(pi_mcp2515, 3, 0, true));
-	PRINT_RES(mcp2515_filter(pi_mcp2515, 4, 0, true));
-	PRINT_RES(mcp2515_filter(pi_mcp2515, 5, 0, true));
+	PRINT_RES(mcp2515_filter_enable(pi_mcp2515, false));
 
 	printf("\n");
 
@@ -106,7 +129,7 @@ main()
 		goto end;
 	}
 
-	checkpoint = 4;
+	set_checkpoint(4);
 
 	printf("\n");
 
@@ -127,14 +150,14 @@ main()
 		goto end;
 	}
 
-	checkpoint = 5;
+	set_checkpoint(5);
 
 	printf("\n");
 
 	memset(&frame, 0, sizeof(frame));
 	PRINT_RES(mcp2515_can_message_read(pi_mcp2515, &frame));
 	printf("CAN msg retrieved:\n  id:  0x%08lx\n  dlc: 0x%02x\n  CAN data:\n   ", frame.id, frame.dlc);
-	if (frame.dlc > CAN_FRAME_PAYLOAD_MAX) {
+	if (frame.dlc > PI_MCP2515_CAN_FRAME_PAYLOAD_MAX) {
 		printf("CAN msg received with invalid DLC length!\n");
 		goto end;
 	}
@@ -146,7 +169,7 @@ main()
 		printf(" 0x%02x", frame.payload[i]);
 	printf("\n\n");
 
-	checkpoint = 6;
+	set_checkpoint(6);
 
 	tmp_bool = mcp2515_can_message_received(pi_mcp2515);
 	printf("Is CAN msg received after already reading? %s\n\n", tmp_bool ? "yes" : "no");
@@ -165,10 +188,11 @@ main()
 	printf("\n");
 
 	/* Repeat for extended ID. */
-	checkpoint = 7;
-	frame.id = 0x00000420 | 0x40000000UL;
+	set_checkpoint(7);
+	frame.id = 0x0420420;
+	frame.extended_id = true;
 	frame.dlc = sizeof(frame.payload);
-	//memset(frame.payload, 0x69, sizeof(frame.payload));
+	memset(frame.payload, 0x69, sizeof(frame.payload));
 	PRINT_RES(mcp2515_can_message_send(pi_mcp2515, &frame));
 
 	printf("\n");
@@ -176,12 +200,12 @@ main()
 
 	memset(&frame, 0, sizeof(frame));
 	PRINT_RES(mcp2515_can_message_read(pi_mcp2515, &frame));
-	printf("CAN msg retrieved:\n  id:  0x%08lx\n  dlc: 0x%02x\n", frame.id, frame.dlc);
-	if (frame.dlc > CAN_FRAME_PAYLOAD_MAX) {
+	printf("CAN msg retrieved:\n  id:  0x%08lx\n  eid: %d\n  dlc: 0x%02x\n", frame.id, frame.extended_id, frame.dlc);
+	if (frame.dlc > PI_MCP2515_CAN_FRAME_PAYLOAD_MAX) {
 		printf("CAN msg received with invalid DLC length!\n");
 		goto end;
 	}
-	if (frame.id != (0x0420420 | PI_MCP2515_FLAG_EFF) || frame.dlc != 0) {
+	if (frame.id != 0x0420420 || frame.dlc != 8 || !frame.extended_id) {
 		printf("Frame or DLC incorrect in received message\n");
 		goto end;
 	}

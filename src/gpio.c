@@ -110,9 +110,9 @@ typedef struct gpio_pin gpio_set_t;
 #include <stdint.h>
 #include <string.h>
 
-#include "pi_MCP2515_handle.h"
+#include <pi_MCP2515.h>
 
-#include "gpio.h"
+#include "internal.h"
 
 #ifdef USE_SPI
 static int	spi_duplex_com(const pi_mcp2515_t *, char[sizeof(uint64_t)], size_t, char[sizeof(uint64_t)]);

@@ -15,14 +15,9 @@
 
 #include <stdbool.h>
 
-#include "pi_MCP2515_handle.h"
-#include "../include/pi_MCP2515_defs.h"
-#include "gpio.h"
-#include "registers.h"
+#include <pi_MCP2515.h>
 
-#include "status_error.h"
-
-#include "debug.h"
+#include "internal.h"
 
 /**
  * @defgroup piMCP2515_error_status_functions Error/Status Functions

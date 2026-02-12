@@ -13,15 +13,15 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "pi_MCP2515_handle.h"
-
 #ifdef USE_PICO_LIB
 #include "pico/time.h"
 #else
 #include <unistd.h>
 #endif
 
-#include "time.h"
+#include <pi_MCP2515.h>
+
+#include "internal.h"
 
 void
 mcp2515_micro_sleep(uint64_t micro_s)
