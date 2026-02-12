@@ -21,6 +21,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/*! @cond DOXYGEN_IGNORE */
+
 #define CS_LOW(x) mcp2515_gpio_put(x, x->cs_pin, 0)
 #define CS_HIGH(x) mcp2515_gpio_put(x, x->cs_pin, 1)
 
@@ -36,7 +38,6 @@
 
 #define PI_MCP2515_GPIO_PIN_MAP_LEN 26
 
-/*! @cond DOXYGEN_IGNORE */
 struct pi_mcp2515 {
 	void (*callback)(char *, va_list);
 	uint8_t cs_pin;
@@ -61,7 +62,6 @@ struct pi_mcp2515 {
 #endif /* __linux__ */
 #endif /* USE_PICO_LIB */
 };
-/*! @endcond */
 
 #if defined(__cplusplus)
 extern "C" {
@@ -79,6 +79,8 @@ int	mcp2515_gpio_put(const pi_mcp2515_t *, uint8_t, uint8_t);
 #ifndef NO_DEBUG
 void	__mcp2515_debug(pi_mcp2515_t *, char *, ...);
 #endif
+
+/*! @endcond */
 
 #if defined(__cplusplus)
 }

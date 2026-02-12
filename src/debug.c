@@ -22,6 +22,8 @@
 
 #include "internal.h"
 
+/*! @cond DOXYGEN_IGNORE */
+
 static void	mcp2515_debug_default_callback(char *, va_list);
 
 static void
@@ -43,6 +45,7 @@ __mcp2515_debug(pi_mcp2515_t *pi_mcp2515, char *msg, ...)
 	pi_mcp2515->callback(msg, args);
 	va_end(args);
 }
+/*! @endcond */
 #endif /* NO_DEBUG */
 
 /**
