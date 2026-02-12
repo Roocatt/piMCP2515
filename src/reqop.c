@@ -45,11 +45,11 @@ mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
 
 	mcp2515_micro_sleep(mcp2515_osc_time(pi_mcp2515, MCP2515_REQOP_CHANGE_SLEEP_CYCLES));
 
-	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), 0x30)))
+	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_TXB0CTRL)))
 		goto err;
-	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), 0x40)))
+	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_TXB1CTRL)))
 		goto err;
-	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), 0x50)))
+	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_TXB2CTRL)))
 		goto err;
 	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RXB0CTRL)))
 		goto err;
