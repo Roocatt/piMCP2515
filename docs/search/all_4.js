@@ -1,5 +1,7 @@
 var searchData=
 [
   ['filter_20functions_0',['Filter Functions',['../group__pi_m_c_p2515__filter__functions.html',1,'']]],
-  ['functions_1',['Functions',['../group__pi_m_c_p2515__can__functions.html',1,'CAN Bus Functions'],['../group__pi_m_c_p2515__error__status__functions.html',1,'Error/Status Functions'],['../group__pi_m_c_p2515__filter__functions.html',1,'Filter Functions'],['../group__pi_m_c_p2515__config__init__functions.html',1,'Init and Config Functions'],['../group__pi_m_c_p2515__interrupt__functions.html',1,'Interrupt Functions'],['../group__pi_m_c_p2515__register__functions.html',1,'Register Functions'],['../group__pi_m_c_p2515__reqop__functions.html',1,'REQOP (Operating Mode) Functions']]]
+  ['flags_1',['Flags',['../group__pi_m_c_p2515__canintf.html',1,'CANINTF Register Flags.'],['../group__pi_m_c_p2515__eflg.html',1,'EFLG Register Flags.']]],
+  ['flags_2',['&lt;span class=&quot;tt&quot;&gt;RX STATUS&lt;/span&gt; SPI command flags.',['../group__pi_m_c_p2515__rx__status.html',1,'']]],
+  ['functions_3',['Functions',['../group__pi_m_c_p2515__can__functions.html',1,'CAN Bus Functions'],['../group__pi_m_c_p2515__error__status__functions.html',1,'Error/Status Functions'],['../group__pi_m_c_p2515__filter__functions.html',1,'Filter Functions'],['../group__pi_m_c_p2515__config__init__functions.html',1,'Init and Config Functions'],['../group__pi_m_c_p2515__interrupt__functions.html',1,'Interrupt Functions'],['../group__pi_m_c_p2515__register__functions.html',1,'Register Functions'],['../group__pi_m_c_p2515__reqop__functions.html',1,'REQOP (Operating Mode) Functions']]]
 ];

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.14.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>piMCP2515: pi_mcp2515_can_frame_t Struct Reference</title>
+<title>piMCP2515: CANINTF Register Flags.</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -63,7 +63,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(function(){initNavTree('structpi__mcp2515__can__frame__t.html','',''); });
+$(function(){initNavTree('group__pi_m_c_p2515__canintf.html','',''); });
 </script>
 <div id="container">
 <div id="doc-content">
@@ -89,33 +89,31 @@ $(function(){initNavTree('structpi__mcp2515__can__frame__t.html','',''); });
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">pi_mcp2515_can_frame_t Struct Reference</div></div>
+  <div class="headertitle"><div class="title">CANINTF Register Flags. </div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>CAN bus frame data structure.  
- <a href="#details">More...</a></p>
-
-<p><code>#include &lt;<a class="el" href="pi___m_c_p2515_8h_source.html">pi_MCP2515.h</a>&gt;</code></p>
+<p>These definitions hold the flags in the CANINTF register.  
+<a href="#details">More...</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
-Data Fields</h2></td></tr>
-<tr class="memitem:ac720a61820483241895e5727924b35b9" id="r_ac720a61820483241895e5727924b35b9"><td class="memItemLeft" align="right" valign="top"><a id="ac720a61820483241895e5727924b35b9" name="ac720a61820483241895e5727924b35b9"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>id</b></td></tr>
-<tr class="memitem:a7fbd3b65613078e091499540a750d315" id="r_a7fbd3b65613078e091499540a750d315"><td class="memItemLeft" align="right" valign="top"><a id="a7fbd3b65613078e091499540a750d315" name="a7fbd3b65613078e091499540a750d315"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>extended_id</b></td></tr>
-<tr class="memitem:ad0ceed2cbec4e0dd86b05d78f0790b58" id="r_ad0ceed2cbec4e0dd86b05d78f0790b58"><td class="memItemLeft" align="right" valign="top"><a id="ad0ceed2cbec4e0dd86b05d78f0790b58" name="ad0ceed2cbec4e0dd86b05d78f0790b58"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>rtr</b></td></tr>
-<tr class="memitem:a4c46a551a384d44d5eae8021ac1255a0" id="r_a4c46a551a384d44d5eae8021ac1255a0"><td class="memItemLeft" align="right" valign="top"><a id="a4c46a551a384d44d5eae8021ac1255a0" name="a4c46a551a384d44d5eae8021ac1255a0"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>dlc</b></td></tr>
-<tr class="memitem:a7ad5405db5d31bfd4ea6c3088bb8dfd2" id="r_a7ad5405db5d31bfd4ea6c3088bb8dfd2"><td class="memItemLeft" align="right" valign="top"><a id="a7ad5405db5d31bfd4ea6c3088bb8dfd2" name="a7ad5405db5d31bfd4ea6c3088bb8dfd2"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>payload</b> [PI_MCP2515_CAN_FRAME_PAYLOAD_MAX]</td></tr>
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:gaaf9036f54dfb51943abd0376ee1dcee9" id="r_gaaf9036f54dfb51943abd0376ee1dcee9"><td class="memItemLeft" align="right" valign="top"><a id="gaaf9036f54dfb51943abd0376ee1dcee9" name="gaaf9036f54dfb51943abd0376ee1dcee9"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>PI_MCP2515_CANINTF_RX0</b>&#160;&#160;&#160;0x01</td></tr>
+<tr class="memitem:gad4e2b017e1ce955396090f1c21fc0d07" id="r_gad4e2b017e1ce955396090f1c21fc0d07"><td class="memItemLeft" align="right" valign="top"><a id="gad4e2b017e1ce955396090f1c21fc0d07" name="gad4e2b017e1ce955396090f1c21fc0d07"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>PI_MCP2515_CANINTF_RX1</b>&#160;&#160;&#160;0x02</td></tr>
+<tr class="memitem:ga7bd73a69d8bcade8100cf7fb98e76a9b" id="r_ga7bd73a69d8bcade8100cf7fb98e76a9b"><td class="memItemLeft" align="right" valign="top"><a id="ga7bd73a69d8bcade8100cf7fb98e76a9b" name="ga7bd73a69d8bcade8100cf7fb98e76a9b"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>PI_MCP2515_CANINTF_TX0IF</b>&#160;&#160;&#160;0x04</td></tr>
+<tr class="memitem:ga795429759923d68bf57ede6e2de53a71" id="r_ga795429759923d68bf57ede6e2de53a71"><td class="memItemLeft" align="right" valign="top"><a id="ga795429759923d68bf57ede6e2de53a71" name="ga795429759923d68bf57ede6e2de53a71"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>PI_MCP2515_CANINTF_TX1IF</b>&#160;&#160;&#160;0x08</td></tr>
+<tr class="memitem:ga76acc7c79c6333b571a6cb380de83d94" id="r_ga76acc7c79c6333b571a6cb380de83d94"><td class="memItemLeft" align="right" valign="top"><a id="ga76acc7c79c6333b571a6cb380de83d94" name="ga76acc7c79c6333b571a6cb380de83d94"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>PI_MCP2515_CANINTF_TX2IF</b>&#160;&#160;&#160;0x10</td></tr>
+<tr class="memitem:gac463251615128895692ca12c707575fc" id="r_gac463251615128895692ca12c707575fc"><td class="memItemLeft" align="right" valign="top"><a id="gac463251615128895692ca12c707575fc" name="gac463251615128895692ca12c707575fc"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>PI_MCP2515_CANINTF_ERRIF</b>&#160;&#160;&#160;0x20</td></tr>
+<tr class="memdesc:gac463251615128895692ca12c707575fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error interrupt flag. <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>CAN bus frame data structure. </p>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
-<li>include/<a class="el" href="pi___m_c_p2515_8h_source.html">pi_MCP2515.h</a></li>
-</ul>
+<p>These definitions hold the flags in the CANINTF register. </p>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <div id="page-nav" class="page-nav-panel">
@@ -129,7 +127,6 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>payload</b> [PI_MC
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="structpi__mcp2515__can__frame__t.html">pi_mcp2515_can_frame_t</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0 </li>
   </ul>
 </div>

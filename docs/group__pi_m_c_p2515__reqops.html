@@ -98,23 +98,54 @@ $(function(){initNavTree('group__pi_m_c_p2515__reqops.html','',''); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ga0b1ca5a5d46de8cef5a9731f3a4deefd" id="r_ga0b1ca5a5d46de8cef5a9731f3a4deefd"><td class="memItemLeft" align="right" valign="top"><a id="ga0b1ca5a5d46de8cef5a9731f3a4deefd" name="ga0b1ca5a5d46de8cef5a9731f3a4deefd"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>PI_MCP2515_REQOP_NORMAL</b>&#160;&#160;&#160;0x00</td></tr>
-<tr class="memitem:gab36a43e077674410355ba843fdce08ec" id="r_gab36a43e077674410355ba843fdce08ec"><td class="memItemLeft" align="right" valign="top"><a id="gab36a43e077674410355ba843fdce08ec" name="gab36a43e077674410355ba843fdce08ec"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>PI_MCP2515_REQOP_SLEEP</b>&#160;&#160;&#160;0x20</td></tr>
-<tr class="memitem:ga340c698eda01b1d981e9884f85d5855e" id="r_ga340c698eda01b1d981e9884f85d5855e"><td class="memItemLeft" align="right" valign="top"><a id="ga340c698eda01b1d981e9884f85d5855e" name="ga340c698eda01b1d981e9884f85d5855e"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>PI_MCP2515_REQOP_LOOPBACK</b>&#160;&#160;&#160;0x40</td></tr>
-<tr class="memitem:ga0859ae29acebd0996c73e76d1f9dfb77" id="r_ga0859ae29acebd0996c73e76d1f9dfb77"><td class="memItemLeft" align="right" valign="top"><a id="ga0859ae29acebd0996c73e76d1f9dfb77" name="ga0859ae29acebd0996c73e76d1f9dfb77"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>PI_MCP2515_REQOP_LISTENONLY</b>&#160;&#160;&#160;0x60</td></tr>
-<tr class="memitem:ga13c0021b10e7307b7a14fdfa5520ba11" id="r_ga13c0021b10e7307b7a14fdfa5520ba11"><td class="memItemLeft" align="right" valign="top"><a id="ga13c0021b10e7307b7a14fdfa5520ba11" name="ga13c0021b10e7307b7a14fdfa5520ba11"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>PI_MCP2515_REQOP_CONFIG</b>&#160;&#160;&#160;0x80</td></tr>
-<tr class="memitem:gaaf3949b585bb5b121b59b33bb9b2373f" id="r_gaaf3949b585bb5b121b59b33bb9b2373f"><td class="memItemLeft" align="right" valign="top"><a id="gaaf3949b585bb5b121b59b33bb9b2373f" name="gaaf3949b585bb5b121b59b33bb9b2373f"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>PI_MCP2515_REQOP_POWERUP</b>&#160;&#160;&#160;0xE0</td></tr>
 <tr class="memitem:ga78c9ba1bb85eea8f227a8f4d348fb0f4" id="r_ga78c9ba1bb85eea8f227a8f4d348fb0f4"><td class="memItemLeft" align="right" valign="top"><a id="ga78c9ba1bb85eea8f227a8f4d348fb0f4" name="ga78c9ba1bb85eea8f227a8f4d348fb0f4"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>PI_MCP2515_REQOP_MASK</b>&#160;&#160;&#160;0xE0</td></tr>
+<tr class="memdesc:ga78c9ba1bb85eea8f227a8f4d348fb0f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask for REQOP values. <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-enum-members" class="groupheader"><a id="enum-members" name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:gac949acaac7f50599282dbc8edb2f1afa" id="r_gac949acaac7f50599282dbc8edb2f1afa"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gac949acaac7f50599282dbc8edb2f1afa">mcp2515_reqop_t</a> { <br />
+&#160;&#160;<a class="el" href="#ggac949acaac7f50599282dbc8edb2f1afaacada69dc99af5753dc9da7a724aa4d62">PI_MCP2515_REQOP_NORMAL</a> = 0x00
+, <a class="el" href="#ggac949acaac7f50599282dbc8edb2f1afaa5324bbdeef7535ad06d97690d8c752ca">PI_MCP2515_REQOP_SLEEP</a> = 0x20
+, <a class="el" href="#ggac949acaac7f50599282dbc8edb2f1afaaa03755a1606e78407b49710459189bf1">PI_MCP2515_REQOP_LOOPBACK</a> = 0x40
+, <a class="el" href="#ggac949acaac7f50599282dbc8edb2f1afaaeaa2b846eec85bd2769d55cab04f4fef">PI_MCP2515_REQOP_LISTENONLY</a> = 0x60
+, <br />
+&#160;&#160;<a class="el" href="#ggac949acaac7f50599282dbc8edb2f1afaa1790bc826551a498d47e5427da7dfaf4">PI_MCP2515_REQOP_CONFIG</a> = 0x80
+, <a class="el" href="#ggac949acaac7f50599282dbc8edb2f1afaa95f5117692863d03975d8fb1436602c3">PI_MCP2515_REQOP_POWERUP</a> = 0xE0
+<br />
+ }</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <p>These definitions hold the REQOP (operating mode) codes. </p>
+<a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">Enumeration Type Documentation</h2>
+<a id="gac949acaac7f50599282dbc8edb2f1afa" name="gac949acaac7f50599282dbc8edb2f1afa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac949acaac7f50599282dbc8edb2f1afa">&#9670;&#160;</a></span>mcp2515_reqop_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#gac949acaac7f50599282dbc8edb2f1afa">mcp2515_reqop_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggac949acaac7f50599282dbc8edb2f1afaacada69dc99af5753dc9da7a724aa4d62" name="ggac949acaac7f50599282dbc8edb2f1afaacada69dc99af5753dc9da7a724aa4d62"></a>PI_MCP2515_REQOP_NORMAL&#160;</td><td class="fielddoc"><p>Normal operating mode. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggac949acaac7f50599282dbc8edb2f1afaa5324bbdeef7535ad06d97690d8c752ca" name="ggac949acaac7f50599282dbc8edb2f1afaa5324bbdeef7535ad06d97690d8c752ca"></a>PI_MCP2515_REQOP_SLEEP&#160;</td><td class="fielddoc"><p>Sleep operating mode. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggac949acaac7f50599282dbc8edb2f1afaaa03755a1606e78407b49710459189bf1" name="ggac949acaac7f50599282dbc8edb2f1afaaa03755a1606e78407b49710459189bf1"></a>PI_MCP2515_REQOP_LOOPBACK&#160;</td><td class="fielddoc"><p>Loopback operating mode. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggac949acaac7f50599282dbc8edb2f1afaaeaa2b846eec85bd2769d55cab04f4fef" name="ggac949acaac7f50599282dbc8edb2f1afaaeaa2b846eec85bd2769d55cab04f4fef"></a>PI_MCP2515_REQOP_LISTENONLY&#160;</td><td class="fielddoc"><p>Listenonly operating mode. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggac949acaac7f50599282dbc8edb2f1afaa1790bc826551a498d47e5427da7dfaf4" name="ggac949acaac7f50599282dbc8edb2f1afaa1790bc826551a498d47e5427da7dfaf4"></a>PI_MCP2515_REQOP_CONFIG&#160;</td><td class="fielddoc"><p>Config operating mode. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggac949acaac7f50599282dbc8edb2f1afaa95f5117692863d03975d8fb1436602c3" name="ggac949acaac7f50599282dbc8edb2f1afaa95f5117692863d03975d8fb1436602c3"></a>PI_MCP2515_REQOP_POWERUP&#160;</td><td class="fielddoc"><p>Powerup operating mode. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <div id="page-nav" class="page-nav-panel">
