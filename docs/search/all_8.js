@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['pi_5fmcp2515_0',['pi_mcp2515',['../structpi__mcp2515.html',1,'']]],
-  ['pi_5fmcp2515_5fcan_5fframe_1',['pi_mcp2515_can_frame',['../structpi__mcp2515__can__frame.html',1,'']]]
+  ['register_20functions_0',['Register Functions',['../group__pi_m_c_p2515__register__functions.html',1,'']]],
+  ['reqop_20operating_20mode_20functions_1',['REQOP (Operating Mode) Functions',['../group__pi_m_c_p2515__reqop__functions.html',1,'']]]
 ];

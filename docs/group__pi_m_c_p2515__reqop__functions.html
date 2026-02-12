@@ -98,18 +98,18 @@ $(function(){initNavTree('group__pi_m_c_p2515__reqop__functions.html','',''); })
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gac9870d96205ee601464d67869652f04e" id="r_gac9870d96205ee601464d67869652f04e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gac9870d96205ee601464d67869652f04e">mcp2515_reset</a> (<a class="el" href="structpi__mcp2515.html">pi_mcp2515_t</a> *<a class="el" href="structpi__mcp2515.html">pi_mcp2515</a>)</td></tr>
+<tr class="memitem:gac9870d96205ee601464d67869652f04e" id="r_gac9870d96205ee601464d67869652f04e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gac9870d96205ee601464d67869652f04e">mcp2515_reset</a> (pi_mcp2515_t *pi_mcp2515)</td></tr>
 <tr class="memdesc:gac9870d96205ee601464d67869652f04e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issue a reset command to the MCP2515 via the SPI interface.  <br /></td></tr>
-<tr class="memitem:gaae01aa187b5fde6752fced35afff8aa3" id="r_gaae01aa187b5fde6752fced35afff8aa3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaae01aa187b5fde6752fced35afff8aa3">mcp2515_reqop</a> (<a class="el" href="structpi__mcp2515.html">pi_mcp2515_t</a> *<a class="el" href="structpi__mcp2515.html">pi_mcp2515</a>, uint8_t reqop)</td></tr>
-<tr class="memdesc:gaae01aa187b5fde6752fced35afff8aa3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the operating mode.  <br /></td></tr>
-<tr class="memitem:ga3bec6d85776e2eb13351186fa41eaf28" id="r_ga3bec6d85776e2eb13351186fa41eaf28"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga3bec6d85776e2eb13351186fa41eaf28">mcp2515_reqop_get</a> (<a class="el" href="structpi__mcp2515.html">pi_mcp2515_t</a> *<a class="el" href="structpi__mcp2515.html">pi_mcp2515</a>)</td></tr>
-<tr class="memdesc:ga3bec6d85776e2eb13351186fa41eaf28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current operating mode.  <br /></td></tr>
+<tr class="memitem:ga8643ea4f14361b466e23ac476ee58d13" id="r_ga8643ea4f14361b466e23ac476ee58d13"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga8643ea4f14361b466e23ac476ee58d13">mcp2515_reqop</a> (pi_mcp2515_t *pi_mcp2515, const mcp2515_reqop_t reqop)</td></tr>
+<tr class="memdesc:ga8643ea4f14361b466e23ac476ee58d13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the operating mode.  <br /></td></tr>
+<tr class="memitem:ga85a7df5de7637ab887b89dc58c44e26b" id="r_ga85a7df5de7637ab887b89dc58c44e26b"><td class="memItemLeft" align="right" valign="top">mcp2515_reqop_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga85a7df5de7637ab887b89dc58c44e26b">mcp2515_reqop_get</a> (pi_mcp2515_t *pi_mcp2515)</td></tr>
+<tr class="memdesc:ga85a7df5de7637ab887b89dc58c44e26b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current operating mode.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <p>These functions handle REQOP (operating mode) functionality. </p>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="gaae01aa187b5fde6752fced35afff8aa3" name="gaae01aa187b5fde6752fced35afff8aa3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaae01aa187b5fde6752fced35afff8aa3">&#9670;&#160;</a></span>mcp2515_reqop()</h2>
+<a id="ga8643ea4f14361b466e23ac476ee58d13" name="ga8643ea4f14361b466e23ac476ee58d13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8643ea4f14361b466e23ac476ee58d13">&#9670;&#160;</a></span>mcp2515_reqop()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -117,12 +117,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int mcp2515_reqop </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structpi__mcp2515.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span>, </td>
+          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>reqop</em></span>&#160;)</td>
+          <td class="paramtype">const mcp2515_reqop_t</td>          <td class="paramname"><span class="paramname"><em>reqop</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -131,7 +131,7 @@ Functions</h2></td></tr>
 <p>After the mode change, this code will then sleep for a 128 oscillator cycles delay before continuing operations as defined by the MCP2515 manual.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"><a class="el" href="structpi__mcp2515.html">pi_mcp2515</a></td><td>the piMCP2515 handle. </td></tr>
+    <tr><td class="paramname">pi_mcp2515</td><td>the piMCP2515 handle. </td></tr>
     <tr><td class="paramname">reqop</td><td>the new operating mode. Acceptable values being:<ul>
 <li>PI_MCP2515_REQOP_MASK</li>
 <li>PI_MCP2515_REQOP_NORMAL</li>
@@ -149,16 +149,16 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ga3bec6d85776e2eb13351186fa41eaf28" name="ga3bec6d85776e2eb13351186fa41eaf28"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga3bec6d85776e2eb13351186fa41eaf28">&#9670;&#160;</a></span>mcp2515_reqop_get()</h2>
+<a id="ga85a7df5de7637ab887b89dc58c44e26b" name="ga85a7df5de7637ab887b89dc58c44e26b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga85a7df5de7637ab887b89dc58c44e26b">&#9670;&#160;</a></span>mcp2515_reqop_get()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint8_t mcp2515_reqop_get </td>
+          <td class="memname">mcp2515_reqop_t mcp2515_reqop_get </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structpi__mcp2515.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
+          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -167,7 +167,7 @@ Functions</h2></td></tr>
 <p>Get the current operating mode. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"><a class="el" href="structpi__mcp2515.html">pi_mcp2515</a></td><td>the piMCP2515 handle. </td></tr>
+    <tr><td class="paramname">pi_mcp2515</td><td>the piMCP2515 handle. </td></tr>
   </table>
   </dd>
 </dl>
@@ -184,7 +184,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int mcp2515_reset </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structpi__mcp2515.html">pi_mcp2515_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
+          <td class="paramtype">pi_mcp2515_t *</td>          <td class="paramname"><span class="paramname"><em>pi_mcp2515</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -193,7 +193,7 @@ Functions</h2></td></tr>
 <p>Issue a reset command to the MCP2515 via the SPI interface. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"><a class="el" href="structpi__mcp2515.html">pi_mcp2515</a></td><td>the piMCP2515 handle. </td></tr>
+    <tr><td class="paramname">pi_mcp2515</td><td>the piMCP2515 handle. </td></tr>
   </table>
   </dd>
 </dl>
