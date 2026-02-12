@@ -13,11 +13,9 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "gpio.h"
-#include "../include/pi_MCP2515_defs.h"
-#include "pi_MCP2515_handle.h"
+#include <pi_MCP2515.h>
 
-#include "registers.h"
+#include "internal.h"
 
 /**
  * @defgroup piMCP2515_register_functions Register Functions
@@ -34,21 +32,21 @@
  * @return zero if success, otherwise non-zero.
  */
 int
-mcp2515_register_read(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t len, uint8_t rgstr)
+mcp2515_register_read(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t len, mcp2515_rgstr_t rgstr)
 {
 	int res;
 	uint8_t message[2];
 
-	SET_CS(pi_mcp2515);
+	CS_LOW(pi_mcp2515);
 	message[0] = PI_MCP2515_INSTR_READ;
-	message[1] = rgstr;
+	message[1] = (uint8_t)rgstr;
 	res = mcp2515_gpio_spi_write_blocking(pi_mcp2515, message, 2);
 	if (res)
 		goto err;
 	res = mcp2515_gpio_spi_read_blocking(pi_mcp2515, data, len);
 
 err:
-	UNSET_CS(pi_mcp2515);
+	CS_HIGH(pi_mcp2515);
 
 	return (res);
 }
@@ -63,14 +61,14 @@ err:
  * @return zero if success, otherwise non-zero.
  */
 int
-mcp2515_register_write(pi_mcp2515_t *pi_mcp2515, uint8_t values[], uint8_t len, uint8_t rgstr)
+mcp2515_register_write(pi_mcp2515_t *pi_mcp2515, uint8_t values[], uint8_t len, mcp2515_rgstr_t rgstr)
 {
 	int res;
 	uint8_t message[2];
 
-	SET_CS(pi_mcp2515);
+	CS_LOW(pi_mcp2515);
 	message[0] = PI_MCP2515_INSTR_WRITE;
-	message[1] = rgstr;
+	message[1] = (uint8_t)rgstr;
 
 	res = mcp2515_gpio_spi_write_blocking(pi_mcp2515, message, 2);
 	if (res)
@@ -78,7 +76,7 @@ mcp2515_register_write(pi_mcp2515_t *pi_mcp2515, uint8_t values[], uint8_t len, 
 	res = mcp2515_gpio_spi_write_blocking(pi_mcp2515, values, len);
 
 err:
-	UNSET_CS(pi_mcp2515);
+	CS_HIGH(pi_mcp2515);
 
 	return (res);
 }
@@ -93,18 +91,18 @@ err:
  * @return zero if success, otherwise non-zero.
  */
 int
-mcp2515_register_bitmod(pi_mcp2515_t *pi_mcp2515, uint8_t data, uint8_t mask, uint8_t rgstr)
+mcp2515_register_bitmod(pi_mcp2515_t *pi_mcp2515, const uint8_t data, const uint8_t mask, const mcp2515_rgstr_t rgstr)
 {
 	int res;
 	uint8_t message[4];
 
-	SET_CS(pi_mcp2515);
+	CS_LOW(pi_mcp2515);
 	message[0] = PI_MCP2515_INSTR_BITMOD;
-	message[1] = rgstr;
+	message[1] = (uint8_t)rgstr;
 	message[2] = mask;
 	message[3] = data;
 	res = mcp2515_gpio_spi_write_blocking(pi_mcp2515, message, 4);
-	UNSET_CS(pi_mcp2515);
+	CS_HIGH(pi_mcp2515);
 
 	return (res);
 }

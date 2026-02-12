@@ -22,11 +22,10 @@
 
 /* Notes to Help Navigating the `#ifdef` Labyrinth:
  *
- * USE_PICO_LIB / USE_SPI / USE_PRINT_DEBUG:
+ * USE_PICO_LIB / USE_SPI:
  *   - These three are set by CMake, or more specifically in the context of this file, by `-D` arguments to the compiler
  *     for the purposes of conditional building. USE_SPI covers Linux or BSD systems, while `USE_PICO_LIB` will cover
- *     using the Raspberry Pi Pico SDK. `USE_PRINT_DEBUG` is for testing purposes with very limited practical use. It
- *     turns all functionality into a NOOP and prints function arguments to stdout.
+ *     using the Raspberry Pi Pico SDK.
  *
  * USE_SPIDEV_LINUX:
  *   - This is set automatically when built with `USE_SPI` and on a Linux system. It covers conditions for handling SPI
@@ -90,8 +89,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#elif defined(USE_PRINT_DEBUG)
-#include <stdio.h>
 #endif
 
 #ifdef USE_SPIDEV_LINUX
@@ -113,9 +110,9 @@ typedef struct gpio_pin gpio_set_t;
 #include <stdint.h>
 #include <string.h>
 
-#include "pi_MCP2515_handle.h"
+#include <pi_MCP2515.h>
 
-#include "gpio.h"
+#include "internal.h"
 
 #ifdef USE_SPI
 static int	spi_duplex_com(const pi_mcp2515_t *, char[sizeof(uint64_t)], size_t, char[sizeof(uint64_t)]);
@@ -132,7 +129,8 @@ static int	spi_duplex_com(const pi_mcp2515_t *, char[sizeof(uint64_t)], size_t, 
  * @return zero if success, otherwise non-zero.
  */
 static int
-spi_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t)], size_t tx_len, char rx_buffer[sizeof(uint64_t)])
+spi_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t)], /* NOLINT(*-non-const-parameter) */
+    size_t tx_len, char rx_buffer[sizeof(uint64_t)]) /* NOLINT(*-non-const-parameter) */
 {
 	int res = 0;
 
@@ -179,7 +177,9 @@ err:
 
 static char *spi_dev_defaults[] = {
 	"/dev/spiN",
-	"/dev/spi0.N"
+	"/dev/spi0.N",
+	"/dev/spidevN",
+	"/dev/spidev0.N",
 #ifdef USE_SPIGEN_BSD
 	"/dev/spigenN" /* Only bother checking this if using spigen */
 #endif
@@ -287,8 +287,6 @@ mcp2515_gpio_init(pi_mcp2515_t *pi_mcp2515, uint8_t pin)
 	pin_config.gp_flags = GPIO_PIN_INPUT;
 
 	res = ioctl(pi_mcp2515->gpio_gpio_fd, GPIOSET, &pin_config);
-#elif defined(USE_PRINT_DEBUG)
-	printf("gpio_init(0x%02x)\n", pin);
 #endif
 	return (res);
 }
@@ -363,9 +361,9 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 	pi_mcp2515->gpio_spi_inst = spi_inst,
 
 	spi_init(spi_inst, pi_mcp2515->spi_clock);
-	gpio_set_function(pi_mcp2515->tx_pin, PI_MCP2515_GPIO_FUNC_SPI);
-	gpio_set_function(pi_mcp2515->rx_pin, PI_MCP2515_GPIO_FUNC_SPI);
-	gpio_set_function(pi_mcp2515->sck_pin, PI_MCP2515_GPIO_FUNC_SPI);
+	gpio_set_function(pi_mcp2515->tx_pin, GPIO_FUNC_SPI);
+	gpio_set_function(pi_mcp2515->rx_pin, GPIO_FUNC_SPI);
+	gpio_set_function(pi_mcp2515->sck_pin, GPIO_FUNC_SPI);
 	mcp2515_gpio_init(pi_mcp2515, pi_mcp2515->cs_pin);
 
 	mcp2515_gpio_set_dir(pi_mcp2515, pi_mcp2515->cs_pin, true);
@@ -445,8 +443,6 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 	pi_mcp2515->gpio_gpio_fd = gpio_fd;
 	pi_mcp2515->gpio_spidev_fd = spidev_fd;
 	pi_mcp2515->gpio_spi_mode = mode;
-#elif defined(USE_PRINT_DEBUG)
-	printf("spi_init(0x%02x, 0x%08x)\n", pi_mcp2515->spi_channel, pi_mcp2515->spi_clock);
 #endif
 
 err:
@@ -458,10 +454,9 @@ int
 mcp2515_gpio_set_dir(const pi_mcp2515_t *pi_mcp2515, uint8_t gpio, bool out)
 {
 	int res = 0;
+
 #ifdef USE_PICO_LIB
 	gpio_set_dir(gpio, out);
-#elif defined(USE_PRINT_DEBUG)
-	printf("gpio_set_dir(0x%02x, %s)\n", gpio, out ? "true" : "false");
 #elif defined(USE_SPIDEV_LINUX)
 	struct gpio_v2_line_config config = { 0 };
 
@@ -491,6 +486,7 @@ int
 mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t len)
 {
 	int res = 0;
+
 #ifdef USE_PICO_LIB
 	spi_write_blocking(pi_mcp2515->gpio_spi_inst, data, len);
 #elif defined(USE_SPI)
@@ -513,9 +509,6 @@ mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t
 		if ((res = spi_duplex_com(pi_mcp2515, tx_buffer, chunk_len, rx_buffer)))
 			goto err;
 	}
-#elif defined(USE_PRINT_DEBUG)
-	printf("spi_write_blocking(0x%02x, 0x%02x%s, 0x%02x)\n", pi_mcp2515->spi_channel, data[0],
-	    len == 1 ? "" : "...", len);
 #endif
 
 err:
@@ -538,9 +531,6 @@ mcp2515_gpio_spi_read_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t 
 			goto err;
 		memcpy(&data[i], &rx_buffer, len - i > sizeof(uint64_t) ? sizeof(rx_buffer) : len - i);
 	}
-#elif defined(USE_PRINT_DEBUG)
-	printf("spi_read_blocking(0x%02x, 0x00, 0x%02x%s, 0x%02x)\n", pi_mcp2515->spi_channel, data[0],
-	    len == 1 ? "" : "...", len);
 #endif
 
 err:
@@ -568,26 +558,7 @@ mcp2515_gpio_put(const pi_mcp2515_t *pi_mcp2515, uint8_t pin, uint8_t value)
 	pin_op.gp_value = value ? 1 : 0;
 
 	res = ioctl(pi_mcp2515->gpio_gpio_fd, GPIOWRITE, &pin_op);
-#elif defined(USE_PRINT_DEBUG)
-	printf("gpio_put(0x%02x, 0x%02x)\n", pin, value);
 #endif
+
 	return (res);
-}
-
-
-/**
- * @brief Calculate the time for the number of oscillator cycles supplied, and based on the oscillator frequency.
- *
- * @param pi_mcp2515 the piMCP2515 handle.
- * @param num_cycles The number of oscillator cycles to calculate time for.
- * @return The calculated time in microseconds.
- */
-uint64_t
-mcp2515_osc_time(const pi_mcp2515_t *pi_mcp2515, uint32_t num_cycles)
-{
-	uint64_t cycle_len_nano_sec;
-
-	cycle_len_nano_sec = 1000000000 / (pi_mcp2515->osc_mhz * 1000000);
-
-	return (num_cycles * cycle_len_nano_sec / 1000); /* return microseconds */
 }

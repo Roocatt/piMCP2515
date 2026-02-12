@@ -27,78 +27,63 @@ if (USE_SPI)
     elseif (USE_AARCH64_FREEBSD_CC)
         include("cmake/freebsd-aarch64-cross-compile.cmake")
     endif ()
-elseif (NOT USE_PRINT_DEBUG) # USE_PICO_LIB as default, for USE_PRINT_DEBUG just skip
+    project(piMCP2515 C)
+    set(CMAKE_C_STANDARD 99)
+else ()
     include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+    set(USE_PICO_LIB 1)
+    project(piMCP2515 C CXX ASM)
 endif ()
 
-project(piMCP2515 C CXX ASM)
-
-find_package(Doxygen)
-if (DOXYGEN_FOUND)
-    set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
-    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-
-    add_custom_target(docgenerate
-            COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
-            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMENT "generating documentation" VERBATIM)
-
-    find_package(Git QUIET)
-    if(GIT_FOUND)
-        execute_process(
-                COMMAND git rev-parse --abbrev-ref HEAD
-                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                OUTPUT_VARIABLE GIT_BRANCH
-                OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-        if("${GIT_BRANCH}" STREQUAL "gh-pages")
-            add_custom_target(docpublish
-                    COMMAND ${CMAKE_COMMAND} -E rm -r ${CMAKE_CURRENT_SOURCE_DIR}/docs/
-                    COMMAND ${CMAKE_COMMAND} -E copy_directory
-                        ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/html/
-                        ${CMAKE_CURRENT_SOURCE_DIR}/docs/
-                    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMENT "setting up github pages" VERBATIM)
-            add_dependencies(docpublish docgenerate)
-        endif()
-    endif()
-endif()
+include(cmake/doxygen.cmake)
 
 if (USE_PICO_LIB)
     set(PICO_BOARD pico)
     pico_sdk_init()
+    set(CMAKE_C_STANDARD 11)
+    set(CMAKE_CXX_STANDARD 17)
 endif ()
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 17)
+set(LIB_SOURCES src/pi_MCP2515.c
+        src/gpio.c
+        src/can.c
+        src/status_error.c
+        src/interrupt.c
+        src/filter.c
+        src/reqop.c
+        src/registers.c
+        src/debug.c
+        src/time.c
+        src/internal.h)
 
-add_library(piMCP2515 STATIC
-        src/pi_MCP2515.c src/pi_MCP2515.h
-        src/gpio.c src/gpio.h
-        src/can.c src/can.h
-        src/status_error.c src/status_error.h
-        src/interrupt.c src/interrupt.h
-        src/filter.c src/filter.h
-        src/reqop.c src/reqop.h
-        src/registers.c src/registers.h
-        src/pi_MCP2515_handle.h include/pi_MCP2515_defs.h)
+add_library(piMCP2515_objects OBJECT ${LIB_SOURCES})
+set_target_properties(piMCP2515_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_include_directories(piMCP2515_objects PUBLIC include)
+add_library(piMCP2515_static STATIC $<TARGET_OBJECTS:piMCP2515_objects>)
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
-if (USE_SPI)
-    target_compile_definitions(piMCP2515 PRIVATE USE_SPI=1)
-elseif (USE_PRINT_DEBUG)
-    target_compile_definitions(piMCP2515 PRIVATE USE_PRINT_DEBUG=1)
-else () # USE_PICO_LIB
-    target_compile_definitions(piMCP2515 PRIVATE USE_PICO_LIB=1)
-
-    target_link_libraries(${PROJECT_NAME}
-            pico_stdlib
-            hardware_spi
-    )
+if (USE_PICO_LIB)
+    target_compile_definitions(piMCP2515_objects PRIVATE USE_PICO_LIB=1)
+    target_link_libraries(piMCP2515_objects pico_stdlib hardware_spi) # Fixes include issue
+    set_target_properties(piMCP2515_static PROPERTIES OUTPUT_NAME "piMCP2515_pico")
+    target_link_libraries(piMCP2515_static pico_stdlib hardware_spi)
+else ()
+    set_target_properties(piMCP2515_static PROPERTIES OUTPUT_NAME "piMCP2515")
+    add_library(piMCP2515_shared SHARED $<TARGET_OBJECTS:piMCP2515_objects>)
+    set_target_properties(piMCP2515_shared PROPERTIES OUTPUT_NAME "piMCP2515")
+    target_compile_definitions(piMCP2515_objects PRIVATE USE_SPI=1)
+    install(TARGETS piMCP2515_shared LIBRARY DESTINATION lib)
+    install(TARGETS piMCP2515_static ARCHIVE DESTINATION lib)
+    install(FILES include/pi_MCP2515.h include/pi_MCP2515_defs.h DESTINATION include)
 endif ()
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
 
 unset(USE_PICO_LIB CACHE)
 unset(USE_SPI CACHE)
-unset(USE_AARCH64_LINUX_CC CACHE)
 unset(USE_ARM_LINUX_CC CACHE)
+unset(USE_AARCH64_LINUX_CC CACHE)
+unset(USE_AARCH64_NETBSD_CC CACHE)
 unset(USE_AARCH64_FREEBSD_CC CACHE)
-unset(USE_PRINT_DEBUG CACHE)

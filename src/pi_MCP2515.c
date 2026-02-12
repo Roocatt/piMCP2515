@@ -20,11 +20,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "../include/pi_MCP2515_defs.h"
-#include "registers.h"
-#include "gpio.h"
+#include <pi_MCP2515.h>
 
-#include "pi_MCP2515.h"
+#include "internal.h"
 
 /**
  * @defgroup piMCP2515_config_init_functions Init and Config Functions
@@ -81,8 +79,21 @@ mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps,
 	    || prseg_tqps > 8 || phseg_tqps1 == 0 || phseg_tqps1 > 8 || phseg_tqps2 == 0 || phseg_tqps2 > 8
 	    || phseg_tqps2 <= sjw || prseg_tqps + phseg_tqps1 < phseg_tqps2) {
 		res = 1;
+		MCP2515_DEBUG(pi_mcp2515, "Bad config parameters prevented setting CNF registers\n");
 		goto err;
 	}
+
+	MCP2515_DEBUG(pi_mcp2515, "Configuring with following parameters:\n");
+	MCP2515_DEBUG(pi_mcp2515, "  - baud_rate_kbps: %d\n", baud_rate_kbps);
+	MCP2515_DEBUG(pi_mcp2515, "  - sjw: 0x%02x\n", sjw);
+	MCP2515_DEBUG(pi_mcp2515, "  - prescaler: 0x%02x\n", prescaler);
+	MCP2515_DEBUG(pi_mcp2515, "  - prseg_tqps: 0x%02x\n", prseg_tqps);
+	MCP2515_DEBUG(pi_mcp2515, "  - phseg_tqps1: 0x%02x\n", phseg_tqps1);
+	MCP2515_DEBUG(pi_mcp2515, "  - phseg_tqps2: 0x%02x\n", phseg_tqps2);
+	MCP2515_DEBUG(pi_mcp2515, "  - sof: %d\n", sof);
+	MCP2515_DEBUG(pi_mcp2515, "  - wakfil: %d\n", wakfil);
+	MCP2515_DEBUG(pi_mcp2515, "  - sam: %d\n", sam);
+	MCP2515_DEBUG(pi_mcp2515, "  - btlmode: %d\n", btlmode);
 
 	cnf1 = ((sjw - 1) << 6) | (prescaler & 0x3f);
 	cnf2 = (((phseg_tqps1 - 1) & 0x07) << 3) | (prseg_tqps & 0x7);
@@ -99,9 +110,13 @@ mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps,
 
 	if ((res = mcp2515_register_write(pi_mcp2515, &cnf1, 1, PI_MCP2515_RGSTR_CNF1)))
 		goto err;
+	MCP2515_DEBUG(pi_mcp2515, "Wrote 0x%02x to CNF1\n", cnf1);
 	if ((res = mcp2515_register_write(pi_mcp2515, &cnf2, 1, PI_MCP2515_RGSTR_CNF2)))
 		goto err;
+	MCP2515_DEBUG(pi_mcp2515, "Wrote 0x%02x to CNF2\n", cnf2);
 	res = mcp2515_register_write(pi_mcp2515, &cnf3, 1, PI_MCP2515_RGSTR_CNF3);
+	if (res)
+		MCP2515_DEBUG(pi_mcp2515, "Wrote 0x%02x to CNF3\n", cnf3);
 
 err:
 	return (res);
@@ -204,7 +219,7 @@ mcp2515_init(pi_mcp2515_t **pi_mcp2515, uint8_t spi_channel, uint8_t tx_pin, uin
 	if ((res = mcp2515_gpio_spi_init(*pi_mcp2515)))
 		goto err;
 
-	UNSET_CS((*pi_mcp2515));
+	CS_HIGH((*pi_mcp2515));
 
 err:
 	return (res);

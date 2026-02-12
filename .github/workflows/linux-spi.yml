@@ -17,6 +17,8 @@ jobs:
       - name: Install dependencies
         run: sudo apt install -y cmake gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libnewlib-arm-none-eabi python3 git tar build-essential
       - uses: actions/checkout@v4
+      - name: Ensure CMake cache is cleared
+        run: rm -f CMakeCache.txt
       - name: Configure CMake
         run: cmake -DUSE_SPI=true -DUSE_AARCH64_LINUX_CC=true -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
       - name: Build
@@ -31,6 +33,8 @@ jobs:
       - name: Create
         run: sudo ln -s /usr/bin/arm-linux-gnueabihf-g++-13 /usr/bin/arm-linux-gnueabihf-g++
       - uses: actions/checkout@v4
+      - name: Ensure CMake cache is cleared
+        run: rm -f CMakeCache.txt
       - name: Configure CMake
         run: cmake -DUSE_SPI=true -DUSE_ARM_LINUX_CC=true -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
       - name: Build

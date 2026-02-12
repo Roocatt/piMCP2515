@@ -13,11 +13,9 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "../include/pi_MCP2515_defs.h"
-#include "pi_MCP2515_handle.h"
-#include "registers.h"
+#include <pi_MCP2515.h>
 
-#include "interrupt.h"
+#include "internal.h"
 
 /**
  * @defgroup piMCP2515_interrupt_functions Interrupt Functions

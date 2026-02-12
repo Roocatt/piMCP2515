@@ -15,20 +15,9 @@
 
 #include <stdint.h>
 
-#include "../include/pi_MCP2515_defs.h"
-#include "registers.h"
+#include <pi_MCP2515.h>
 
-#include "reqop.h"
-
-#include "gpio.h"
-
-#ifdef USE_PICO_LIB
-#include "pico/time.h"
-#define MICRO_SLEEP(x) sleep_us(x)
-#else
-#include <unistd.h>
-#define MICRO_SLEEP(x) usleep(x);
-#endif
+#include "internal.h"
 
 /**
  * @defgroup piMCP2515_reqop_functions REQOP (Operating Mode) Functions
@@ -47,24 +36,24 @@ mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
 	int res;
 	uint8_t instr = PI_MCP2515_INSTR_RESET, blank[14] = { 0 };
 
-	SET_CS(pi_mcp2515);
+	CS_LOW(pi_mcp2515);
 	res = mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instr, 1);
-	UNSET_CS(pi_mcp2515);
+	CS_HIGH(pi_mcp2515);
 
 	if (res)
 		goto err;
 
-	MICRO_SLEEP(mcp2515_osc_time(pi_mcp2515, 128));
+	mcp2515_micro_sleep(mcp2515_osc_time(pi_mcp2515, MCP2515_REQOP_CHANGE_SLEEP_CYCLES));
 
-	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), 0x30)))
+	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_TXB0CTRL)))
 		goto err;
-	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), 0x40)))
+	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_TXB1CTRL)))
 		goto err;
-	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), 0x50)))
+	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_TXB2CTRL)))
 		goto err;
-	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RX0CTRL)))
+	if ((res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RXB0CTRL)))
 		goto err;
-	res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RX1CTRL);
+	res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RXB1CTRL);
 
 	err:
 		return (res);
@@ -89,12 +78,14 @@ mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
  * @return zero if success, otherwise non-zero.
  */
 int
-mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, uint8_t reqop)
+mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, const mcp2515_reqop_t reqop)
 {
 	int res;
 
-	res = mcp2515_register_bitmod(pi_mcp2515, reqop, PI_MCP2515_REQOP_MASK, PI_MCP2515_RGSTR_CANCTRL);
-	MICRO_SLEEP(mcp2515_osc_time(pi_mcp2515, 128));
+	MCP2515_DEBUG(pi_mcp2515, "mcp2515_reqop changing to 0x%02x\n", reqop);
+
+	res = mcp2515_register_bitmod(pi_mcp2515, (uint8_t)reqop, PI_MCP2515_REQOP_MASK, (uint8_t)PI_MCP2515_RGSTR_CANCTRL);
+	mcp2515_micro_sleep(mcp2515_osc_time(pi_mcp2515, MCP2515_REQOP_CHANGE_SLEEP_CYCLES));
 
 	return (res);
 }
@@ -105,12 +96,12 @@ mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, uint8_t reqop)
  * @param pi_mcp2515 the piMCP2515 handle.
  * @return the current operating mode.
  */
-uint8_t
+mcp2515_reqop_t
 mcp2515_reqop_get(pi_mcp2515_t *pi_mcp2515)
 {
 	uint8_t reqop;
 
-	mcp2515_register_read(pi_mcp2515, &reqop, 1, PI_MCP2515_RGSTR_CANSTAT);
+	mcp2515_register_read(pi_mcp2515, &reqop, 1, (uint8_t)PI_MCP2515_RGSTR_CANSTAT);
 
 	return (reqop & PI_MCP2515_REQOP_MASK);
 }

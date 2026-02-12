@@ -1,5 +1,5 @@
-/* Copyright 2025-2026 Roos Catling-Tate
- *
+/* Copyright 2026 Roos Catling-Tate
+*
  * Permission to use, copy, modify, and/or distribute this software for any purpose with or
  * without fee is hereby granted, provided that the above copyright notice and this permission
  * notice appear in all copies.
@@ -13,19 +13,9 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef PIMCP2515_INTERRUPT_H
-#define PIMCP2515_INTERRUPT_H
+#ifndef __PIMCP2515_PIMCP2515_QUICKTEST_H__
+#define __PIMCP2515_PIMCP2515_QUICKTEST_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+#define PRINT_RES(x) printf(#x " has returned: %d\n", x)
 
-uint8_t	mcp2515_interrupts_get(pi_mcp2515_t *);
-uint8_t	mcp2515_interrupts_mask(pi_mcp2515_t *);
-void	mcp2515_interrupts_clear(pi_mcp2515_t *);
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
-#endif /* PIMCP2515_INTERRUPT_H */
+#endif /* __PIMCP2515_PIMCP2515_QUICKTEST_H__ */

@@ -15,12 +15,9 @@
 
 #include <stdbool.h>
 
-#include "pi_MCP2515_handle.h"
-#include "../include/pi_MCP2515_defs.h"
-#include "gpio.h"
-#include "registers.h"
+#include <pi_MCP2515.h>
 
-#include "status_error.h"
+#include "internal.h"
 
 /**
  * @defgroup piMCP2515_error_status_functions Error/Status Functions
@@ -38,11 +35,13 @@ mcp2515_status(pi_mcp2515_t *pi_mcp2515)
 {
 	uint8_t instruction, res;
 
-	SET_CS(pi_mcp2515);
+	CS_LOW(pi_mcp2515);
 	instruction = PI_MCP2515_INSTR_READ_STATUS;
 	mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instruction, 1);
 	mcp2515_gpio_spi_read_blocking(pi_mcp2515, &res, 1);
-	UNSET_CS(pi_mcp2515);
+	CS_HIGH(pi_mcp2515);
+
+	MCP2515_DEBUG(pi_mcp2515, "MCP2515 status 0x%04x\n", res);
 
 	return (res);
 }
