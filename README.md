@@ -77,5 +77,9 @@ pages as well as the same HTML documentation seen on GitHub pages.
 Automated documentation generation is done using Doxygen, which must
 be installed to work.
 
+## Known Issues
+
+ - Sending RTR messages does not appear to work at the moment.
+
 ## Licence
 This project is available under the ISC licence.

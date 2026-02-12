@@ -22,7 +22,7 @@
 
 #include "pimcp2515-quicktest.h"
 
-static int checkpoint = 1;
+static int checkpoint = 0;
 
 static void	banner_print(char *);
 static void
@@ -30,22 +30,22 @@ banner_print(char *str)
 {
 	uint8_t i;
 
-	for (i = 0; i < 50; i++)
+	for (i = 0; i < 100; i++)
 		printf("*");
 	printf("\n");
 	printf(str);
 	printf("\n");
-	for (i = 0; i < 50; i++)
+	for (i = 0; i < 100; i++)
 		printf("*");
 	printf("\n\n");
 }
 
 static void
-set_checkpoint(int c)
+set_checkpoint(int c, char *title)
 {
 	char buf[32] = {0};
 
-	sprintf(buf, "Checkpoint #%d", c);
+	sprintf(buf, "     Checkpoint #%d - %s", c, title);
 
 	checkpoint = c;
 
@@ -73,6 +73,9 @@ main()
 
 	banner_print("Starting Test Run...");
 
+	printf("\n");
+	set_checkpoint(1, "Init, Reset, and REQOP");
+
 	/* Hardcoded stuff because this is just a dev tool. Maybe improve this later, maybe not. */
 	/* This is for the Pico, so returns are always 0 */
 	mcp2515_init(&pi_mcp2515, 0, 19, 16, 18, 17, 10000000, 8);
@@ -94,7 +97,7 @@ main()
 	}
 	printf("\n");
 
-	set_checkpoint(2);
+	set_checkpoint(2, "Set bitrate and LOOPBACK mode");
 
 	mcp2515_bitrate_simplified(pi_mcp2515, 500);
 	printf("mcp2515_bitrate_simplified\n");
@@ -110,11 +113,10 @@ main()
 		goto end;
 	}
 	printf("\n");
-
-	set_checkpoint(3);
-
 	printf("CNF1: 0x%02x\nCNF2: 0x%02x\nCNF3: 0x%02x\n", mcp2515_cnf_get(pi_mcp2515, 1),
 	    mcp2515_cnf_get(pi_mcp2515, 2), mcp2515_cnf_get(pi_mcp2515, 3));
+
+	set_checkpoint(3, "Disable filter and check for messages before begining");
 
 	printf("\n");
 
@@ -129,7 +131,7 @@ main()
 		goto end;
 	}
 
-	set_checkpoint(4);
+	set_checkpoint(4, "Send standard message");
 
 	printf("\n");
 
@@ -150,7 +152,7 @@ main()
 		goto end;
 	}
 
-	set_checkpoint(5);
+	set_checkpoint(5, "Retreive message");
 
 	printf("\n");
 
@@ -169,7 +171,7 @@ main()
 		printf(" 0x%02x", frame.payload[i]);
 	printf("\n\n");
 
-	set_checkpoint(6);
+	set_checkpoint(6, "Check after reading message");
 
 	tmp_bool = mcp2515_can_message_received(pi_mcp2515);
 	printf("Is CAN msg received after already reading? %s\n\n", tmp_bool ? "yes" : "no");
@@ -188,7 +190,7 @@ main()
 	printf("\n");
 
 	/* Repeat for extended ID. */
-	set_checkpoint(7);
+	set_checkpoint(7, "Test send/receive EID message");
 	frame.id = 0x0420420;
 	frame.extended_id = true;
 	frame.dlc = sizeof(frame.payload);
@@ -211,6 +213,46 @@ main()
 	}
 	printf("\n");
 
+	/* Repeat for RTR */
+	set_checkpoint(8, "Test send/receive RTR message");
+	frame.id = 0x00000420;
+	frame.rtr = true;
+	frame.dlc = sizeof(frame.payload);
+	PRINT_RES(mcp2515_can_message_send(pi_mcp2515, &frame));
+
+	printf("\n");
+	mcp2515_status(pi_mcp2515);
+
+	memset(&frame, 0, sizeof(frame));
+	PRINT_RES(mcp2515_can_message_read(pi_mcp2515, &frame));
+	printf("CAN msg retrieved:\n  id:  0x%08lx\n  rtr: %d\n  dlc: 0x%02x\n", frame.id, frame.rtr, frame.dlc);
+	if (frame.id != 0x00000420 || frame.dlc != 8 || !frame.rtr) {
+		printf("Frame or DLC incorrect in received message\n");
+		goto end;
+	}
+	printf("\n");
+
+	/* Repeat for both EID and  RTR */
+	set_checkpoint(9, "Test send/receive RTR and EID message");
+	frame.id = 0x00420420;
+	frame.extended_id = true;
+	frame.rtr = true;
+	frame.dlc = sizeof(frame.payload);
+	PRINT_RES(mcp2515_can_message_send(pi_mcp2515, &frame));
+
+	printf("\n");
+	mcp2515_status(pi_mcp2515);
+
+	memset(&frame, 0, sizeof(frame));
+	PRINT_RES(mcp2515_can_message_read(pi_mcp2515, &frame));
+	printf("CAN msg retrieved:\n  id:  0x%08lx\n  eid: %d\n  rtr: %d\n  dlc: 0x%02x\n", frame.id, frame.extended_id,
+	    frame.rtr, frame.dlc);
+	if (frame.id != 0x0420420 || frame.dlc != 8 || !frame.rtr || !frame.rtr) {
+		printf("Frame or DLC incorrect in received message\n");
+		goto end;
+	}
+	printf("\n");
+
 	checkpoint = 0;
 
 end:
@@ -225,11 +267,17 @@ end:
 		gpio_put(PICO_DEFAULT_LED_PIN, true);
 	} else {
 		for (;;) {
-			for (i = 0; i < checkpoint; i++) {
+			for (i = 0; i < checkpoint / 5; i++) {
 				gpio_put(PICO_DEFAULT_LED_PIN, true);
-				sleep_ms(200);
+				sleep_ms(500);
 				gpio_put(PICO_DEFAULT_LED_PIN, false);
-				sleep_ms(200);
+				sleep_ms(250);
+			}
+			for (i = 0; i < checkpoint % 5; i++) {
+				gpio_put(PICO_DEFAULT_LED_PIN, true);
+				sleep_ms(250);
+				gpio_put(PICO_DEFAULT_LED_PIN, false);
+				sleep_ms(250);
 			}
 			sleep_ms(1000);
 		}
