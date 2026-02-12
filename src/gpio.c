@@ -114,6 +114,8 @@ typedef struct gpio_pin gpio_set_t;
 
 #include "internal.h"
 
+/*! @cond DOXYGEN_IGNORE */
+
 #ifdef USE_SPI
 static int	spi_duplex_com(const pi_mcp2515_t *, char[sizeof(uint64_t)], size_t, char[sizeof(uint64_t)]);
 
@@ -562,3 +564,5 @@ mcp2515_gpio_put(const pi_mcp2515_t *pi_mcp2515, uint8_t pin, uint8_t value)
 
 	return (res);
 }
+
+/*! @endcond */

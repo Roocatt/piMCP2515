@@ -1,9 +1,9 @@
 PROJECT_NAME     = "@PROJECT_NAME@"
 PROJECT_VERSION  = "@PROJECT_VERSION@"
 PROJECT_BRIEF    = "A library for controlling an MCP2515 on the Raspberry Pi and Raspberry Pi Pico"
-INPUT            = "@CMAKE_CURRENT_SOURCE_DIR@/src"
+INPUT            = "@CMAKE_CURRENT_SOURCE_DIR@"
 OUTPUT_DIRECTORY = doxygen/
-FILE_PATTERNS    = pi_MCP2515* can.* filter.* interrupt.* registers.* reqop.* status_error.*
+FILE_PATTERNS    = src/*.c include/*.h
 
 GENERATE_MAN           = YES
 GENERATE_XML           = NO
