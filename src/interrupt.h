@@ -16,6 +16,9 @@
 #ifndef PIMCP2515_INTERRUPT_H
 #define PIMCP2515_INTERRUPT_H
 
+#include <stdint.h>
+#include "pi_MCP2515_handle.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */

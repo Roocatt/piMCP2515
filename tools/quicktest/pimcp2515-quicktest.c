@@ -26,6 +26,10 @@
 
 /* This is not 100% comprehensive for testing functionality, but it does call most functions. Ideally this should be
  * expanded to really cover everything, but this will do for now.
+ *
+ * Currently this is only for the Pico, which means a number of functions (ex `mcp2515_register_bitmod`) will always
+ * return `0`. Logging return code with the `PRINT_RES` macro is still done as it helps view progress through the run
+ * and this will probably be ported to support testing other platforms at some point.
  */
 int
 main()
@@ -33,6 +37,7 @@ main()
 	pi_mcp2515_t *pi_mcp2515;
 	pi_mcp2515_can_frame_t frame;
 	int i;
+	uint32_t id;
 	uint8_t reg_tmp = 0, checkpoint = 1;
 	bool tmp_bool;
 
@@ -83,14 +88,14 @@ main()
 
 	printf("\n");
 
-	PRINT_RES(mcp2515_filter_mask(pi_mcp2515, PI_MCP2515_RGSTR_RXM0SIDH, 0, true));
-	PRINT_RES(mcp2515_filter_mask(pi_mcp2515, PI_MCP2515_RGSTR_RXM1SIDH, 0, true));
-	PRINT_RES(mcp2515_filter(pi_mcp2515, PI_MCP2515_RGSTR_RXF0SIDH, 0, true));
-	PRINT_RES(mcp2515_filter(pi_mcp2515, PI_MCP2515_RGSTR_RXF1SIDH, 0, true));
-	PRINT_RES(mcp2515_filter(pi_mcp2515, PI_MCP2515_RGSTR_RXF2SIDH, 0, true));
-	PRINT_RES(mcp2515_filter(pi_mcp2515, PI_MCP2515_RGSTR_RXF3SIDH, 0, true));
-	PRINT_RES(mcp2515_filter(pi_mcp2515, PI_MCP2515_RGSTR_RXF4SIDH, 0, true));
-	PRINT_RES(mcp2515_filter(pi_mcp2515, PI_MCP2515_RGSTR_RXF5SIDH, 0, true));
+	PRINT_RES(mcp2515_filter_mask(pi_mcp2515, 0, 0, true));
+	PRINT_RES(mcp2515_filter_mask(pi_mcp2515, 1, 0, true));
+	PRINT_RES(mcp2515_filter(pi_mcp2515, 0, 0, true));
+	PRINT_RES(mcp2515_filter(pi_mcp2515, 1, 0, true));
+	PRINT_RES(mcp2515_filter(pi_mcp2515, 2, 0, true));
+	PRINT_RES(mcp2515_filter(pi_mcp2515, 3, 0, true));
+	PRINT_RES(mcp2515_filter(pi_mcp2515, 4, 0, true));
+	PRINT_RES(mcp2515_filter(pi_mcp2515, 5, 0, true));
 
 	printf("\n");
 
@@ -106,10 +111,12 @@ main()
 	printf("\n");
 
 	memset(&frame, 0, sizeof(frame));
-	frame.id = 0x0420;
+	frame.id = 0x00000420;
 	frame.dlc = sizeof(frame.payload);
 	memset(frame.payload, 0x69, sizeof(frame.payload));
 	PRINT_RES(mcp2515_can_message_send(pi_mcp2515, &frame));
+
+	mcp2515_micro_sleep(3);
 
 	printf("\n");
 
@@ -126,9 +133,13 @@ main()
 
 	memset(&frame, 0, sizeof(frame));
 	PRINT_RES(mcp2515_can_message_read(pi_mcp2515, &frame));
-	printf("CAN msg retrieved:\n  id:  %08lx\n  dlc: 0x%02x\n  CAN data:\n   ", frame.id, frame.dlc);
+	printf("CAN msg retrieved:\n  id:  0x%08lx\n  dlc: 0x%02x\n  CAN data:\n   ", frame.id, frame.dlc);
 	if (frame.dlc > CAN_FRAME_PAYLOAD_MAX) {
 		printf("CAN msg received with invalid DLC length!\n");
+		goto end;
+	}
+	if (frame.id != 0x00000420 || frame.dlc != sizeof(frame.payload)) {
+		printf("Frame or DLC incorrect in received message\n");
 		goto end;
 	}
 	for (i = 0; i < frame.dlc; i++)
@@ -147,9 +158,34 @@ main()
 	printf("\n");
 
 	reg_tmp = mcp2515_interrupts_get(pi_mcp2515);
-	printf("interrupt flags: %02x\n", reg_tmp);
+	printf("interrupt flags: 0x%02x\n", reg_tmp);
 	reg_tmp = mcp2515_interrupts_mask(pi_mcp2515);
-	printf("interrupt mask: %02x\n", reg_tmp);
+	printf("interrupt mask: 0x%02x\n", reg_tmp);
+
+	printf("\n");
+
+	/* Repeat for extended ID. */
+	checkpoint = 7;
+	frame.id = 0x00000420 | 0x40000000UL;
+	frame.dlc = sizeof(frame.payload);
+	//memset(frame.payload, 0x69, sizeof(frame.payload));
+	PRINT_RES(mcp2515_can_message_send(pi_mcp2515, &frame));
+
+	printf("\n");
+	mcp2515_status(pi_mcp2515);
+
+	memset(&frame, 0, sizeof(frame));
+	PRINT_RES(mcp2515_can_message_read(pi_mcp2515, &frame));
+	printf("CAN msg retrieved:\n  id:  0x%08lx\n  dlc: 0x%02x\n", frame.id, frame.dlc);
+	if (frame.dlc > CAN_FRAME_PAYLOAD_MAX) {
+		printf("CAN msg received with invalid DLC length!\n");
+		goto end;
+	}
+	if (frame.id != (0x0420420 | PI_MCP2515_FLAG_EFF) || frame.dlc != 0) {
+		printf("Frame or DLC incorrect in received message\n");
+		goto end;
+	}
+	printf("\n");
 
 	checkpoint = 0;
 

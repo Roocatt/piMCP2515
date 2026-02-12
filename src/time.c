@@ -23,7 +23,7 @@
 
 #include "time.h"
 
-inline void
+void
 mcp2515_micro_sleep(uint64_t micro_s)
 {
 #ifdef USE_PICO_LIB
@@ -40,7 +40,7 @@ mcp2515_micro_sleep(uint64_t micro_s)
  * @param num_cycles The number of oscillator cycles to calculate time for.
  * @return The calculated time in microseconds.
  */
-inline uint64_t
+uint64_t
 mcp2515_osc_time(const pi_mcp2515_t *pi_mcp2515, uint32_t num_cycles)
 {
 	uint64_t cycle_len_nano_sec;

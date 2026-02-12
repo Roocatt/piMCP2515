@@ -34,11 +34,14 @@ typedef struct {
 extern "C" {
 #endif /* __cplusplus */
 
+uint32_t	mcp2515_can_id_build(uint32_t, bool);
+
+int	mcp2515_can_clear_txif(pi_mcp2515_t *, uint8_t);
 int	mcp2515_can_message_send(pi_mcp2515_t *, const pi_mcp2515_can_frame_t *);
 int	mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
 bool	mcp2515_can_message_received(pi_mcp2515_t *);
 
-int	mcp2515_rts(pi_mcp2515_t *, uint8_t);
+void	mcp2515_rts(pi_mcp2515_t *, uint8_t);
 
 #ifdef __cplusplus
 }

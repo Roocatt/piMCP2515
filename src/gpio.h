@@ -25,8 +25,8 @@
 
 #include "pi_MCP2515_handle.h"
 
-#define SET_CS(x) mcp2515_gpio_put(x, x->cs_pin, 0)
-#define UNSET_CS(x) mcp2515_gpio_put(x, x->cs_pin, 1)
+#define CS_LOW(x) mcp2515_gpio_put(x, x->cs_pin, 0)
+#define CS_HIGH(x) mcp2515_gpio_put(x, x->cs_pin, 1)
 
 #ifdef __cplusplus
 extern "C" {

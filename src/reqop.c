@@ -41,9 +41,9 @@ mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
 	int res;
 	uint8_t instr = PI_MCP2515_INSTR_RESET, blank[14] = { 0 };
 
-	SET_CS(pi_mcp2515);
+	CS_LOW(pi_mcp2515);
 	res = mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instr, 1);
-	UNSET_CS(pi_mcp2515);
+	CS_HIGH(pi_mcp2515);
 
 	if (res)
 		goto err;
@@ -83,7 +83,7 @@ mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
  * @return zero if success, otherwise non-zero.
  */
 int
-mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, uint8_t reqop)
+mcp2515_reqop(pi_mcp2515_t *pi_mcp2515, mcp2515_reqop_t reqop)
 {
 	int res;
 

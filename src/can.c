@@ -25,12 +25,83 @@
 
 #include "can.h"
 
-static const uint8_t tx_reg_list[][2] = {
-	/* CTRL, INSTR */
-	{ 0x30, PI_MCP2515_INSTR_LOAD_TX0 },
-	{ 0x40, PI_MCP2515_INSTR_LOAD_TX1 },
-	{ 0x50, PI_MCP2515_INSTR_LOAD_TX2 }
+#include <stdio.h>
+
+static const uint8_t tx_reg_list[][3] = {
+	/* CTRL, INSTR, TBxIF CANINTF flag */
+	{ 0x30, PI_MCP2515_INSTR_LOAD_TX0, PI_MCP2515_CANINTF_TX0IF },
+	{ 0x40, PI_MCP2515_INSTR_LOAD_TX1, PI_MCP2515_CANINTF_TX1IF },
+	{ 0x50, PI_MCP2515_INSTR_LOAD_TX2, PI_MCP2515_CANINTF_TX2IF }
 };
+
+/**
+ * @brief Assemble a CAN bus message frame ID.
+ *
+ * @param id the ID to assemble
+ * @param extended_id if it is using an extended ID
+ * @return 4 bytes representing the ID as a uint32_t.
+ */
+uint32_t
+mcp2515_can_id_build(uint32_t id, bool extended_id)
+{
+	uint16_t id_tmp = 0;
+	uint8_t result[4] = {0};
+
+	id = id & (extended_id ? PI_MCP2515_CAN_ID_EFF_MASK : PI_MCP2515_CAN_ID_SFF_MASK);
+
+	id_tmp = (uint16_t)(id & 0x0000FFFF);
+	if (extended_id) {
+		result[3] = (uint8_t)(id_tmp & 0x00FF);
+		result[2] = (uint8_t)(id_tmp >> 8);
+		id_tmp = (uint16_t)(id >> 16);
+		result[1] = (((uint8_t)(id_tmp & 0x03)) + ((uint8_t)((id_tmp & 0x1C) << 3))) | 0x08;
+		result[0] = (uint8_t)(id_tmp >> 5);
+	} else {
+		result[3] = 0;
+		result[2] = 0;
+		result[1] = (uint8_t)((id_tmp & 0x07) << 5);
+		result[0] = (uint8_t)(id_tmp >> 3);
+	}
+
+	return (*((uint32_t *)result));
+}
+
+/**
+ * @brief Clear a TX buffer empty interrupt flag.
+ *
+ * Sending a message will set one of these flags. Use this function to clear it.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param index which TX buffer empty interrupt flag to clear (0-2).
+ * @return zero if success, otherwise non-zero.
+ */
+int
+mcp2515_can_clear_txif(pi_mcp2515_t *pi_mcp2515, const uint8_t index)
+{
+	int res;
+	uint8_t flag;
+
+	switch (index) {
+	case 0:
+		flag = PI_MCP2515_CANINTF_TX0IF;
+		break;
+	case 1:
+		flag = PI_MCP2515_CANINTF_TX1IF;
+		break;
+	case 2:
+		flag = PI_MCP2515_CANINTF_TX2IF;
+		break;
+	default:
+		res = -1;
+		goto end;
+	}
+	MCP2515_DEBUG(pi_mcp2515, "clearing TX%dIF\n", index);
+	CS_LOW(pi_mcp2515);
+	res = mcp2515_register_bitmod(pi_mcp2515, 0, flag, PI_MCP2515_RGSTR_CANINTF);
+	CS_HIGH(pi_mcp2515);
+end:
+	return (res);
+}
 
 /**
  * @defgroup piMCP2515_can_functions CAN Bus Functions
@@ -48,8 +119,8 @@ int
 mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t *can_frame)
 {
 	int res;
-	uint16_t id_tmp;
-	uint8_t payload[13], ctrl, instr, i;
+	uint32_t built_id;
+	uint8_t payload[13], ctrl, instr, canintf, i;
 	bool extended_id, rtr;
 
 	res = -1;
@@ -62,26 +133,19 @@ mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t 
 			extended_id = !!(can_frame->id & PI_MCP2515_FLAG_EFF);
 			rtr = !!(can_frame->id & PI_MCP2515_FLAG_RTR);
 
-			id_tmp = (uint16_t)((can_frame->id & (extended_id ? PI_MCP2515_ID_MASK_EFF
-			    : PI_MCP2515_ID_MASK_SFF)) & 0x0FFFF);
-			if (extended_id) {
-				payload[3] = (uint8_t)(id_tmp & 0xFF);
-				payload[2] = (uint8_t)(id_tmp >> 8);
-				id_tmp = (uint16_t)(id_tmp >> 16);
-				payload[1] = ((uint8_t)(id_tmp & 0x03) + (uint8_t)((id_tmp & 0x1C) << 3)) | 0x08;
-				payload[0] = (uint8_t)(id_tmp >> 5);
-			} else {
-				payload[0] = (uint8_t)(id_tmp >> 3);
-				payload[1] = (uint8_t)((id_tmp & 0x07) << 5);
-				payload[2] = 0;
-				payload[3] = 0;
-			}
+			built_id = mcp2515_can_id_build(can_frame->id, extended_id);
+			*((uint32_t *)payload) = built_id;
 
-			payload[4] = rtr ? (can_frame->dlc | PI_MCP2515_RTR_MASK) : can_frame->dlc;
-			memcpy(&payload[4], can_frame->payload, can_frame->dlc);
+			payload[4] = rtr ? (can_frame->dlc | PI_MCP2515_CAN_DLC_RTR_MASK) : can_frame->dlc;
+			if (!rtr)
+				memcpy(&payload[5], can_frame->payload, can_frame->dlc);
+
 			instr = tx_reg_list[i][1];
+			CS_LOW(pi_mcp2515);
 			mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instr, 1);
-			mcp2515_gpio_spi_write_blocking(pi_mcp2515, payload, can_frame->dlc + 5);
+			mcp2515_gpio_spi_write_blocking(pi_mcp2515, payload, rtr ? 5 : (can_frame->dlc + 5));
+			CS_HIGH(pi_mcp2515);
+
 			res = 0;
 			break;
 		}
@@ -95,6 +159,13 @@ mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t 
 			MCP2515_DEBUG(pi_mcp2515, "TX%dCTRL has errors. Value: 0x%02x\n", ctrl);
 			res = 1;
 		}
+
+		mcp2515_register_read(pi_mcp2515, &canintf, 1, PI_MCP2515_RGSTR_CANINTF);
+		if ((canintf | tx_reg_list[i][2]) == 0) {
+			res = 1;
+			MCP2515_DEBUG(pi_mcp2515, "TXxIF not set after sending.\n");
+		}
+		mcp2515_can_clear_txif(pi_mcp2515, i);
 	} else
 		MCP2515_DEBUG(pi_mcp2515, "no available tx found\n");
 
@@ -113,48 +184,52 @@ mcp2515_can_message_read(pi_mcp2515_t *pi_mcp2515, pi_mcp2515_can_frame_t *can_f
 {
 	uint32_t id;
 	int res;
-	uint8_t buffer[5], status, dlc, ctrl, ctrl_reg, sidh_reg, data_reg, canintf;
+	uint8_t buffer[10], status, dlc, instr;
+	bool rtr, extended_id;
 
 	res = 0;
+	instr = PI_MCP2515_INSTR_RX_STATUS;
 
-	SET_CS(pi_mcp2515);
+	CS_LOW(pi_mcp2515);
 
-	status = mcp2515_status(pi_mcp2515);
-	if (status & PI_MCP2515_STATUS_RX0BF) {
-		ctrl_reg = PI_MCP2515_RGSTR_RX0CTRL;
-		sidh_reg = PI_MCP2515_RGSTR_RX0SIDH;
-		data_reg = PI_MCP2515_RGSTR_RX0DATA;
-		canintf = PI_MCP2515_CANINTF_RX0;
-	} else if (status & PI_MCP2515_STATUS_RX1BF) {
-		ctrl_reg = PI_MCP2515_RGSTR_RX1CTRL;
-		sidh_reg = PI_MCP2515_RGSTR_RX1SIDH;
-		data_reg = PI_MCP2515_RGSTR_RX1DATA;
-		canintf = PI_MCP2515_CANINTF_RX1;
+	mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instr, 1);
+	mcp2515_gpio_spi_read_blocking(pi_mcp2515, &status, 1);
+
+	if (status & PI_MCP2515_RX_STATUS_RCV_RXB0) {
+		instr = PI_MCP2515_INSTR_READ_RX0;
+	} else if (status & PI_MCP2515_RX_STATUS_RCV_RXB1) {
+		instr = PI_MCP2515_INSTR_READ_RX1;
 	} else {
 		res = -1;
 		goto end;
 	}
-	mcp2515_register_read(pi_mcp2515, buffer, 5, sidh_reg);
+	CS_HIGH(pi_mcp2515);
 
-	id = (buffer[0] << 3) | (buffer[1] >> 5);
+	/* The MCP2515 prioritizes RXB0, so if both PI_MCP2515_RX_STATUS_RCV_RXB0 and PI_MCP2515_RX_STATUS_RCV_RXB1 are
+	 * set in status, indicating both buffers used, then the bits of status masked by 0x1f only apply to RXB0. As
+	 * RXB1 is only checked when RXB0 is empty in the above if/else, this does not present a problem.
+	 */
+	extended_id = !!(status & PI_MCP2515_RX_STATUS_EID);
+	rtr = !!(status & PI_MCP2515_RX_STATUS_RTR);
 
-	if (buffer[1] & 0x08) /* Uses expanded ID */
+	CS_LOW(pi_mcp2515);
+	mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instr, 1);
+	mcp2515_gpio_spi_read_blocking(pi_mcp2515, buffer, 5);
+
+	id = ((uint16_t)buffer[0] << 3) | (buffer[1] >> 5);
+	if (extended_id)
 		id = (((((id << 2) + (buffer[1] & 0x03)) << 8) + buffer[2]) << 8) + buffer[3];
-
 	dlc = buffer[4] & 0x0F;
 
-	mcp2515_register_read(pi_mcp2515, &ctrl, 1, ctrl_reg);
-	if (ctrl & PI_MCP2515_CTRL_RTR)
+	if (rtr)
 		id |= PI_MCP2515_FLAG_RTR;
 
 	can_frame->id = id;
 	can_frame->dlc = dlc;
-
-	mcp2515_register_read(pi_mcp2515, can_frame->payload, dlc, data_reg);
-	mcp2515_register_bitmod(pi_mcp2515, 0, canintf, PI_MCP2515_RGSTR_CANINTF);
+	mcp2515_gpio_spi_read_blocking(pi_mcp2515, can_frame->payload, dlc);
 
 end:
-	UNSET_CS(pi_mcp2515);
+	CS_HIGH(pi_mcp2515);
 
 	return (res);
 }
@@ -174,12 +249,12 @@ mcp2515_can_message_received(pi_mcp2515_t *pi_mcp2515)
 }
 /** @} */
 
-int
+void
 mcp2515_rts(pi_mcp2515_t *pi_mcp2515, uint8_t buffer)
 {
-	uint8_t instruction, res = -1;
+	uint8_t instruction;
 
-	SET_CS(pi_mcp2515);
+	CS_LOW(pi_mcp2515);
 	switch (buffer) {
 	case 0:
 		instruction = PI_MCP2515_INSTR_RTS_TX0;
@@ -191,13 +266,9 @@ mcp2515_rts(pi_mcp2515_t *pi_mcp2515, uint8_t buffer)
 		instruction = PI_MCP2515_INSTR_RTS_TX2;
 		break;
 	default:
-		goto end;
+		return;
 	}
 
 	mcp2515_gpio_spi_write_blocking(pi_mcp2515, &instruction, 1);
-	UNSET_CS(pi_mcp2515);
-
-	MCP2515_DEBUG(pi_mcp2515, "MCP2515 RTS %04x\n", res);
-end:
-	return (res);
+	CS_HIGH(pi_mcp2515);
 }

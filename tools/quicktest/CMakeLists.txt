@@ -30,7 +30,7 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(${PROJECT_NAME} pimcp2515-quicktest.c pimcp2515-quicktest.h)
 target_include_directories(${PROJECT_NAME} PRIVATE ../../include)
 target_link_directories(${PROJECT_NAME} PRIVATE ../../)
-target_link_libraries(${PROJECT_NAME} pico_stdlib hardware_spi piMCP2515)
+target_link_libraries(${PROJECT_NAME} pico_stdlib hardware_spi piMCP2515_pico)
 pico_add_extra_outputs(${PROJECT_NAME})
 
 pico_enable_stdio_uart(${PROJECT_NAME} 1)

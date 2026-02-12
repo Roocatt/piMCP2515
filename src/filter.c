@@ -16,38 +16,9 @@
 #include "../include/pi_MCP2515_defs.h"
 #include "pi_MCP2515_handle.h"
 #include "registers.h"
+#include "can.h"
 
 #include "filter.h"
-
-/**
- * @brief Assemble a CAN bus message frame ID.
- *
- * @param id the ID to assemble
- * @param extended_id if it is using an extended ID
- * @return 4 bytes representing the ID as a uint32_t.
- */
-inline static uint32_t
-id_build(uint32_t id, bool extended_id)
-{
-	uint16_t id_tmp = 0;
-	uint8_t result[4] = {0};
-
-	id_tmp = (uint16_t)((id & (extended_id ? PI_MCP2515_ID_MASK_EFF : PI_MCP2515_ID_MASK_SFF)) & 0x0FFFF);
-	if (extended_id) {
-		result[3] = (uint8_t)(id_tmp & 0xFF);
-		result[2] = (uint8_t)(id_tmp >> 8);
-		id_tmp = (uint16_t)(id_tmp >> 16);
-		result[1] = ((uint8_t)(id_tmp & 0x03) + (uint8_t)((id_tmp & 0x1C) << 3)) | 0x08;
-		result[0] = (uint8_t)(id_tmp >> 5);
-	} else {
-		result[0] = (uint8_t)(id_tmp >> 3);
-		result[1] = (uint8_t)((id_tmp & 0x07) << 5);
-		result[2] = 0;
-		result[3] = 0;
-	}
-
-	return (*((uint32_t *)result));
-}
 
 /**
  * @defgroup piMCP2515_filter_functions Filter Functions
@@ -61,27 +32,53 @@ id_build(uint32_t id, bool extended_id)
  * and mcp2515_reqop_get).
  *
  * @param pi_mcp2515 the piMCP2515 handle.
- * @param filter_reg the filter register.
+ * @param filter_index the filter register.
  *                   This may be any of the following:
- *                   - PI_MCP2515_RGSTR_RXF0SIDH
- *                   - PI_MCP2515_RGSTR_RXF1SIDH
- *                   - PI_MCP2515_RGSTR_RXF2SIDH
- *                   - PI_MCP2515_RGSTR_RXF3SIDH
- *                   - PI_MCP2515_RGSTR_RXF4SIDH
- *                   - PI_MCP2515_RGSTR_RXF5SIDH
+ *                   - 0 for PI_MCP2515_RGSTR_RXF0SIDH
+ *                   - 1 for PI_MCP2515_RGSTR_RXF1SIDH
+ *                   - 2 for PI_MCP2515_RGSTR_RXF2SIDH
+ *                   - 3 for PI_MCP2515_RGSTR_RXF3SIDH
+ *                   - 4 for PI_MCP2515_RGSTR_RXF4SIDH
+ *                   - 5 for PI_MCP2515_RGSTR_RXF5SIDH
  * @param id
  * @param extended_id
  * @return zero if success, otherwise non-zero.
  */
 int
-mcp2515_filter(pi_mcp2515_t *pi_mcp2515, uint8_t filter_reg, uint32_t id, bool extended_id)
+mcp2515_filter(pi_mcp2515_t *pi_mcp2515, uint8_t filter_index, uint32_t id, bool extended_id)
 {
 	int res;
 	uint32_t data;
+	uint8_t filter_mask_reg;
 
-	data = id_build(id, extended_id);
-	res = mcp2515_register_write(pi_mcp2515, (uint8_t *)&data, 4, filter_reg);
+	switch (filter_index) {
+	case 0:
+		filter_mask_reg = PI_MCP2515_RGSTR_RXF0SIDH;
+		break;
+	case 1:
+		filter_mask_reg = PI_MCP2515_RGSTR_RXF1SIDH;
+		break;
+	case 2:
+		filter_mask_reg = PI_MCP2515_RGSTR_RXF2SIDH;
+		break;
+	case 3:
+		filter_mask_reg = PI_MCP2515_RGSTR_RXF3SIDH;
+		break;
+	case 4:
+		filter_mask_reg = PI_MCP2515_RGSTR_RXF4SIDH;
+		break;
+	case 5:
+		filter_mask_reg = PI_MCP2515_RGSTR_RXF5SIDH;
+		break;
+	default:
+		res = -1;
+		goto end;
+	}
 
+	data = mcp2515_can_id_build(id, extended_id);
+	res = mcp2515_register_write(pi_mcp2515, (uint8_t *)&data, 4, filter_mask_reg);
+
+end:
 	return (res);
 }
 
@@ -89,21 +86,35 @@ mcp2515_filter(pi_mcp2515_t *pi_mcp2515, uint8_t filter_reg, uint32_t id, bool e
  * @brief Set the filter mask. The MCP2515 must be in config mode to use this (see mcp2515_reqop/mcp2515_reqop_get).
  *
  * @param pi_mcp2515 the piMCP2515 handle.
- * @param filter_mask_reg the filter mask register to use.
- *                        Acceptable values are PI_MCP2515_RGSTR_RXM0SIDH and PI_MCP2515_RGSTR_RXM1SIDH.
+ * @param filter_mask_index the filter mask register to use.
+ *                        Acceptable values are 0 for PI_MCP2515_RGSTR_RXM0SIDH and 1 for PI_MCP2515_RGSTR_RXM1SIDH.
  * @param id_mask the ID mask to use.
  * @param extended_id if the ID is extended.
  * @return zero if success, otherwise non-zero.
  */
 int
-mcp2515_filter_mask(pi_mcp2515_t *pi_mcp2515, uint8_t filter_mask_reg, uint32_t id_mask, bool extended_id)
+mcp2515_filter_mask(pi_mcp2515_t *pi_mcp2515, uint8_t filter_mask_index, uint32_t id_mask, bool extended_id)
 {
 	int res;
 	uint32_t data;
+	uint8_t filter_mask_reg;
 
-	data = id_build(id_mask, extended_id);
+	switch (filter_mask_index) {
+	case 0:
+		filter_mask_reg = PI_MCP2515_RGSTR_RXM0SIDH;
+		break;
+	case 1:
+		filter_mask_reg = PI_MCP2515_RGSTR_RXM1SIDH;
+		break;
+	default:
+		res = -1;
+		goto end;
+	}
+
+	data = mcp2515_can_id_build(id_mask, extended_id);
 	res = mcp2515_register_write(pi_mcp2515, (uint8_t *)&data, 4, filter_mask_reg);
 
+end:
 	return (res);
 }
 /** @} */

@@ -27,6 +27,7 @@ static void	mcp2515_debug_default_callback(char *, va_list);
 static void
 mcp2515_debug_default_callback(char *msg, va_list args)
 {
+	printf("libpiMCP2515: ");
 	vprintf(msg, args);
 }
 

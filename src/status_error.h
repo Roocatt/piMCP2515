@@ -16,6 +16,8 @@
 #ifndef PIMCP2515_STATUS_ERROR_H
 #define PIMCP2515_STATUS_ERROR_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */

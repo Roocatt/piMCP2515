@@ -204,7 +204,7 @@ mcp2515_init(pi_mcp2515_t **pi_mcp2515, uint8_t spi_channel, uint8_t tx_pin, uin
 	if ((res = mcp2515_gpio_spi_init(*pi_mcp2515)))
 		goto err;
 
-	UNSET_CS((*pi_mcp2515));
+	CS_HIGH((*pi_mcp2515));
 
 err:
 	return (res);

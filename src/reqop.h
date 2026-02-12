@@ -24,9 +24,9 @@
 extern "C" {
 #endif /* __cplusplus */
 
-int	mcp2515_reset(pi_mcp2515_t *);
-int	mcp2515_reqop(pi_mcp2515_t *, uint8_t);
-uint8_t	mcp2515_reqop_get(pi_mcp2515_t *);
+int		mcp2515_reset(pi_mcp2515_t *);
+int		mcp2515_reqop(pi_mcp2515_t *, mcp2515_reqop_t);
+mcp2515_reqop_t	mcp2515_reqop_get(pi_mcp2515_t *);
 
 #ifdef __cplusplus
 }
