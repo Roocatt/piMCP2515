@@ -132,11 +132,11 @@ static int	spi_duplex_com(const pi_mcp2515_t *, char[sizeof(uint64_t)], size_t, 
  */
 static int
 spi_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t)], /* NOLINT(*-non-const-parameter) */
-    size_t tx_len, char rx_buffer[sizeof(uint64_t)]) /* NOLINT(*-non-const-parameter) */
+    size_t len, char rx_buffer[sizeof(uint64_t)]) /* NOLINT(*-non-const-parameter) */
 {
 	int res = 0;
 
-	if (tx_len > sizeof(uint64_t)) {
+	if (len > sizeof(uint64_t)) {
 		res = -1;
 		goto err;
 	}
@@ -154,9 +154,9 @@ spi_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t)],
 #elif defined(USE_SPI_BSD)
 	spi_ioctl_transfer_t tr = {
 		.sit_send = tx_buffer,
-		.sit_sendlen = tx_len,
+		.sit_sendlen = len,
 		.sit_recv = rx_buffer,
-		.sit_recvlen = sizeof(uint64_t),
+		.sit_recvlen = len,
 		/* .sit_addr ? */
 	};
 
@@ -165,9 +165,9 @@ spi_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t)],
 	struct spigen_transfer transfer =  { 0 };
 
 	transfer.st_command.iov_base = tx_buffer;
-	transfer.st_command.iov_len = tx_len;
+	transfer.st_command.iov_len = len;
 	transfer.st_data.iov_base = rx_buffer;
-	transfer.st_data.iov_len = sizeof(uint64_t);
+	transfer.st_data.iov_len = len;
 
 	res = ioctl(pi_mcp2515->gpio_spidev_fd, SPIGENIOC_TRANSFER, &transfer);
 #endif
@@ -492,20 +492,20 @@ mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t
 #ifdef USE_PICO_LIB
 	spi_write_blocking(pi_mcp2515->gpio_spi_inst, data, len);
 #elif defined(USE_SPI)
-	/* TODO incomplete */
 	size_t chunk_len;
 	int tail_len;
-	char tx_buffer[sizeof(uint64_t)] = { 0 }, rx_buffer[sizeof(tx_buffer)] = { 0 };
+	uint8_t i;
+	char tx_buffer[sizeof(uint64_t)] = { 0 }, rx_buffer[sizeof(uint64_t)] = { 0 };
 
-	for (uint8_t i = 0; i < len; i += sizeof(uint64_t)) {
+	for (i = 0; i < len; i += sizeof(uint64_t)) {
 		if (len - i > sizeof(uint64_t)) {
-			memcpy(&tx_buffer, &data[i], sizeof(tx_buffer));
+			memcpy(&tx_buffer, &data[i], sizeof(uint64_t));
 			chunk_len = sizeof(uint64_t);
 		} else {
 			tail_len = len - i;
 			memcpy(&tx_buffer, &data[i], tail_len);
-			memset(&tx_buffer[tail_len], 0, sizeof(tx_buffer) - tail_len);
-			chunk_len = sizeof(tx_buffer) - tail_len;
+			memset(&tx_buffer[tail_len], 0, sizeof(uint64_t) - tail_len);
+			chunk_len = sizeof(uint64_t) - tail_len;
 		}
 
 		if ((res = spi_duplex_com(pi_mcp2515, tx_buffer, chunk_len, rx_buffer)))
@@ -525,13 +525,18 @@ mcp2515_gpio_spi_read_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t 
 	/* Note: For now, repeated_tx_data is not used anywhere in the library so we just skip it. */
 	spi_read_blocking(pi_mcp2515->gpio_spi_inst, 0x00, data, len);
 #elif defined(USE_SPI)
-	/* TODO incomplete */
-	char tx_buffer[sizeof(uint64_t)] = { 0 }, rx_buffer[sizeof(tx_buffer)] = { 0 };
+	uint8_t chunk_len, i;
+	char tx_buffer[sizeof(uint64_t)], rx_buffer[sizeof(uint64_t)] = { 0 };
 
-	for (uint8_t i = 0; i < len; i += sizeof(uint64_t)) {
-		if ((res = spi_duplex_com(pi_mcp2515, tx_buffer, 0, rx_buffer)))
+	memset(tx_buffer, 0xff, sizeof(tx_buffer));
+
+	for (i = 0; i < len; i += sizeof(uint64_t)) {
+		chunk_len = len - i > sizeof(uint64_t) ? sizeof(uint64_t) : len - i;
+
+		if ((res = spi_duplex_com(pi_mcp2515, tx_buffer, chunk_len, rx_buffer)))
 			goto err;
-		memcpy(&data[i], &rx_buffer, len - i > sizeof(uint64_t) ? sizeof(rx_buffer) : len - i);
+
+		memcpy(&data[i], &rx_buffer, chunk_len);
 	}
 #endif
 
