@@ -257,6 +257,31 @@ mcp2515_can_message_received(pi_mcp2515_t *pi_mcp2515)
 {
 	return (!!(mcp2515_status(pi_mcp2515) & (PI_MCP2515_STATUS_RX0BF | PI_MCP2515_STATUS_RX0BF)));
 }
+
+/**
+ * @brief Check if there is a CAN bus message received in a specific buffer.
+ *
+ * The message can then be read with `mcp2515_can_message_read`.
+ *
+ * @param pi_mcp2515 the piMCP2515 handle.
+ * @param rxb The RX buffer to check for a message in.
+ * @return true if a message is received in the RX buffer requested for.
+ */
+bool
+mcp2515_can_message_received_rxb(pi_mcp2515_t *pi_mcp2515, const mcp2515_rxb_t rxb)
+{
+	uint8_t status;
+	bool res = false;
+
+	status = mcp2515_status(pi_mcp2515);
+
+	if (rxb == PI_MCP2515_RXB0)
+		res = !!(status & PI_MCP2515_STATUS_RX0BF);
+	else if (rxb == PI_MCP2515_RXB1)
+		res = !!(status & PI_MCP2515_STATUS_RX1BF);
+
+	return (res);
+}
 /** @} */
 
 void

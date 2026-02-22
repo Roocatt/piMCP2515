@@ -27,6 +27,8 @@
 /**
  * @brief Issue a reset command to the MCP2515 via the SPI interface.
  *
+ * It is important to note that the reset command will automatically put the MCP2515 in config mode.
+ *
  * @param pi_mcp2515 the piMCP2515 handle.
  * @return zero if success, otherwise non-zero.
  */
@@ -55,8 +57,8 @@ mcp2515_reset(pi_mcp2515_t *pi_mcp2515)
 		goto err;
 	res = mcp2515_register_write(pi_mcp2515, blank, sizeof(blank), PI_MCP2515_RGSTR_RXB1CTRL);
 
-	err:
-		return (res);
+err:
+	return (res);
 }
 
 /**

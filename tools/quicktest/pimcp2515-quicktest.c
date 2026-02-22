@@ -101,7 +101,7 @@ main()
 
 	set_checkpoint(2, "Set bitrate and LOOPBACK mode");
 
-	mcp2515_bitrate_simplified(pi_mcp2515, 500);
+	mcp2515_bitrate_full_optional(pi_mcp2515, 500, 2, 0, 2, 2, 3, false, false, false, true);
 	printf("mcp2515_bitrate_simplified\n");
 
 	printf("\n");
@@ -193,7 +193,7 @@ main()
 
 	/* Repeat for extended ID. */
 	set_checkpoint(7, "Test send/receive EID message");
-	frame.id = 0x0420420;
+	frame.id = 0x00420420;
 	frame.extended_id = true;
 	frame.dlc = sizeof(frame.payload);
 	memset(frame.payload, 0x69, sizeof(frame.payload));

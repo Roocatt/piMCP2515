@@ -60,7 +60,7 @@ add_library(piMCP2515_objects OBJECT ${LIB_SOURCES})
 set_target_properties(piMCP2515_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(piMCP2515_objects PUBLIC include)
 add_library(piMCP2515_static STATIC $<TARGET_OBJECTS:piMCP2515_objects>)
-add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+add_compile_options(-Wall -Wextra -Werror)
 
 if (USE_PICO_LIB)
     target_compile_definitions(piMCP2515_objects PRIVATE USE_PICO_LIB=1)
@@ -76,6 +76,8 @@ else ()
     install(TARGETS piMCP2515_static ARCHIVE DESTINATION lib)
     install(FILES include/pi_MCP2515.h include/pi_MCP2515_defs.h DESTINATION include)
 endif ()
+
+add_subdirectory(examples)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)

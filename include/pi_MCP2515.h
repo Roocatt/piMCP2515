@@ -238,6 +238,7 @@ int		mcp2515_can_message_send(pi_mcp2515_t *, const pi_mcp2515_can_frame_t *);
 int		mcp2515_can_message_read(pi_mcp2515_t *, pi_mcp2515_can_frame_t *);
 int		mcp2515_can_message_read_rxb(pi_mcp2515_t *, mcp2515_rxb_t, pi_mcp2515_can_frame_t *);
 bool		mcp2515_can_message_received(pi_mcp2515_t *);
+bool		mcp2515_can_message_received_rxb(pi_mcp2515_t *, mcp2515_rxb_t);
 void		mcp2515_rts(pi_mcp2515_t *, uint8_t);
 
 uint8_t		mcp2515_interrupts_get(pi_mcp2515_t *);
