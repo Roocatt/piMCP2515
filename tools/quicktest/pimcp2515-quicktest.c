@@ -40,10 +40,12 @@ banner_print(char *str)
 	printf("\n\n");
 }
 
+static void	set_checkpoint(int, char *);
+
 static void
 set_checkpoint(int c, char *title)
 {
-	char buf[32] = {0};
+	char buf[128] = {0};
 
 	sprintf(buf, "     Checkpoint #%d - %s", c, title);
 

@@ -115,8 +115,7 @@ mcp2515_bitrate_full_optional(pi_mcp2515_t *pi_mcp2515, uint16_t baud_rate_kbps,
 		goto err;
 	MCP2515_DEBUG(pi_mcp2515, "Wrote 0x%02x to CNF2\n", cnf2);
 	res = mcp2515_register_write(pi_mcp2515, &cnf3, 1, PI_MCP2515_RGSTR_CNF3);
-	if (res)
-		MCP2515_DEBUG(pi_mcp2515, "Wrote 0x%02x to CNF3\n", cnf3);
+	MCP2515_DEBUG(pi_mcp2515, "Wrote 0x%02x to CNF3\n", cnf3);
 
 err:
 	return (res);
