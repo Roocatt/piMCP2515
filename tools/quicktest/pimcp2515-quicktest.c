@@ -66,7 +66,7 @@ main()
 {
 	pi_mcp2515_t *pi_mcp2515;
 	pi_mcp2515_can_frame_t frame;
-	int i;
+	int i, res;
 	uint32_t id;
 	uint8_t reg_tmp = 0;
 	bool tmp_bool;
@@ -197,10 +197,16 @@ main()
 	frame.extended_id = true;
 	frame.dlc = sizeof(frame.payload);
 	memset(frame.payload, 0x69, sizeof(frame.payload));
-	PRINT_RES(mcp2515_can_message_send(pi_mcp2515, &frame));
+	PRINT_RES((res = mcp2515_can_message_send(pi_mcp2515, &frame)));
+
+	mcp2515_status(pi_mcp2515);
+
+	if (res != 0) {
+		printf("Failed to send\n");
+		goto end;
+	}
 
 	printf("\n");
-	mcp2515_status(pi_mcp2515);
 
 	memset(&frame, 0, sizeof(frame));
 	PRINT_RES(mcp2515_can_message_read(pi_mcp2515, &frame));
@@ -220,10 +226,16 @@ main()
 	frame.id = 0x00000420;
 	frame.rtr = true;
 	frame.dlc = sizeof(frame.payload);
-	PRINT_RES(mcp2515_can_message_send(pi_mcp2515, &frame));
+	PRINT_RES((res = mcp2515_can_message_send(pi_mcp2515, &frame)));
+
+	mcp2515_status(pi_mcp2515);
+
+	if (res != 0) {
+		printf("Failed to send\n");
+		goto end;
+	}
 
 	printf("\n");
-	mcp2515_status(pi_mcp2515);
 
 	memset(&frame, 0, sizeof(frame));
 	PRINT_RES(mcp2515_can_message_read(pi_mcp2515, &frame));
@@ -240,10 +252,16 @@ main()
 	frame.extended_id = true;
 	frame.rtr = true;
 	frame.dlc = sizeof(frame.payload);
-	PRINT_RES(mcp2515_can_message_send(pi_mcp2515, &frame));
+	PRINT_RES((res = mcp2515_can_message_send(pi_mcp2515, &frame)));
+
+	mcp2515_status(pi_mcp2515);
+
+	if (res != 0) {
+		printf("Failed to send\n");
+		goto end;
+	}
 
 	printf("\n");
-	mcp2515_status(pi_mcp2515);
 
 	memset(&frame, 0, sizeof(frame));
 	PRINT_RES(mcp2515_can_message_read(pi_mcp2515, &frame));
@@ -271,10 +289,11 @@ end:
 		for (;;) {
 			for (i = 0; i < checkpoint / 5; i++) {
 				gpio_put(PICO_DEFAULT_LED_PIN, true);
-				sleep_ms(500);
+				sleep_ms(1000);
 				gpio_put(PICO_DEFAULT_LED_PIN, false);
 				sleep_ms(250);
 			}
+			sleep_ms(250);
 			for (i = 0; i < checkpoint % 5; i++) {
 				gpio_put(PICO_DEFAULT_LED_PIN, true);
 				sleep_ms(250);

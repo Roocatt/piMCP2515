@@ -113,7 +113,7 @@ mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t 
 {
 	int res;
 	uint32_t built_id;
-	uint8_t payload[13], ctrl, instr, canintf, i;
+	uint8_t payload[13], ctrl = 0, instr = 0, canintf = 0, i;
 
 	res = -1;
 
@@ -143,6 +143,14 @@ mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t 
 	if (res != -1) {
 		mcp2515_rts(pi_mcp2515, i);
 
+		/* TODO Determine if/how much delay is needed in all scenarios (ex. 500 vs 1000 CAN speed)
+		 *
+		 * At 500kbps CAN speed w/8Mhz osc, and 10_000_000 SPI clock, 500 is not long enough.
+		 */
+		/* Sleep to ensure send is complete and to check TXxIF is set after send if all is well.
+		 */
+		mcp2515_micro_sleep(750);
+
 		/* Check status again for errors */
 		mcp2515_register_read(pi_mcp2515, &ctrl, 1, tx_reg_list[i][0]);
 		if (ctrl & (PI_MCP2515_CTRL_TXERR | PI_MCP2515_CTRL_MLOA | PI_MCP2515_CTRL_ABTF)) {
@@ -154,11 +162,13 @@ mcp2515_can_message_send(pi_mcp2515_t *pi_mcp2515, const pi_mcp2515_can_frame_t 
 		if ((canintf & tx_reg_list[i][2]) == 0) {
 			res = 1;
 			MCP2515_DEBUG(pi_mcp2515, "TXxIF not set after sending.\n");
+			goto end;
 		}
 		mcp2515_can_clear_txif(pi_mcp2515, i);
 	} else
 		MCP2515_DEBUG(pi_mcp2515, "no available tx found\n");
 
+end:
 	return (res);
 }
 
@@ -217,12 +227,14 @@ mcp2515_can_message_read_rxb(pi_mcp2515_t *pi_mcp2515, mcp2515_rxb_t rxb, pi_mcp
 		id = (((((id << 2) + (buffer[1] & 0x03)) << 8) + buffer[2]) << 8) + buffer[3];
 		can_frame->extended_id = true;
 	}
-	dlc = buffer[4] & PI_MCP2515_CAN_DLC_RTR_MASK;
+	dlc = buffer[4];
 
 	can_frame->id = id;
-	can_frame->dlc = dlc;
+	can_frame->dlc = dlc & PI_MCP2515_CAN_DLC_RTR_MASK;
+	can_frame->rtr = !!(dlc & PI_MCP2515_CAN_DLC_RTR_FLAG);
+
 	if (!(status & PI_MCP2515_RXBSIDL_SRR)) {
-		mcp2515_gpio_spi_read_blocking(pi_mcp2515, can_frame->payload, dlc);
+		mcp2515_gpio_spi_read_blocking(pi_mcp2515, can_frame->payload, can_frame->dlc);
 		can_frame->rtr = true;
 	}
 

@@ -32,7 +32,7 @@
  * @return zero if success, otherwise non-zero.
  */
 int
-mcp2515_register_read(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t len, mcp2515_rgstr_t rgstr)
+mcp2515_register_read(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t len, const mcp2515_rgstr_t rgstr)
 {
 	int res;
 	uint8_t message[2];
@@ -61,7 +61,7 @@ err:
  * @return zero if success, otherwise non-zero.
  */
 int
-mcp2515_register_write(pi_mcp2515_t *pi_mcp2515, uint8_t values[], uint8_t len, mcp2515_rgstr_t rgstr)
+mcp2515_register_write(pi_mcp2515_t *pi_mcp2515, uint8_t values[], const uint8_t len, const mcp2515_rgstr_t rgstr)
 {
 	int res;
 	uint8_t message[2];

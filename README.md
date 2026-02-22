@@ -79,7 +79,7 @@ be installed to work.
 
 ## Known Issues
 
- - Sending RTR messages does not appear to work at the moment.
+None at the moment! 🙆‍♀️
 
 ## Licence
 This project is available under the ISC licence.
