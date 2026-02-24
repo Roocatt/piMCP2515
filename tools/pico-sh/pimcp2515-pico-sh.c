@@ -105,7 +105,7 @@ main(void)
 			} else if (strncmp(command + CMD_CAN_LEN, CMD_CAN_READ, CMD_CAN_READ_LEN)) {
 				memset(&frame, 0, sizeof(frame));
 				PRINT_RES(mcp2515_can_message_read(pi_mcp2515, &frame));
-				printf("got frame:\n  id:  %02x\n  dlc: %02x\n", frame.id);
+				printf("got frame:\n  id:  %02x\n  dlc: %02x\n", frame.id, frame.dlc);
 			} else
 				BAD_CMD_PRINT(command);
 		} else if (strncmp(command, CMD_STATUS, CMD_STATUS_LEN)) {

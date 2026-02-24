@@ -12,7 +12,8 @@ env:
 jobs:
   build-with-linux-spi-aarch64:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
     steps:
       - name: Install dependencies
         run: sudo apt install -y cmake gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libnewlib-arm-none-eabi python3 git tar build-essential
@@ -26,7 +27,8 @@ jobs:
 
   build-with-linux-spi-arm:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
     steps:
       - name: Install dependencies
         run: sudo apt install -y cmake gcc-arm-linux-gnueabihf g++-13-arm-linux-gnueabihf libnewlib-arm-none-eabi python3 git tar build-essential

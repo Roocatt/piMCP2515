@@ -12,7 +12,8 @@ env:
 jobs:
   build-with-pico-sdk:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
     steps:
     - name: Install dependencies
       run: sudo apt install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi python3 git tar build-essential
