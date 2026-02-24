@@ -67,6 +67,7 @@ if (USE_PICO_LIB)
     target_link_libraries(piMCP2515_objects pico_stdlib hardware_spi) # Fixes include issue
     set_target_properties(piMCP2515_static PROPERTIES OUTPUT_NAME "piMCP2515_pico")
     target_link_libraries(piMCP2515_static pico_stdlib hardware_spi)
+    add_subdirectory(examples)
 else ()
     set_target_properties(piMCP2515_static PROPERTIES OUTPUT_NAME "piMCP2515")
     add_library(piMCP2515_shared SHARED $<TARGET_OBJECTS:piMCP2515_objects>)
@@ -76,8 +77,6 @@ else ()
     install(TARGETS piMCP2515_static ARCHIVE DESTINATION lib)
     install(FILES include/pi_MCP2515.h include/pi_MCP2515_defs.h DESTINATION include)
 endif ()
-
-add_subdirectory(examples)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)

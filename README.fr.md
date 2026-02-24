@@ -44,6 +44,11 @@ changez la configuration dans `Doxyfile.in`, il est possible de générer
 quelque chose d'autre pour la documentation. Pour générer la
 documentation automatiquement, Doxygen doit être installé.
 
+## Exemples
+
+Il y a plusieurs exemples dans le répertoire d'`examples`. C'est un
+bon point à commencer avec cette bibliothèque.
+
 ## License
 
 Ce projet est sous licence ISC.

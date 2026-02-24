@@ -49,7 +49,7 @@ reading the code as many are intended slightly more as personal notes.
     - [ ] Compiling/Setup
     - [ ] Quickstart guide
     - [ ] General Tutorials
-  - [ ] Examples
+  - [x] Examples
   - [x] Doxygen API docs
 
 ## Supported Platforms
@@ -76,6 +76,11 @@ There is automatically generated API documentation available on
 pages as well as the same HTML documentation seen on GitHub pages.
 Automated documentation generation is done using Doxygen, which must
 be installed to work.
+
+## Examples
+
+There are several examples with detailed comments in the `examples`
+directory. This is a great place to start with this library.
 
 ## Known Issues
 

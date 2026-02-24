@@ -43,6 +43,11 @@ man-sidor men om man ändrar `Doxyfile.in` kan det genereras flera andra
 format som man vill. För att detta ska fungera måste Doxygen
 installeras.
 
+## Exempel
+
+Det finns flera exempel i katalogen `examples`. Den här är ett bra
+ställe för att börja med det här biblioteket.
+
 ## Licens
 
 Det här projektet är tillgängligt under ISC-licensen.
