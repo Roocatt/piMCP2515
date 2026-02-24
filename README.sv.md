@@ -2,6 +2,7 @@
 
 [![Pico SDK Build](https://github.com/Roocatt/piMCP2515/actions/workflows/pico-sdk.yml/badge.svg)](https://github.com/Roocatt/piMCP2515/actions/workflows/pico-sdk.yml)
 [![Linux SPI Build](https://github.com/Roocatt/piMCP2515/actions/workflows/linux-spi.yml/badge.svg)](https://github.com/Roocatt/piMCP2515/actions/workflows/linux-spi.yml)
+[![CodeQL](https://github.com/Roocatt/piMCP2515/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Roocatt/piMCP2515/actions/workflows/github-code-scanning/codeql)
 ![GitHub Licence](https://img.shields.io/github/license/Roocatt/piMCP2515?label=licence)
 
 <a href="README.md">🇬🇧 English</a> |
