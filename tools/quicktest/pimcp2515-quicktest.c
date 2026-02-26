@@ -267,7 +267,7 @@ main()
 	PRINT_RES(mcp2515_can_message_read(pi_mcp2515, &frame));
 	printf("CAN msg retrieved:\n  id:  0x%08lx\n  eid: %d\n  rtr: %d\n  dlc: 0x%02x\n", frame.id, frame.extended_id,
 	    frame.rtr, frame.dlc);
-	if (frame.id != 0x0420420 || frame.dlc != 8 || !frame.rtr || !frame.rtr) {
+	if (frame.id != 0x0420420 || frame.dlc != 8 || !frame.extended_id || !frame.rtr) {
 		printf("Frame or DLC incorrect in received message\n");
 		goto end;
 	}
