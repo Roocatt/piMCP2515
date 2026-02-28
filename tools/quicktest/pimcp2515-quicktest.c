@@ -16,7 +16,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef USE_PICO_LIB
 #include "pico/stdlib.h"
+#endif
 
 #include <pi_MCP2515.h>
 
@@ -280,6 +282,7 @@ end:
 	    mcp2515_status(pi_mcp2515), mcp2515_error_flags(pi_mcp2515), mcp2515_error_tx_count(pi_mcp2515),
 	    mcp2515_error_rx_count(pi_mcp2515));
 
+#ifdef USE_PICO_LIB
 	gpio_init(PICO_DEFAULT_LED_PIN);
 	gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 	
@@ -303,6 +306,7 @@ end:
 			sleep_ms(1000);
 		}
 	}
+#endif
 
 	return (0);
 }
