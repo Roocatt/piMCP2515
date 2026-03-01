@@ -73,7 +73,9 @@ main()
 	uint8_t reg_tmp = 0;
 	bool tmp_bool;
 
+#ifdef USE_PICO_LIB
 	stdio_init_all();
+#endif
 
 	banner_print("Starting Test Run...");
 
@@ -86,7 +88,7 @@ main()
 	mcp2515_debug_enable(pi_mcp2515, NULL);
 	printf("mcp2515_init\n");
 	PRINT_RES(mcp2515_reset(pi_mcp2515));
-	sleep_us(mcp2515_osc_time(pi_mcp2515, 128) + 30);
+	mcp2515_micro_sleep(mcp2515_osc_time(pi_mcp2515, 128) + 30);
 
 	printf("\n");
 
