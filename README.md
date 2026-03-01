@@ -34,7 +34,7 @@ reading the code as many are intended slightly more as personal notes.
   - [ ] Regular Raspberry Pi devices
     - [ ] With Linux
       - [x] Feature Complete (Compiles)
-      - [ ] Run on Device
+      - [x] Run on Device
       - [ ] Tested
     - [ ] With FreeBSD
         - [x] Feature Complete (Compiles)
