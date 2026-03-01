@@ -42,7 +42,7 @@ reading the code as many are intended slightly more as personal notes.
         - [ ] Tested
     - [ ] With NetBSD
         - [x] Feature Complete (Compiles)
-        - [ ] Run on Device
+        - [x] Run on Device
         - [ ] Tested
 - [ ] Unit testing
 - [x] Easy cross-compiling
