@@ -178,10 +178,10 @@ err:
 
 
 static char *spi_dev_defaults[] = {
-	"/dev/spiN",
-	"/dev/spi0.N",
-	"/dev/spidevN",
-	"/dev/spidev0.N",
+	"/dev/spi",
+	"/dev/spi0.",
+	"/dev/spidev",
+	"/dev/spidev0.",
 #ifdef USE_SPIGEN_BSD
 	"/dev/spigenN" /* Only bother checking this if using spigen */
 #endif
@@ -193,9 +193,10 @@ static char *gpio_dev_defaults[] = {
 };
 
 
-static char	*find_spi_dev_path(uint8_t);
+static int	find_spi_dev_path(uint8_t, char[32]);
 static char	*find_gpio_dev_path(void);
 
+#define SPI_PATH_BUFF_LEN 32
 
 /**
  * @brief Find a spi device in /dev.
@@ -206,18 +207,20 @@ static char	*find_gpio_dev_path(void);
  * @param spi_channel the spi channel.
  * @return the path found or NULL if not found.
  */
-static char *
-find_spi_dev_path(const uint8_t spi_channel)
+static int
+find_spi_dev_path(const uint8_t spi_channel, char res_buff[SPI_PATH_BUFF_LEN])
 {
 	struct stat s;
 	size_t i;
-	char *cur_path = NULL, *res = NULL;
+	int res = 1;
+	char *cur_path = NULL, buff[SPI_PATH_BUFF_LEN];
 
 	for (i = 0; i < sizeof(spi_dev_defaults) / sizeof(spi_dev_defaults[0]); i++) {
 		cur_path = spi_dev_defaults[i];
-		cur_path[strlen(cur_path) - 1] = spi_channel == 0 ? '0' : '1';
-		if (stat(cur_path, &s) != 0) {
-			res = cur_path;
+		snprintf(buff, sizeof(buff), "%s%c", cur_path, spi_channel == 0 ? '0' : '1');
+		if (stat(buff, &s) != 0) {
+			res = 0;
+			strncpy(res_buff, buff, SPI_PATH_BUFF_LEN);
 			goto end;
 		}
 	}
@@ -374,16 +377,16 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 	spi_ioctl_configure_t spi_cfg = { 0 };
 #endif
 	int spidev_fd, gpio_fd;
-	char *spidev_path, *gpiodev_path;
+	char spidev_path[SPI_PATH_BUFF_LEN], *gpiodev_path;
 
 	if (pi_mcp2515->gpio_dev_spi_path == NULL) {
-		spidev_path = find_spi_dev_path(pi_mcp2515->spi_channel);
+		if (find_spi_dev_path(pi_mcp2515->spi_channel, spidev_path)) {
+			res = -1;
+			goto err;
+		}
 	} else
-		spidev_path = pi_mcp2515->gpio_dev_spi_path;
-	if (spidev_path == NULL) {
-		res = -1;
-		goto err;
-	}
+		strncpy(spidev_path, pi_mcp2515->gpio_dev_spi_path, SPI_PATH_BUFF_LEN);
+
 	if (pi_mcp2515->gpio_dev_gpio_path == NULL) {
 		gpiodev_path = find_gpio_dev_path();
 	} else
