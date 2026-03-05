@@ -127,7 +127,7 @@ static int	spi_duplex_com(const pi_mcp2515_t *, char[sizeof(uint64_t)], size_t, 
  *
  * @param pi_mcp2515 the piMCP2515 handle.
  * @param tx_buffer the buffer to use for transmitting.
- * @param tx_len the length of the tx data.
+ * @param len the length of the data to exchange.
  * @param rx_buffer the buffer to use for receiving.
  * @return zero if success, otherwise non-zero.
  */
@@ -143,9 +143,9 @@ spi_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t)],
 	}
 #if defined(USE_SPIDEV_LINUX)
 	struct spi_ioc_transfer tr = {
-		.tx_buf = *(uint64_t *)tx_buffer,
-		.rx_buf = *(uint64_t *)rx_buffer,
-		.len = sizeof(uint64_t),
+		.tx_buf = (uint64_t)(uint64_t *)tx_buffer,
+		.rx_buf = (uint64_t)(uint64_t *)rx_buffer,
+		.len = len,
 		.delay_usecs = pi_mcp2515->gpio_spi_delay_usec,
 		.speed_hz = pi_mcp2515->spi_clock,
 		.bits_per_word = pi_mcp2515->gpio_spi_bits_per_word,
