@@ -84,7 +84,7 @@ main()
 
 	/* Hardcoded stuff because this is just a dev tool. Maybe improve this later, maybe not. */
 	/* This is for the Pico, so returns are always 0 */
-	mcp2515_init(&pi_mcp2515, 0, 19, 16, 18, 17, 10000000, 8);
+	PRINT_RES(mcp2515_init(&pi_mcp2515, 0, 19, 16, 18, 17, 10000000, 8));
 	mcp2515_debug_enable(pi_mcp2515, NULL);
 	printf("mcp2515_init\n");
 	PRINT_RES(mcp2515_reset(pi_mcp2515));

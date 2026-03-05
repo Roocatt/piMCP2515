@@ -56,9 +56,10 @@
  * Code Style and Cleanliness:
  *
  * This file is awful to keep other files clean. The `#ifdef`s make it hard to keep good consistent style, but generally
- * the idea is to make the best effort possible to keep to OpenBSD's style(9) guidelines through the chaos. Just use
- * approach it logically. While this nightmare beast of a file is generally doomed to be annoying, all efforts will still
- * be made to get this as clean as possible with future refactoring, and with the quality of new code.
+ * the idea is to make the best effort possible to keep to OpenBSD's style(9) guidelines through the chaos. Just
+ * approach it logically and it should be fine. While this nightmare beast of a file is generally doomed to be annoying,
+ * all efforts will still be made to get this as clean as possible with future refactoring, and with the quality of new
+ * code.
  */
 
 #ifdef USE_PICO_LIB
@@ -218,7 +219,7 @@ find_spi_dev_path(const uint8_t spi_channel, char res_buff[SPI_PATH_BUFF_LEN])
 	for (i = 0; i < sizeof(spi_dev_defaults) / sizeof(spi_dev_defaults[0]); i++) {
 		cur_path = spi_dev_defaults[i];
 		snprintf(buff, sizeof(buff), "%s%c", cur_path, spi_channel == 0 ? '0' : '1');
-		if (stat(buff, &s) != 0) {
+		if (stat(buff, &s) == 0) {
 			res = 0;
 			strncpy(res_buff, buff, SPI_PATH_BUFF_LEN);
 			goto end;
@@ -244,7 +245,7 @@ find_gpio_dev_path(void)
 
 	for (i = 0; i < sizeof(gpio_dev_defaults) / sizeof(gpio_dev_defaults[0]); i++) {
 		cur_path = gpio_dev_defaults[i];
-		if (stat(cur_path, &s) != 0) {
+		if (stat(cur_path, &s) == 0) {
 			res = cur_path;
 			goto end;
 		}
@@ -363,7 +364,7 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 		goto err;
 	}
 
-	pi_mcp2515->gpio_spi_inst = spi_inst,
+	pi_mcp2515->gpio_spi_inst = spi_inst;
 
 	spi_init(spi_inst, pi_mcp2515->spi_clock);
 	gpio_set_function(pi_mcp2515->tx_pin, GPIO_FUNC_SPI);
