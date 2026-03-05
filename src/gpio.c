@@ -152,6 +152,8 @@ spi_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t)],
 	};
 
 	res = ioctl(pi_mcp2515->gpio_spidev_fd, SPI_IOC_MESSAGE(1), &tr);
+	if (res == len)
+		res = 0;
 #elif defined(USE_SPI_BSD)
 	spi_ioctl_transfer_t tr = {
 		.sit_send = tx_buffer,
