@@ -498,28 +498,14 @@ mcp2515_gpio_spi_write_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t
 #ifdef USE_PICO_LIB
 	spi_write_blocking(pi_mcp2515->gpio_spi_inst, data, len);
 #elif defined(USE_SPI)
-	size_t chunk_len;
-	int tail_len;
-	uint8_t i;
-	char tx_buffer[sizeof(uint64_t)] = { 0 }, rx_buffer[sizeof(uint64_t)] = { 0 };
+	char rx_buffer[len];
 
-	for (i = 0; i < len; i += sizeof(uint64_t)) {
-		if (len - i > sizeof(uint64_t)) {
-			memcpy(&tx_buffer, &data[i], sizeof(uint64_t));
-			chunk_len = sizeof(uint64_t);
-		} else {
-			tail_len = len - i;
-			memcpy(&tx_buffer, &data[i], tail_len);
-			memset(&tx_buffer[tail_len], 0, sizeof(uint64_t) - tail_len);
-			chunk_len = sizeof(uint64_t) - tail_len;
-		}
+	memset(rx_buffer, 0, sizeof(rx_buffer));
 
-		if ((res = spi_duplex_com(pi_mcp2515, tx_buffer, chunk_len, rx_buffer)))
-			goto err;
-	}
+	res = spi_duplex_com(pi_mcp2515, (char *)data, len, rx_buffer);
+
 #endif
 
-err:
 	return (res);
 }
 
@@ -528,25 +514,16 @@ mcp2515_gpio_spi_read_blocking(pi_mcp2515_t *pi_mcp2515, uint8_t *data, uint8_t 
 {
 	int res = 0;
 #ifdef USE_PICO_LIB
-	/* Note: For now, repeated_tx_data is not used anywhere in the library so we just skip it. */
 	spi_read_blocking(pi_mcp2515->gpio_spi_inst, 0x00, data, len);
 #elif defined(USE_SPI)
-	uint8_t chunk_len, i;
-	char tx_buffer[sizeof(uint64_t)], rx_buffer[sizeof(uint64_t)] = { 0 };
+	char tx_buffer[len];
 
 	memset(tx_buffer, 0xff, sizeof(tx_buffer));
 
-	for (i = 0; i < len; i += sizeof(uint64_t)) {
-		chunk_len = len - i > sizeof(uint64_t) ? sizeof(uint64_t) : len - i;
+	res = spi_duplex_com(pi_mcp2515, tx_buffer, len, (char *)data);
 
-		if ((res = spi_duplex_com(pi_mcp2515, tx_buffer, chunk_len, rx_buffer)))
-			goto err;
-
-		memcpy(&data[i], &rx_buffer, chunk_len);
-	}
 #endif
 
-err:
 	return (res);
 }
 
