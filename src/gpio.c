@@ -142,14 +142,14 @@ spi_duplex_com(const pi_mcp2515_t *pi_mcp2515, char tx_buffer[sizeof(uint64_t)],
 		goto err;
 	}
 #if defined(USE_SPIDEV_LINUX)
-	struct spi_ioc_transfer tr = {
-		.tx_buf = (uint64_t)(uint64_t *)tx_buffer,
-		.rx_buf = (uint64_t)(uint64_t *)rx_buffer,
-		.len = len,
-		.delay_usecs = pi_mcp2515->gpio_spi_delay_usec,
-		.speed_hz = pi_mcp2515->spi_clock,
-		.bits_per_word = pi_mcp2515->gpio_spi_bits_per_word,
-	};
+	struct spi_ioc_transfer tr = { 0 };
+
+	tr.tx_buf = (uint64_t)(uint64_t *)tx_buffer;
+	tr.rx_buf = (uint64_t)(uint64_t *)rx_buffer;
+	tr.len = len;
+	tr.delay_usecs = pi_mcp2515->gpio_spi_delay_usec;
+	tr.speed_hz = pi_mcp2515->spi_clock;
+	tr.bits_per_word = pi_mcp2515->gpio_spi_bits_per_word;
 
 	res = ioctl(pi_mcp2515->gpio_spidev_fd, SPI_IOC_MESSAGE(1), &tr);
 	if (res == len)
