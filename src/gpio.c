@@ -363,7 +363,7 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 		break;
 	default:
 		res = -1;
-		goto err;
+		goto end;
 	}
 
 	pi_mcp2515->gpio_spi_inst = spi_inst;
