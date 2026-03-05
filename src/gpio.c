@@ -415,6 +415,7 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 	memset(&pi_mcp2515->gpio_pin_fd_map, 0 , sizeof(pi_mcp2515->gpio_pin_fd_map));
 
 	if ((res = ioctl(spidev_fd, SPI_IOC_WR_MODE, &mode)
+	    || (res = ioctl(spidev_fd, SPI_IOC_RD_MODE, &mode)
 	    || ioctl(spidev_fd, SPI_IOC_WR_BITS_PER_WORD, &bits_per_word)
 	    || ioctl(spidev_fd, SPI_IOC_RD_BITS_PER_WORD, &bits_per_word)
 	    || ioctl(spidev_fd, SPI_IOC_WR_MAX_SPEED_HZ, &pi_mcp2515->spi_clock)
