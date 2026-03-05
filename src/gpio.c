@@ -379,7 +379,7 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 #ifdef USE_SPI_BSD
 	spi_ioctl_configure_t spi_cfg = { 0 };
 #endif
-	int spidev_fd, gpio_fd;
+	int spidev_fd = 0, gpio_fd = 0;
 	char spidev_path[SPI_PATH_BUFF_LEN], *gpiodev_path;
 
 	if (pi_mcp2515->gpio_dev_spi_path == NULL) {
@@ -408,22 +408,24 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 	if (spidev_fd < 0) {
 		close(gpio_fd);
 		res = -1;
-		goto err;
+		goto end;
 	}
 
 #ifdef USE_SPIDEV_LINUX
 	memset(&pi_mcp2515->gpio_pin_fd_map, 0 , sizeof(pi_mcp2515->gpio_pin_fd_map));
 
-	if ((res = ioctl(spidev_fd, SPI_IOC_WR_MODE, &mode)
-	    || (res = ioctl(spidev_fd, SPI_IOC_RD_MODE, &mode)
-	    || ioctl(spidev_fd, SPI_IOC_WR_BITS_PER_WORD, &bits_per_word)
-	    || ioctl(spidev_fd, SPI_IOC_RD_BITS_PER_WORD, &bits_per_word)
-	    || ioctl(spidev_fd, SPI_IOC_WR_MAX_SPEED_HZ, &pi_mcp2515->spi_clock)
-	    || ioctl(spidev_fd, SPI_IOC_RD_MAX_SPEED_HZ, &pi_mcp2515->spi_clock))) {
-		close(gpio_fd);
-		close(spidev_fd);
+	if ((res = ioctl(spidev_fd, SPI_IOC_WR_MODE, &mode)))
 		goto err;
-	}
+	if ((res = ioctl(spidev_fd, SPI_IOC_RD_MODE, &mode)))
+		goto err;
+	if ((res = ioctl(spidev_fd, SPI_IOC_WR_BITS_PER_WORD, &bits_per_word)))
+		goto err;
+	if ((res = ioctl(spidev_fd, SPI_IOC_RD_BITS_PER_WORD, &bits_per_word)))
+		goto err;
+	if ((res = ioctl(spidev_fd, SPI_IOC_WR_MAX_SPEED_HZ, &pi_mcp2515->spi_clock)))
+		goto err;
+	if ((res = ioctl(spidev_fd, SPI_IOC_RD_MAX_SPEED_HZ, &pi_mcp2515->spi_clock)))
+		goto err;
 
 	pi_mcp2515->gpio_spi_bits_per_word = bits_per_word;
 	pi_mcp2515->gpio_spi_delay_usec = 0;
@@ -432,19 +434,13 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 	spi_cfg.sic_speed = pi_mcp2515->spi_clock; /* NOLINT(*-narrowing-conversions) */
 
 	if ((res = ioctl(spidev_fd, SPI_IOCTL_CONFIGURE, &spi_cfg))) {
-		close(gpio_fd);
-		close(spidev_fd);
 		goto err;
 	}
 #elif defined(USE_SPIGEN_BSD)
 	if ((res = ioctl(spidev_fd, SPIGENIOC_SET_CLOCK_SPEED))) {
-		close(gpio_fd);
-		close(spidev_fd);
 		goto err;
 	}
 	if ((res = ioctl(spidev_fd, SPIGENIOC_SET_SPI_MODE))) {
-		close(gpio_fd);
-		close(spidev_fd);
 		goto err;
 	}
 #endif
@@ -452,9 +448,16 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 	pi_mcp2515->gpio_gpio_fd = gpio_fd;
 	pi_mcp2515->gpio_spidev_fd = spidev_fd;
 	pi_mcp2515->gpio_spi_mode = mode;
-#endif
+
+	goto end;
 
 err:
+	close(gpio_fd);
+	close(spidev_fd);
+#endif
+
+
+end:
 	return (res);
 }
 
