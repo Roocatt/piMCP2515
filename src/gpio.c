@@ -416,15 +416,9 @@ mcp2515_gpio_spi_init_full_optional(pi_mcp2515_t *pi_mcp2515, uint8_t mode, uint
 
 	if ((res = ioctl(spidev_fd, SPI_IOC_WR_MODE, &mode)))
 		goto err;
-	if ((res = ioctl(spidev_fd, SPI_IOC_RD_MODE, &mode)))
-		goto err;
 	if ((res = ioctl(spidev_fd, SPI_IOC_WR_BITS_PER_WORD, &bits_per_word)))
 		goto err;
-	if ((res = ioctl(spidev_fd, SPI_IOC_RD_BITS_PER_WORD, &bits_per_word)))
-		goto err;
 	if ((res = ioctl(spidev_fd, SPI_IOC_WR_MAX_SPEED_HZ, &pi_mcp2515->spi_clock)))
-		goto err;
-	if ((res = ioctl(spidev_fd, SPI_IOC_RD_MAX_SPEED_HZ, &pi_mcp2515->spi_clock)))
 		goto err;
 
 	pi_mcp2515->gpio_spi_bits_per_word = bits_per_word;
