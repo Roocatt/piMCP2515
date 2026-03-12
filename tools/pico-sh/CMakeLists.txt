@@ -30,9 +30,10 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(${PROJECT_NAME} pimcp2515-pico-sh.c pimcp2515-pico-sh.h)
+target_compile_definitions(${PROJECT_NAME} PRIVATE USE_PICO_LIB=1)
 target_include_directories(${PROJECT_NAME} PRIVATE ../../include)
 target_link_directories(${PROJECT_NAME} PRIVATE ../../)
-target_link_libraries(${PROJECT_NAME} pico_stdlib hardware_spi piMCP2515_pico)
+target_link_libraries(${PROJECT_NAME} pico_stdlib hardware_spi hardware_uart hardware_irq piMCP2515_pico)
 pico_add_extra_outputs(${PROJECT_NAME})
 
 pico_enable_stdio_uart(${PROJECT_NAME} 1)

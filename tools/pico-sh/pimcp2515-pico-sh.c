@@ -16,19 +16,30 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "hardware/uart.h"
+#include "hardware/irq.h"
 #include "pico/stdlib.h"
 
-#include "../../include/pi_MCP2515.h"
-#include "../../include/pi_MCP2515_defs.h"
+#include <pi_MCP2515.h>
 
 #include "pimcp2515-pico-sh.h"
+
+#define UART uart0
+/* ...or alternatively use uart1
+ * #define UART uart1
+ */
+
+#define UART_IRQ UART0_IRQ
+/* ...or alternatively with uart1
+ * #define UART_IRG UART1_IRQ
+ */
 
 int
 main(void)
 {
 	pi_mcp2515_t *pi_mcp2515;
 	pi_mcp2515_can_frame_t frame;
-	int res;
+	int res, c, buff_index;
 	char command[MAX_COMMAND_LENGTH];
 
 	stdio_init_all();
@@ -59,13 +70,25 @@ main(void)
 	printf("CNF1: %02x\nCNF2: %02x\nCNF3: %02x\n\n\n", mcp2515_cnf_get(pi_mcp2515, 1),
 	    mcp2515_cnf_get(pi_mcp2515, 2), mcp2515_cnf_get(pi_mcp2515, 3));
 
+	buff_index = 0;
+
 	/* Not worried about this being the best quality code, it is just to test the library. */
 	for (;;) {
 		printf(PICO_SH_PROMPT);
-		if (fgets(command, MAX_COMMAND_LENGTH, stdin) == NULL)
-			continue; /* Since we're running on Pico, don't exit on EOF or error, just keep trying again. */
 
-		command[strcspn(command, "\n")] = '\0';
+		for (;;) {
+			c = getchar_timeout_us(0);
+			if (c != PICO_ERROR_TIMEOUT) {
+				if (c == '\r' || c == '\n') {
+					command[buff_index] = '\0';
+					buff_index = 0;
+					break;
+				}
+				if (buff_index < MAX_COMMAND_LENGTH - 1)
+					command[buff_index++] = (char)c;
+			}
+		}
+
 		if (strnlen(command, MAX_COMMAND_LENGTH) == 0) {
 			printf("\n");
 			continue;
@@ -95,7 +118,7 @@ main(void)
 				BAD_CMD_PRINT(command);
 		} else if (strncmp(command, CMD_CAN, CMD_CAN_LEN)) {
 			if (strncmp(command + CMD_CAN_LEN, CMD_CAN_RECEIVED, CMD_CAN_RECEIVED_LEN)) {
-				printf("CAN msg recieved: %s\n", mcp2515_can_message_received(pi_mcp2515) ? "true" : "false");
+				printf("CAN msg received: %s\n", mcp2515_can_message_received(pi_mcp2515) ? "true" : "false");
 			} else if (strncmp(command + CMD_CAN_LEN, CMD_CAN_SEND, CMD_CAN_SEND_LEN)) {
 				memset(&frame, 0, sizeof(frame));
 				frame.id = 0x0420;
@@ -105,7 +128,7 @@ main(void)
 			} else if (strncmp(command + CMD_CAN_LEN, CMD_CAN_READ, CMD_CAN_READ_LEN)) {
 				memset(&frame, 0, sizeof(frame));
 				PRINT_RES(mcp2515_can_message_read(pi_mcp2515, &frame));
-				printf("got frame:\n  id:  %02x\n  dlc: %02x\n", frame.id, frame.dlc);
+				printf("got frame:\n  id:  %08lx\n  dlc: %02x\n", frame.id, frame.dlc);
 			} else
 				BAD_CMD_PRINT(command);
 		} else if (strncmp(command, CMD_STATUS, CMD_STATUS_LEN)) {
@@ -118,6 +141,4 @@ main(void)
 			BAD_CMD_PRINT(command);
 		}
 	}
-
-	return (0);
 }

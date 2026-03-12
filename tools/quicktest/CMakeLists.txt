@@ -34,6 +34,7 @@ add_executable(${PROJECT_NAME} pimcp2515-quicktest.c pimcp2515-quicktest.h)
 target_include_directories(${PROJECT_NAME} PRIVATE ../../include)
 target_link_directories(${PROJECT_NAME} PRIVATE ../../)
 if (USE_PICO_LIB)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE USE_PICO_LIB=1)
     target_link_libraries(${PROJECT_NAME} pico_stdlib hardware_spi piMCP2515_pico)
     pico_add_extra_outputs(${PROJECT_NAME})
 

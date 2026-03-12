@@ -16,6 +16,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef USE_PICO_LIB
+#include <pico/stdio.h>
+#endif
+
 #include <pi_MCP2515.h>
 
 #include "pimcp2515-hello-world.h"
@@ -74,6 +78,7 @@ main()
 				printf("\n");
 			}
 		}
+		printf("\n");
 
 		mcp2515_micro_sleep(1000000);
 	}
