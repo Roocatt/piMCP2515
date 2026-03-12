@@ -78,6 +78,8 @@ else ()
     install(FILES include/pi_MCP2515.h include/pi_MCP2515_defs.h DESTINATION include)
 endif ()
 
+add_subdirectory(tools EXCLUDE_FROM_ALL)
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
